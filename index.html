@@ -1034,7 +1034,7 @@ body.mnu-on .hdr{z-index:96}
 #mnu .mn-tools a,#mnu .mn-tools button{all:unset;box-sizing:border-box;cursor:pointer;padding:11px 0;font-size:17px;color:rgba(255,255,255,.75)}
 </style>
 
-<div id="camflash" aria-hidden="true"></div><canvas id="gl" aria-hidden="true"></canvas><div id="mvill" aria-hidden="true"><i class="on"><span></span></i><i><span></span></i><i><span></span></i><i><span></span></i></div><div id="festHero" aria-hidden="true"><div class="fh"><img src="a3/hero-fest.jpg" alt="" decoding="async" fetchpriority="low"></div></div><div id="portHero" aria-hidden="true"><div class="fh"><picture><source media="(min-aspect-ratio:4/5)" srcset="a3/hero-portrait-wide.jpg"><img src="a3/hero-portrait.jpg" alt="" decoding="async"></picture></div></div><div id="sportHero" aria-hidden="true"><div class="fh"><img src="a3/hero-sport.jpg" alt="" decoding="async" fetchpriority="low"></div></div><canvas id="snap" aria-hidden="true"></canvas>
+<div id="camflash" aria-hidden="true"></div><canvas id="gl" aria-hidden="true"></canvas><div id="mvill" aria-hidden="true"><i class="on"><span></span></i><i><span></span></i><i><span></span></i><i><span></span></i></div><div id="festHero" aria-hidden="true"><div class="fh"><img data-lsrc="a3/hero-fest.jpg" alt="" decoding="async" fetchpriority="low"></div></div><div id="portHero" aria-hidden="true"><div class="fh"><picture><source media="(min-aspect-ratio:4/5)" data-lsrcset="a3/hero-portrait-wide.jpg"><img data-lsrc="a3/hero-portrait.jpg" alt="" decoding="async"></picture></div></div><div id="sportHero" aria-hidden="true"><div class="fh"><img data-lsrc="a3/hero-sport.jpg" alt="" decoding="async" fetchpriority="low"></div></div><canvas id="snap" aria-hidden="true"></canvas>
 
 <div class="load" id="load"><div class="load-in">
   <svg viewBox="0 0 100 100" fill="none" stroke="#f4f3ef" stroke-width="1.2" aria-hidden="true"><circle cx="50" cy="50" r="46"/><circle cx="50" cy="50" r="18"/><path d="M50 4 L62 34 M90 27 L67 42 M90 73 L67 58 M50 96 L38 66 M10 73 L33 58 M10 27 L33 42"/></svg>
@@ -1155,10 +1155,10 @@ body.mnu-on .hdr{z-index:96}
       <div class="ws" data-s="1">
         <h3 data-t="q1">What are we shooting?</h3>
         <div class="tcards">
-          <label><input type="radio" name="type" id="tFest" value="fest" checked><span class="tc"><img src="media/photos/2w2a1130.jpg" alt=""><b data-t="tc1">Festival / Party</b><small hidden data-t="tFest">מסיבה / פסטיבל</small></span></label>
-          <label><input type="radio" name="type" id="tSport" value="sport"><span class="tc"><img src="media/photos/2w2a7143.jpg" alt=""><b data-t="tc2">Sports</b><small hidden data-t="tSport">ספורט</small></span></label>
-          <label><input type="radio" name="type" id="tModel" value="model"><span class="tc"><img src="media/photos/2w2a0403.jpg" alt=""><b data-t="tc3">Model / Portrait</b><small hidden data-t="tModel">דוגמנות</small></span></label>
-          <label><input type="radio" name="type" id="tVideo" value="video"><span class="tc"><img src="media/photos/2w2a5519.jpg" alt=""><b data-t="tc4">Video</b><small hidden data-t="tVideo">וידאו</small></span></label>
+          <label><input type="radio" name="type" id="tFest" value="fest" checked><span class="tc"><img data-lsrc="media/photos/2w2a1130.jpg" alt=""><b data-t="tc1">Festival / Party</b><small hidden data-t="tFest">מסיבה / פסטיבל</small></span></label>
+          <label><input type="radio" name="type" id="tSport" value="sport"><span class="tc"><img data-lsrc="media/photos/2w2a7143.jpg" alt=""><b data-t="tc2">Sports</b><small hidden data-t="tSport">ספורט</small></span></label>
+          <label><input type="radio" name="type" id="tModel" value="model"><span class="tc"><img data-lsrc="media/photos/2w2a0403.jpg" alt=""><b data-t="tc3">Model / Portrait</b><small hidden data-t="tModel">דוגמנות</small></span></label>
+          <label><input type="radio" name="type" id="tVideo" value="video"><span class="tc"><img data-lsrc="media/photos/2w2a5519.jpg" alt=""><b data-t="tc4">Video</b><small hidden data-t="tVideo">וידאו</small></span></label>
         </div>
       </div>
       <div class="ws" data-s="2" hidden>
@@ -5992,7 +5992,7 @@ function stepFades(){ if(!FADES.length) return; var n=performance.now(); FADES=F
 function setReady(x){ return !x||!x.need||x.need<=0; }
 manager.onProgress=function(u,l,t){ $("pc").textContent=T[lang].loading+" "+Math.round(l/t*100)+"%"; };
 manager.onLoad=openIris;
-var opened=false; function openIris(){ if(opened) return; opened=true; setTimeout(function(){$("load").classList.add("open"); setTimeout(function(){ $("gate").classList.add("ready"); },350); },250); }
+var opened=false; function openIris(){ if(opened) return; opened=true; setTimeout(function(){$("load").classList.add("open"); setTimeout(function(){ $("gate").classList.add("ready"); setTimeout(function(){ if(typeof flushLater==="function") flushLater(); },4000); },350); },250); }
 setTimeout(openIris,9000);
 
 function canvasTex(w,h,draw){ var k=mobile?Math.min(1,1024/Math.max(w,h)):Math.min(2,2048/Math.max(w,h)); var c=document.createElement("canvas"); c.width=Math.round(w*k); c.height=Math.round(h*k); var x=c.getContext("2d"); x.scale(k,k); draw(x,w,h); var t=new THREE.CanvasTexture(c); t.encoding=THREE.sRGBEncoding; t.anisotropy=MAXA; return t; }
@@ -7390,13 +7390,13 @@ if(MD.glow<1) village.traverse(function(o){ var m=o.material; if(m&&!Array.isArr
       sh.fragmentShader="uniform float uFol,uDry,uCold;\n"+sh.fragmentShader.replace("#include <color_fragment>","#include <color_fragment>\ndiffuseColor.rgb*=mix(vec3(1.),vec3(1.35,.95,.4),clamp(uFol*.55+uDry*.25,0.,1.));"); };
     m.customProgramCacheKey=function(){ return "tree3leaf"+cy; }; }
   var WINDT={value:0}; spinners.push({wind:WINDT});
-  ["oak","baobab"].forEach(function(kind){ gl.load(A3+"tree3-"+kind+".json",function(g){
+  afterGate(function(){ ["oak","baobab"].forEach(function(kind){ gl.load(A3+"tree3-"+kind+".json",function(g){
     var proto=g.scene; proto.traverse(function(o){ if(!o.isMesh) return; var m=o.material;
       if(m.map){ m.map.anisotropy=MAXA; } if(/leaf/i.test(m.name)) leafify(m,kind==="oak"?11.5:12.5); else { m.roughness=.95; if(m.normalScale) m.normalScale.set(1.3,1.3); }
       if(VENV){ m.envMap=VENV; m.envMapIntensity=.6; } o.castShadow=!PH; o.receiveShadow=!PH; });
     SPOTS.forEach(function(q){ if(q[2]!==kind) return; var X=Math.sin(q[0])*q[1], Z=Math.cos(q[0])*q[1];
       var t=proto.clone(); t.scale.setScalar(q[3]); t.rotation.y=q[4]; t.position.set(X,hgtAt(X,Z)-.05,Z); village.add(t); });
-  }); });
+  }); }); },1500);
 })();
 /* photos, signs and lines keep their exact colours under the filmic tone mapping */
 village.traverse(function(o){ var m=o.material; (Array.isArray(m)?m:[m]).forEach(function(mm){ if(mm&&(mm.isSpriteMaterial||mm.isLineBasicMaterial||(mm.isMeshBasicMaterial&&mm.map))) mm.toneMapped=false; }); });
@@ -7429,7 +7429,7 @@ function cabinLM(){ var gl=new THREE.GLTFLoader(), G=null, AT=null, META={"LMAX"
 }
 if(MOOD==="day") setTimeout(cabinLM,2600);
 /* real scanned props (Poly Haven glTF), loaded after first paint */
-setTimeout(function(){ var gl=new THREE.GLTFLoader(), need={}; PROPS.forEach(function(q){ need[q[1].split("#")[0]]=1; }); if(PHONE()){ delete need.rock_moss_set_01; delete need.tree_stump_01; }
+afterGate(function(){ var gl=new THREE.GLTFLoader(), need={}; PROPS.forEach(function(q){ need[q[1].split("#")[0]]=1; }); if(PHONE()){ delete need.rock_moss_set_01; delete need.tree_stump_01; }
   Object.keys(need).forEach(function(n){ gl.load(A3+"m/"+n+"/"+n+".json",function(g){ var root=g.scene;
     root.traverse(function(o){ if(!o.isMesh) return; var m=o.material; m.envMap=VENV; m.envMapIntensity=.9; if(m.map) m.map.anisotropy=MAXA;
       if(/glass/i.test(m.name)||/glass|bulb/i.test(o.name)){ m.emissive=new THREE.Color(0xffb35a); m.emissiveIntensity=1.6; m.transparent=true; m.opacity=.85; }
@@ -7963,7 +7963,11 @@ $("navBack").onclick=function(){ if(entering) return; if(view==="room") goHall(h
   set(0);
   var lt=t0; (function f(){ var nw=performance.now(), dt=Math.min(.1,(nw-lt)/1000), t=(nw-t0)/1000; lt=nw; if(!gt.classList.contains("ready")){ t0=nw; t=0; } tgt=gt.classList.contains("go")?1:t<2.7?0:.74+hov*.16+Math.sin(t*.9)*.015; cur+=(tgt-cur)*(1-Math.exp(-dt*(gt.classList.contains("go")?14:2.6))); set(cur); if(!gt.classList.contains("gone")) requestAnimationFrame(f); })(); })();
 var gate=$("gate"), gateOn=true; document.documentElement.style.overflow="hidden"; document.body.classList.add("gate-on");
-function enterGate(){ if(!gateOn) return; gateOn=false; gateT=Date.now(); scrollTo(0,0); gate.classList.add("go"); document.body.classList.remove("gate-on");
+/* v144 load speed: things not needed for the first view wait until the visitor is in (or 4s of idling on the gate) */
+var LATER=LATER||[], laterGo=laterGo||false; function afterGate(fn,ms){ if(laterGo) setTimeout(fn,ms||0); else (LATER=LATER||[]).push([fn,ms||0]); }
+function flushLater(){ if(laterGo) return; laterGo=true; document.querySelectorAll("[data-lsrc]").forEach(function(im){ im.src=im.getAttribute("data-lsrc"); im.removeAttribute("data-lsrc"); });
+  document.querySelectorAll("[data-lsrcset]").forEach(function(so){ so.srcset=so.getAttribute("data-lsrcset"); so.removeAttribute("data-lsrcset"); }); LATER.forEach(function(q){ setTimeout(q[0],q[1]); }); LATER=[]; }
+function enterGate(){ if(!gateOn) return; gateOn=false; setTimeout(flushLater,900); gateT=Date.now(); scrollTo(0,0); gate.classList.add("go"); document.body.classList.remove("gate-on");
   setTimeout(function(){ gate.classList.add("gone"); document.documentElement.style.overflow=""; },reduce?0:1500); }
 gate.addEventListener("click",enterGate);
 addEventListener("wheel",function(e){ if(gateOn&&e.deltaY>0) enterGate(); },{passive:true});
