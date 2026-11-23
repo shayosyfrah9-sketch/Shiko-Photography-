@@ -5772,7 +5772,7 @@ if(typeof THREE!=="undefined"){
 /* load order: the village first; rooms, stadiums, props and photos wait until it is complete */
 var HOLDR=performance.now()+6500; var FRN=0;
 var NETQ={open:false,q:[],busy:0,core:{},go:false,t:0};
-function netOpen(){ if(NETQ.open) return; NETQ.open=true; var q=NETQ.q; NETQ.q=[]; q.forEach(function(f){ try{ f(); }catch(e){} }); try{ flushLater(); }catch(e){} }
+function netOpen(){ if(NETQ.open) return; NETQ.open=true; var q=NETQ.q; NETQ.q=[]; q.forEach(function(f){ try{ f(); }catch(e){} }); try{ flushLater(); }catch(e){} try{ if(THUMBS&&"serviceWorker" in navigator) navigator.serviceWorker.register("sw.js"); }catch(e){} }
 function netCheck(){ if(NETQ.open||!NETQ.go) return; clearTimeout(NETQ.t); if(NETQ.busy>0) return; NETQ.t=setTimeout(netOpen,600); }
 function netGo(ms){ setTimeout(function(){ NETQ.go=true; netCheck(); },ms||0); setTimeout(netOpen,(ms||0)+8000); }
 (function(){ var RX=/bloomfield|sky-stad|stands-|turf\.jpg|media\/photos\/|\/bg-|tree3-|a3\/m\/|hero-|real-|\/mus\//;
