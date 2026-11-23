@@ -6798,10 +6798,11 @@ var lawn=new THREE.Mesh(new THREE.CircleGeometry(17,64),new THREE.MeshStandardMa
 var leafMat=new THREE.MeshStandardMaterial({color:0x10261a,roughness:1,flatShading:true}), leafMat2=new THREE.MeshStandardMaterial({color:0x0c1f14,roughness:1,flatShading:true}), trunkMat=new THREE.MeshStandardMaterial({color:0x4a3527,roughness:.9});
 /* v82 realistic trees: impostors of a photoscanned fir (Poly Haven fir_tree_01), path-traced in Blender from 8 directions
    under the village sun; each tree faces the camera and blends the two nearest views */
-var IMPD=[{f:"tree-a",h:18.9},{f:"tree-b",h:14.0},{f:"tree-c",h:14.4}], IMPL=[[],[],[]];
+var OAKA=1.3416, BAOA=1.0176;
+var IMPD=[{f:"tree-a",h:18.9},{f:"tree-b",h:14.0},{f:"tree-c",h:14.4},{f:"tree-oak",a:OAKA},{f:"tree-baobab",a:BAOA}], IMPL=[[],[],[],[],[]];
 function tree(x,z,sc,y){ var k=(Math.random()*3)|0; IMPL[k].push([x,y||0,z,sc*5.46*(.9+Math.random()*.2)]); }
 function buildTrees(){ IMPD.forEach(function(d,k){ var L=IMPL[k]; if(!L.length) return;
-  var g=new THREE.PlaneGeometry(.5,1); g.translate(0,.5,0);
+  var g=new THREE.PlaneGeometry(d.a||.5,1); g.translate(0,.5,0);
   var m=new THREE.MeshBasicMaterial({color:0xffffff,alphaTest:.42,side:THREE.DoubleSide,transparent:false});
   m.onBeforeCompile=function(sh){
     sh.vertexShader="varying float vF0; varying float vFb;\n"+sh.vertexShader.replace("#include <project_vertex>",
@@ -6819,7 +6820,7 @@ function buildTrees(){ IMPD.forEach(function(d,k){ var L=IMPL[k]; if(!L.length) 
   texL.load(A3+d.f+(mobile?"-sm":"")+".webp",function(t){ t.encoding=THREE.sRGBEncoding; t.anisotropy=MAXA; m.map=t; m.needsUpdate=true; im.visible=true; });
   /* soft contact shadow under each tree */
   var sg=new THREE.PlaneGeometry(1,1); sg.rotateX(-Math.PI/2); var sm=new THREE.MeshBasicMaterial({map:glowTex,color:0x000000,transparent:true,opacity:.22,depthWrite:false});
-  var si=new THREE.InstancedMesh(sg,sm,L.length); L.forEach(function(t,i){ M4.makeScale(t[3]*.32,1,t[3]*.32); M4.setPosition(t[0],t[1]+.03,t[2]); si.setMatrixAt(i,M4); }); si.frustumCulled=false; village.add(si); }); }
+  var si=new THREE.InstancedMesh(sg,sm,L.length); L.forEach(function(t,i){ var ss=t[3]*(d.a?d.a*.55:.32); M4.makeScale(ss,1,ss); M4.setPosition(t[0],t[1]+.03,t[2]); si.setMatrixAt(i,M4); }); si.frustumCulled=false; village.add(si); }); }
 function bush(par,x,z,sc){ var b=new THREE.Mesh(new THREE.IcosahedronGeometry(.42,1),Math.random()>.5?leafMat:leafMat2); b.position.set(x,.32*sc,z); b.scale.set(sc,sc*.8,sc); par.add(b); }
 (function(){
   var skyV=canvasTex(64,1024,function(x,w,h){ var g=x.createLinearGradient(0,0,0,h); [[0,"#05060f"],[.25,"#0c1030"],[.42,"#1d1d4a"],[.49,"#3a2a5e"],[.5,"#1a2420"],[1,"#070a08"]].forEach(function(q){ g.addColorStop(q[0],q[1]); }); x.fillStyle=g; x.fillRect(0,0,w,h);
@@ -6899,6 +6900,8 @@ function bush(par,x,z,sc){ var b=new THREE.Mesh(new THREE.IcosahedronGeometry(.4
   var ff=new THREE.Points(fg,new THREE.PointsMaterial({size:.22,map:glowTex,vertexColors:true,transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false})); village.add(ff); ff.visible=MD.stars>0; spinners.push({ff:ff});
 })();
 for(var ti=0;ti<4;ti++){ var ta=ti*Math.PI/2+Math.PI/4; }
+/* v142 his reference photos: ancient oak + baobabs, Blender-built 8-view impostors (bl/nt/tree.py) */
+[[Math.PI/4+.33,15.6,4,6.9],[Math.PI*5/4+.33,15.2,4,6.4],[Math.PI*3/4-.33,15.4,3,6.2],[Math.PI*7/4-.33,15.8,3,5.6],[Math.PI*7/4-.12,18.6,3,4.6]].forEach(function(q){ var x=Math.sin(q[0])*q[1], z=Math.cos(q[0])*q[1]; IMPL[q[2]].push([x,hgtAt(x,z)-.08,z,q[3]]); });
 buildTrees();
 /* ===== v106 pillar world (his Zhangjiajie reference): the plateau is the top of a sandstone pillar; a path-traced panorama of
    forested pillars rising out of valley mist surrounds it (Blender, bl/pillars.py), waterfalls + drifting mist animate on top ===== */
