@@ -5779,7 +5779,7 @@ var ROOMS=[
     {key:"basketball", title:"Basketball", sets:[
     {id:"rishon",stad:"bb",accent:"orange",title:"מכבי ראשון",link:"https://shikophotography.pixieset.com/mkbyrashvnltsyvnbaryqb/",photos:[["2w2a7135","h"],["2w2a7143","h"],["2w2a6475","h"],["2w2a7285","h"],["2w2a7307","h"],["2w2a6990","h"],["2w2a7546","h"],["2w2a7005","h"],["2w2a7647","h"],["2w2a6498","h"],["2w2a7278","h"],["2w2a7022","v"],["2w2a7734","v"],["2w2a6462","h"],["2w2a6537","h"],["2w2a6585","h"],["2w2a6668","v"],["2w2a6810","h"],["2w2a6917","v"],["2w2a6939","v"]]},
     {id:"miluim",stad:"bb",title:"ליגת המילואימניקים",link:"",photos:[["2w2a7966","h"],["2w2a8009","h"],["2w2a8099","h"],["2w2a8176","h"],["2w2a8190","h"],["2w2a8244","h"],["2w2a8222","v"],["2w2a8445","h"],["2w2a8453","h"],["2w2a8454","h"],["2w2a8534","h"]]}]},
-    {key:"surfing", title:"Surfing", sets:[
+    {key:"surfing", title:"Surfing", direct:true, sets:[
     {id:"surf",stad:"bg",bg:"bg-surf",flow:{hz:.46},title:"Surfing",link:"",photos:[["surf0001","h"],["surf0002","h"],["surf0003","h"],["surf0004","h"],["surf0005","h"],["surf0006","h"],["surf0007","h"]]}]}]},
   {key:"model", tag:"PORTRAITS & BRANDING", sets:[
     {id:"maya",env:"forest",facade:"2w2a5858",title:"Mayu Portraits",link:"https://shikophotography.pixieset.com/mayuportraits",photos:[["2w2a5595","h"],["2w2a5597","h"],["2w2a5611","h"],["2w2a5613","h"],["2w2a5617","h"],["2w2a5634","h"],["2w2a5687","v"],["2w2a5720","h"],["2w2a5722","h"],["2w2a5738","h"],["2w2a5751","h"],["2w2a5757","h"],["2w2a5763","h"],["2w2a5765","h"],["2w2a5796","h"],["2w2a5807","h"],["2w2a5818","v"],["2w2a5858","v"],["2w2a6015","h"],["2w2a6046","h"],["2w2a6047","h"],["2w2a6058","h"],["2w2a6061","h"],["2w2a6069","v"],["2w2a6083","h"],["2w2a6128","h"],["2w2a6129","h"],["2w2a6147","h"],["2w2a6161","v"],["2w2a6193","v"],["2w2a6214","v"],["2w2a6227","v"],["2w2a6306","v"],["2w2a6336","h"],["2w2a6376","v"],["2w2a6384","h"],["2w2a6393","v"],["2w2a6398","v"],["2w2a6400","v"]]},
@@ -6798,8 +6798,7 @@ var lawn=new THREE.Mesh(new THREE.CircleGeometry(17,64),new THREE.MeshStandardMa
 var leafMat=new THREE.MeshStandardMaterial({color:0x10261a,roughness:1,flatShading:true}), leafMat2=new THREE.MeshStandardMaterial({color:0x0c1f14,roughness:1,flatShading:true}), trunkMat=new THREE.MeshStandardMaterial({color:0x4a3527,roughness:.9});
 /* v82 realistic trees: impostors of a photoscanned fir (Poly Haven fir_tree_01), path-traced in Blender from 8 directions
    under the village sun; each tree faces the camera and blends the two nearest views */
-var OAKA=1.3416, BAOA=1.0176;
-var IMPD=[{f:"tree-a",h:18.9},{f:"tree-b",h:14.0},{f:"tree-c",h:14.4},{f:"tree-oak",a:OAKA},{f:"tree-baobab",a:BAOA}], IMPL=[[],[],[],[],[]];
+var IMPD=[{f:"tree-a",h:18.9},{f:"tree-b",h:14.0},{f:"tree-c",h:14.4}], IMPL=[[],[],[]];
 function tree(x,z,sc,y){ var k=(Math.random()*3)|0; IMPL[k].push([x,y||0,z,sc*5.46*(.9+Math.random()*.2)]); }
 function buildTrees(){ IMPD.forEach(function(d,k){ var L=IMPL[k]; if(!L.length) return;
   var g=new THREE.PlaneGeometry(d.a||.5,1); g.translate(0,.5,0);
@@ -6900,8 +6899,6 @@ function bush(par,x,z,sc){ var b=new THREE.Mesh(new THREE.IcosahedronGeometry(.4
   var ff=new THREE.Points(fg,new THREE.PointsMaterial({size:.22,map:glowTex,vertexColors:true,transparent:true,opacity:.85,blending:THREE.AdditiveBlending,depthWrite:false})); village.add(ff); ff.visible=MD.stars>0; spinners.push({ff:ff});
 })();
 for(var ti=0;ti<4;ti++){ var ta=ti*Math.PI/2+Math.PI/4; }
-/* v142 his reference photos: ancient oak + baobabs, Blender-built 8-view impostors (bl/nt/tree.py) */
-[[Math.PI/4+.33,15.6,4,6.9],[Math.PI*5/4+.33,15.2,4,6.4],[Math.PI*3/4-.33,15.4,3,6.2],[Math.PI*7/4-.33,15.8,3,5.6],[Math.PI*7/4-.12,18.6,3,4.6]].forEach(function(q){ var x=Math.sin(q[0])*q[1], z=Math.cos(q[0])*q[1]; IMPL[q[2]].push([x,hgtAt(x,z)-.08,z,q[3]]); });
 buildTrees();
 /* ===== v106 pillar world (his Zhangjiajie reference): the plateau is the top of a sandstone pillar; a path-traced panorama of
    forested pillars rising out of valley mist surrounds it (Blender, bl/pillars.py), waterfalls + drifting mist animate on top ===== */
@@ -7379,6 +7376,27 @@ if(MD.glow<1) village.traverse(function(o){ var m=o.material; if(m&&!Array.isArr
     tickFlock(now); tickPlane(now); };
   window.__sky={flock:function(){ nextF=0; FLOCK&&FLOCK.b.forEach(function(o){ o.m.visible=false; }); FLOCK=null; },plane:function(){ nextP=0; PLANE=null; },get F(){ return FLOCK; },get P(){ return PLANE; }};
 })();
+/* v143 his reference photos: an ancient oak and baobabs as REAL 3D trees (bl/nt/treemesh.py: bark tubes + leaf cards),
+   lit by the village sun and casting shadows, set out to the sides of each house, clear of the stones */
+(function(){ var gl=new THREE.GLTFLoader(), PH=PHONE();
+  /* on the outer meadow, a little to each side of the diagonals (streams run on the exact diagonals, stones sit by the houses):
+     [angle from the Festivals axis, radius, kind, scale, turn] */
+  var Q=Math.PI/4, SPOTS=[[Q+.17,18.6,"oak",.38,.3],[3*Q-.17,18.2,"baobab",.36,1.1],[3*Q+.19,18.8,"oak",.34,2.4],[5*Q+.17,18.4,"oak",.37,4.0],[7*Q-.17,18.2,"baobab",.34,5.2]];
+  function leafify(m,cy){ m.alphaTest=.5; m.color.setRGB(.82,.86,.8); m.transparent=false; m.side=THREE.DoubleSide; m.roughness=.75;
+    m.onBeforeCompile=function(sh){ for(var k in SU) sh.uniforms[k]=SU[k]; sh.uniforms.uWind=WINDT;
+      sh.vertexShader=sh.vertexShader.replace("#include <beginnormal_vertex>","vec3 objectNormal=normalize(normalize(position-vec3(0.,"+cy.toFixed(1)+",0.))+vec3(0.,.35,0.));\n#ifdef USE_TANGENT\nvec3 objectTangent=vec3(tangent.xyz);\n#endif");
+      sh.vertexShader="uniform float uWind;\n"+sh.vertexShader.replace("#include <begin_vertex>","#include <begin_vertex>\nfloat wh=max(0.,position.y-3.);transformed.x+=sin(uWind*1.3+position.y*.4+position.z*.3)*.05*wh*.12;transformed.z+=cos(uWind*1.1+position.x*.35)*.04*wh*.12;");
+      sh.fragmentShader="uniform float uFol,uDry,uCold;\n"+sh.fragmentShader.replace("#include <color_fragment>","#include <color_fragment>\ndiffuseColor.rgb*=mix(vec3(1.),vec3(1.35,.95,.4),clamp(uFol*.55+uDry*.25,0.,1.));"); };
+    m.customProgramCacheKey=function(){ return "tree3leaf"+cy; }; }
+  var WINDT={value:0}; spinners.push({wind:WINDT});
+  ["oak","baobab"].forEach(function(kind){ gl.load(A3+"tree3-"+kind+".json",function(g){
+    var proto=g.scene; proto.traverse(function(o){ if(!o.isMesh) return; var m=o.material;
+      if(m.map){ m.map.anisotropy=MAXA; } if(/leaf/i.test(m.name)) leafify(m,kind==="oak"?11.5:12.5); else { m.roughness=.95; if(m.normalScale) m.normalScale.set(1.3,1.3); }
+      if(VENV){ m.envMap=VENV; m.envMapIntensity=.6; } o.castShadow=!PH; o.receiveShadow=!PH; });
+    SPOTS.forEach(function(q){ if(q[2]!==kind) return; var X=Math.sin(q[0])*q[1], Z=Math.cos(q[0])*q[1];
+      var t=proto.clone(); t.scale.setScalar(q[3]); t.rotation.y=q[4]; t.position.set(X,hgtAt(X,Z)-.05,Z); village.add(t); });
+  }); });
+})();
 /* photos, signs and lines keep their exact colours under the filmic tone mapping */
 village.traverse(function(o){ var m=o.material; (Array.isArray(m)?m:[m]).forEach(function(mm){ if(mm&&(mm.isSpriteMaterial||mm.isLineBasicMaterial||(mm.isMeshBasicMaterial&&mm.map))) mm.toneMapped=false; }); });
 /* stable keys for the cabin parts whose lighting is baked in Blender */
@@ -7628,8 +7646,8 @@ function showSel(){ var d=T[lang], r=ROOMS[selIdx()], rr=realRooms(r), n=0; rr.f
     var ev=$("hEvents"); ev.innerHTML="";
     if(!rr.length){ var sp=document.createElement("span"); sp.className="hsoon"; sp.textContent=d.soon; ev.appendChild(sp); }
     if(r.groups) r.groups.forEach(function(g){ if(!g.sets.length) return; var b=document.createElement("button"); b.type="button"; b.className="hev";
-      b.innerHTML='<img alt="" decoding="async"><span><small></small><b></b></span>'; b.querySelector("img").src=cover(g.sets[0]); b.querySelector("b").textContent=gt(g); b.querySelector("small").textContent=g.sets.length+" "+(g.sets.length===1?d.room:d.rooms);
-      b.onclick=function(){ if(!entering) enterHouse(g); }; ev.appendChild(b); });
+      b.innerHTML='<img alt="" decoding="async"><span><small></small><b></b></span>'; b.querySelector("img").src=cover(g.sets[0]); b.querySelector("b").textContent=g.direct?g.sets[0].title:gt(g); b.querySelector("small").textContent=g.direct?pcount(g.sets[0].photos.length):g.sets.length+" "+(g.sets.length===1?d.room:d.rooms);
+      b.onclick=function(){ if(entering) return; if(g.direct) goRoom(g.sets[0]); else enterHouse(g); }; ev.appendChild(b); });
     if(!r.groups) rr.forEach(function(x){ var b=document.createElement("button"); b.type="button"; b.className="hev";
       b.innerHTML='<img alt="" decoding="async"><span><small></small><b></b></span>'; b.querySelector("img").src=cover(x); if(x.cp) b.querySelector("img").style.objectPosition=x.cp; b.querySelector("b").textContent=x.title; b.querySelector("small").textContent=x.group?gt(x.group):"";
       b.onclick=function(){ if(!entering) goRoom(x); }; ev.appendChild(b); });
@@ -7673,7 +7691,7 @@ function mFull(id){ return P+id+".jpg"; }
       var sub=document.createElement("div"); sub.className="mn-sub";
       var all=document.createElement("button"); all.type="button"; all.className="mn-all"; all.textContent=L("כניסה לבית","Enter the house"); all.onclick=function(){ go(function(){ goHall(r); }); }; sub.appendChild(all);
       (r.rooms||[]).forEach(function(x){ var a=document.createElement("button"); a.type="button"; a.className="mn-r"+(x.placeholder?" soon":"");
-        var g=x.group?gt(x.group):""; a.innerHTML=(g?'<small></small>':'')+'<b></b>'; a.querySelector("b").textContent=x.title; if(g) a.querySelector("small").textContent=g;
+        var g=x.group&&!x.group.direct?gt(x.group):""; a.innerHTML=(g?'<small></small>':'')+'<b></b>'; a.querySelector("b").textContent=x.title; if(g) a.querySelector("small").textContent=g;
         a.onclick=function(){ go(function(){ goRoom(x); }); }; sub.appendChild(a); });
       b.onclick=function(){ var on=!w.classList.contains("on"); [].forEach.call(cats.children,function(c){ c.classList.remove("on"); c.querySelector(".mn-h").setAttribute("aria-expanded","false"); c.querySelector(".mn-sub").style.maxHeight="0px"; });
         if(on){ w.classList.add("on"); b.setAttribute("aria-expanded","true"); sub.style.maxHeight=sub.scrollHeight+"px"; } };
@@ -7778,7 +7796,7 @@ function render(){
     if(r.groups&&!groupSel){
       crumbs($("hCrumb"),[[d.brand,toHalls],[d.nav[r.key],null]]);
       $("hTitle").textContent=d.halls[r.key][0]; $("hText").textContent=d.halls[r.key][1];
-      r.groups.forEach(function(gr,i){ var n=gr.sets.length; g2.appendChild(card(gr.sets[0]?cover(gr.sets[0]):"","0"+(i+1),gt(gr),n?(n>1?n+d.evN:d.ev1):d.soon,function(){ groupSel=gr; render(); },"k-"+r.key+(n?"":" k-soon"))); });
+      r.groups.forEach(function(gr,i){ var n=gr.sets.length; g2.appendChild(card(gr.sets[0]?cover(gr.sets[0]):"","0"+(i+1),gr.direct&&n?gr.sets[0].title:gt(gr),gr.direct&&n?pcount(gr.sets[0].photos.length):(n?(n>1?n+d.evN:d.ev1):d.soon),function(){ if(gr.direct&&n) goRoom(gr.sets[0]); else { groupSel=gr; render(); } },"k-"+r.key+(n?"":" k-soon"))); });
       $("hallp").classList.remove("off"); return;
     }
     if(groupSel){
@@ -7792,13 +7810,13 @@ function render(){
     $("hallp").classList.remove("off");
   } else {
     var s=roomSel, h=s.hall, list=s.group?s.group.sets:h.rooms, idx=list.indexOf(s);
-    crumbs($("rCrumb"),[[d.brand,toHalls],[d.nav[h.key],function(){goHall(h);}]].concat(s.group?[[gt(s.group),function(){goHall(h,s.group);}]]:[]).concat([[s.title,null]]));
+    crumbs($("rCrumb"),[[d.brand,toHalls],[d.nav[h.key],function(){goHall(h);}]].concat(s.group&&!s.group.direct?[[gt(s.group),function(){goHall(h,s.group);}]]:[]).concat([[s.title,null]]));
     $("rTitle").textContent=s.title;
     $("rMeta").textContent=s.placeholder?d.tipSoon:"";
     $("rTip").textContent=s.placeholder?d.halls[h.key][1]:d.walk;
     if(s.link){ $("rLink").href=s.link; $("rLink").hidden=false; $("rLink").querySelector(".mtb").hidden=!/matcha\.photo/.test(s.link); } else $("rLink").hidden=true;
     $("rBack").textContent=(s.group?gt(s.group):d.nav[h.key]);
-    $("rBack").onclick=function(){goHall(h,s.group);};
+    $("rBack").onclick=function(){goHall(h,s.group&&!s.group.direct?s.group:null);};
     var prev=list[idx-1], next=list[idx+1];
     $("rPrev").hidden=!prev; $("rNext").hidden=!next;
     if(prev){ $("rPrev").textContent="‹ "+prev.title; $("rPrev").onclick=function(){goRoom(prev);}; }
@@ -7823,7 +7841,7 @@ function galBg(){ try{ if(view!=="room"||!roomSel) return; var cv=renderer.domEl
   hid.forEach(function(o){ if(o.lamp) o.lamp.visible=true; else o.grp.visible=true; }); draw(performance.now()/1000); galEl.classList.add("hasbg"); }catch(e){} }
 function galShow(now){ if(!galCan()) return; var d=T[lang], s=roomSel;
   $("gTitle").textContent=s.title; $("gMeta").textContent="";
-  var h=s.hall; crumbs($("gCrumb"),[[d.brand,toHalls],[d.nav[h.key],function(){goHall(h);}]].concat(s.group?[[gt(s.group),function(){goHall(h,s.group);}]]:[]).concat([[s.title,null]]));
+  var h=s.hall; crumbs($("gCrumb"),[[d.brand,toHalls],[d.nav[h.key],function(){goHall(h);}]].concat(s.group&&!s.group.direct?[[gt(s.group),function(){goHall(h,s.group);}]]:[]).concat([[s.title,null]]));
   if(s.link){ $("gLink").href=s.link; $("gLink").hidden=false; $("gLink").querySelector(".mtb").hidden=!/matcha\.photo/.test(s.link); } else $("gLink").hidden=true;
   var gl=s.group?s.group.sets:h.rooms, gi=gl.indexOf(s);
   [[gl[gi-1],"gPrev"],[gl[gi+1],"gNext"]].forEach(function(q){ var x=q[0], b=$(q[1]); b.hidden=!x; if(!x) return; b.querySelector("b").textContent=x.title; var c=cover(x); b.querySelector("img").src=c||""; b.querySelector("img").hidden=!c; b.onclick=function(){ goRoom(x); }; });
