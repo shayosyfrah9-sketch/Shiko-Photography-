@@ -1,0 +1,79 @@
+/* SHIKO WORLD 2.0 — interface mock-up layer (Mock-up, not a build). 390x844 phone frame. */
+:root{
+  --ink:#0b0a09; --ivory:#f3efe6; --mute:rgba(243,239,230,.78); --hair:rgba(243,239,230,.2);
+  --gold:#f3dcb0; --sun:#e9a25a; --scrim:rgba(11,10,9,.78);
+  --he:"Rubik","Heebo",system-ui,sans-serif; --en:"Jost","Rubik",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:390px;height:844px;overflow:hidden;background:var(--ink);color:var(--ivory);font-family:var(--he);font-weight:400;-webkit-font-smoothing:antialiased}
+button,a{font:inherit;color:inherit;background:none;border:0;text-decoration:none;cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:2px}
+[lang=en]{font-family:var(--en);unicode-bidi:isolate}
+bdi,.n{unicode-bidi:isolate}
+.phone{position:relative;width:390px;height:844px;overflow:hidden}
+
+/* world placeholder */
+.world{position:absolute;inset:0;background-size:cover;background-position:center}
+.world::after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(11,10,9,.72) 0,rgba(11,10,9,.2) 26%,rgba(11,10,9,0) 45%,rgba(11,10,9,.25) 66%,rgba(11,10,9,.9) 86%)}
+
+/* mock-up label (simulated status-bar strip) */
+.mock{position:absolute;top:0;left:0;right:0;height:24px;display:flex;align-items:center;justify-content:center;gap:6px;
+  font:500 10px/1 var(--en);letter-spacing:.14em;text-transform:uppercase;color:var(--ink);background:var(--gold);z-index:50;direction:ltr}
+.mock span{letter-spacing:0;text-transform:none;font-weight:400;opacity:.85}
+
+/* header: Home (start), language + sound (end) */
+.hdr{position:absolute;top:24px;left:0;right:0;height:56px;padding:0 6px;display:flex;align-items:center;justify-content:space-between;z-index:40}
+.ib{width:44px;height:44px;display:grid;place-items:center;border-radius:3px}
+.ib svg{width:24px;height:24px}
+.home{display:flex;align-items:center;gap:8px;height:44px;padding:0 10px}
+.home svg{width:24px;height:24px;flex:none}
+.home b{font:300 13px/1 var(--en);letter-spacing:.28em;text-transform:uppercase}
+.tools{display:flex;align-items:center}
+.lang{font:400 14px/1 var(--en);letter-spacing:.12em}
+
+/* dock: work / booking / whatsapp */
+.dock{position:absolute;left:0;right:0;bottom:0;height:72px;padding:0 8px 12px;display:grid;grid-template-columns:1fr 1.25fr 1fr;align-items:center;
+  background:rgba(11,10,9,.9);border-top:1px solid var(--hair);z-index:30}
+.dock>*{height:48px;display:flex;align-items:center;justify-content:center;gap:8px;font-size:16px;font-weight:400}
+.dock .bk{color:var(--gold);font-weight:500}
+.dock .bk u{text-decoration:none;border-bottom:1px solid var(--gold);padding-bottom:2px}
+.dock svg{width:20px;height:20px}
+.dock .on{border-bottom:1px solid var(--ivory)}
+
+/* hint line above dock */
+.hint{position:absolute;left:16px;right:16px;bottom:84px;text-align:center;font-size:14px;color:var(--ivory);z-index:25}
+.hint i{font-style:normal;opacity:.9}
+
+/* room list sheet (all 18) */
+.sheet{position:absolute;left:0;right:0;bottom:72px;top:96px;background:#141210;border-top:1px solid var(--hair);border-radius:3px 3px 0 0;z-index:28;padding:14px 16px 12px;display:none;overflow:hidden}
+.st-rooms .sheet{display:block}
+.st-rooms .layer,.st-rooms .hint{display:none}
+.sheet .grab{width:36px;height:3px;border-radius:2px;background:var(--hair);margin:0 auto 12px}
+.sheet header{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:6px}
+.sheet h2{font-size:20px;font-weight:500}
+.sheet h2 small{font-size:14px;font-weight:400;color:var(--mute);margin-inline-start:8px}
+.grp{margin-top:12px}
+.grp h3{font-size:13px;font-weight:400;color:var(--mute);display:flex;gap:8px;margin-bottom:6px}
+.grp h3 b{font-weight:500;color:var(--ivory)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chips button{height:40px;padding:0 12px;border:1px solid var(--hair);border-radius:3px;font-size:15px;display:flex;align-items:center;gap:7px}
+.chips button small{font:400 12px/1 var(--en);color:var(--mute)}
+.sheet footer{position:absolute;left:16px;right:16px;bottom:10px;display:flex;gap:20px;font-size:14px;color:var(--mute);border-top:1px solid var(--hair);padding-top:10px}
+.sheet footer a{border-bottom:1px solid var(--hair);min-height:28px;display:inline-flex;align-items:center;padding:0 2px}
+
+/* photo viewer */
+.viewer{position:absolute;inset:0;z-index:26;display:none}
+.st-viewer .viewer{display:block}
+.st-viewer .layer,.st-viewer .hint{display:none}
+.viewer .dim{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(14px) brightness(.35);transform:scale(1.08)}
+.vbar{position:absolute;top:80px;left:8px;right:16px;height:44px;display:flex;align-items:center;justify-content:space-between}
+.vbar h2{font-size:17px;font-weight:500}
+.vbar h2 small{font-size:14px;font-weight:400;color:var(--mute);margin-inline-start:8px}
+.mount{position:absolute;left:50%;transform:translateX(-50%);background:var(--ivory);padding:4px;box-shadow:0 2px 14px rgba(0,0,0,.08)}
+.mount img{display:block;width:100%;height:auto}
+.vctl{position:absolute;left:16px;right:16px;display:flex;align-items:center;justify-content:space-between}
+.vctl .ct{font:300 18px/1 var(--en);letter-spacing:.08em;direction:ltr}
+.vctl .ib{border:1px solid var(--hair);font-size:20px}
+.vlinks{position:absolute;left:16px;right:16px;display:flex;justify-content:space-between;align-items:center;font-size:15px}
+.vlinks a,.vlinks button{border-bottom:1px solid rgba(243,239,230,.5);padding-bottom:2px;height:32px;display:flex;align-items:flex-end}
+.vnote{position:absolute;left:16px;right:16px;text-align:center;font-size:13px;color:var(--mute)}
