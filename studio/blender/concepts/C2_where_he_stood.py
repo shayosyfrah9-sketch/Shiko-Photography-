@@ -26,7 +26,7 @@ cy.device = "CPU"; cy.samples = SPP; cy.use_adaptive_sampling = True; cy.adaptiv
 cy.use_denoising = True
 try: cy.denoiser = "OPENIMAGEDENOISE"
 except Exception: pass
-cy.max_bounces = 16; cy.diffuse_bounces = 3; cy.glossy_bounces = 4; cy.transmission_bounces = 14; cy.volume_bounces = 1
+cy.max_bounces = 16; cy.diffuse_bounces = 3; cy.glossy_bounces = 4; cy.transmission_bounces = 14; cy.volume_bounces = int(os.environ.get("VB", "2"))
 cy.transparent_max_bounces = 16
 cy.sample_clamp_indirect = 10; cy.blur_glossy = 1.0; cy.caustics_reflective = False; cy.caustics_refractive = False
 cy.volume_step_rate = float(os.environ.get("VSTEP", "4.0")); cy.volume_max_steps = 96
@@ -103,17 +103,21 @@ C = W0 - NL * 9.0                          # crest line centre (in the sea)
 D0 = 30.0                                  # surf vantage distance to the held spray (photo = ~53% of a 50 mm frame)
 LENS_V = 50.0
 S = C + NL * (LIPT * 0.6) + Vector((0, 0, WH + 2.35))   # centre of the held spray = where the surfer was (photo: 2.35 m above the crest)
-AZV = SUN_AZ + 1.0                         # sun ~1 deg right of the spray centre
+AZV = SUN_AZ + float(os.environ.get("SUNOFF", "2.7"))   # sun ~1.4 m right of the absence: hidden behind the thrown fan (rim light), not behind the hole
 fwd_h = Vector((math.cos(math.radians(AZV)), math.sin(math.radians(AZV)), 0))
 V = S - fwd_h * D0; V.z = 0.0              # where he stood
 CAMV = V + Vector((0, 0, 1.2))
-T = S - Vector((0, 0, 1.2))                # aim a little below the spray centre: sun ~2 deg above centre
+if "SUN_EL" not in os.environ:   # sun sits behind the fan tail, 0.6 m above the absence centre (~8.6 deg)
+    SUN_EL = math.degrees(math.atan2(S.z + float(os.environ.get("SUNUP", "0.6")) - CAMV.z, D0))
+    sund = Vector((math.cos(math.radians(SUN_EL)) * math.cos(math.radians(SUN_AZ)), math.cos(math.radians(SUN_EL)) * math.sin(math.radians(SUN_AZ)), math.sin(math.radians(SUN_EL))))
+print("SUN_EL", SUN_EL)
+T = S - Vector((0, 0, float(os.environ.get("AIMDROP", "0.2"))))   # round 2: tight crop on the lip + spray (procedural wave body failed twice), sun just above centre
 YAW_O = 86.0
 O = V - Vector((math.cos(math.radians(YAW_O - 4)), math.sin(math.radians(YAW_O - 4)), 0)) * 30.0 + Vector((0, 0, 14.0))  # overview cam behind his vantage
 LENS_O = 30.0
 def at_az(az, dist, z=0.0): return Vector((O.x + dist * math.cos(math.radians(az)), O.y + dist * math.sin(math.radians(az)), z))
 CANOPY = at_az(YAW_O + 21.0, 50)
-TICK = at_az(YAW_O + 8.0, 66)
+TICK = at_az(YAW_O + 13.0, 64)
 PINES = at_az(YAW_O + 31.0, 105)
 TRAIL0 = at_az(YAW_O + 17.0, 22)
 PAIRC = at_az(YAW_O + 19.0, 40)      # festival vantage: footprints facing the tapestry
@@ -121,7 +125,7 @@ print("layout V", V, "O", O, "canopy", CANOPY, "tick", TICK, "pines", PINES, "se
 
 # surf-vantage camera frame (also used to carve the surfer-shaped absence)
 cf = (T - CAMV).normalized(); cr = cf.cross(Vector((0, 0, 1))).normalized(); cu = cr.cross(cf)
-PHOTO_W, PHOTO_H = 1500 / 132.0, 1238 / 132.0       # surf0001 at subject scale (board ~1.75 m = 232 px)
+PHOTO_W, PHOTO_H = 1500 / 145.0, 1238 / 145.0       # surf0001 at subject scale (board ~1.75 m = 232 px)
 def plane_of(p):
     d = Vector(p) - CAMV; dep = d.dot(cf); return (d.dot(cr) * D0 / dep, d.dot(cu) * D0 / dep)
 SX, SY = plane_of(S)
@@ -164,8 +168,8 @@ json.dump(dict(rect=RECT, sil=SILP, frame_w=2 * D0 * 18 / LENS_V, frame_h=2 * D0
 wd = bpy.data.worlds.new("W"); sc.world = wd; wd.use_nodes = True; wn = wd.node_tree
 tc = wn.nodes.new("ShaderNodeTexCoord")
 sky = wn.nodes.new("ShaderNodeTexSky"); sky.sky_type = "MULTIPLE_SCATTERING"
-sky.sun_elevation = math.radians(SUN_EL); sky.sun_rotation = math.radians(SUN_AZ - 90)
-sky.sun_disc = True; sky.sun_size = math.radians(0.6); sky.air_density = 1.0; sky.aerosol_density = float(os.environ.get("AEROSOL", "1.6")); sky.altitude = 2
+sky.sun_elevation = math.radians(SUN_EL); sky.sun_rotation = math.radians(90 - SUN_AZ)   # verified with an equirect probe: azimuth = 90 - rotation
+sky.sun_disc = True; sky.sun_size = math.radians(0.6); sky.air_density = 1.0; sky.aerosol_density = float(os.environ.get("AEROSOL", "1.0")); sky.altitude = 2
 bg = wn.nodes["Background"]; wn.links.new(sky.outputs["Color"], bg.inputs["Color"]); bg.inputs["Strength"].default_value = float(os.environ.get("SKY", "0.3"))
 sun_d = bpy.data.lights.new("sun", "SUN"); sun_d.energy = float(os.environ.get("SUNE", "4.5")); sun_d.angle = math.radians(0.6)
 sun_d.color = (1.0, 0.8, 0.6)
@@ -175,7 +179,7 @@ sun = link(bpy.data.objects.new("sun", sun_d)); sun.rotation_euler = (-sund).to_
 def fbm(x, y, s, oc=4, seed=0.0): return noise.fractal(Vector((x / s, y / s, seed)), 1.0, 2.0, oc)
 TRAIL = []   # filled below; list of (pos, heading_deg, side, depth)
 def trail_pts():
-    pts = []; p0 = TRAIL0; p1 = PAIRC.copy(); d = (p1 - p0); L_ = d.length; d.normalize(); side = Vector((-d.y, d.x, 0))
+    pts = []; p0 = TRAIL0; p1 = V.copy(); d = (p1 - p0); L_ = d.length; d.normalize(); side = Vector((-d.y, d.x, 0))
     n = int(L_ / 0.74)
     for i in range(n):
         t = i / n; c = p0 + d * (L_ * t) + side * (0.035 * math.sin(i * 0.7))   # slight wander
@@ -188,7 +192,7 @@ def trail_pts():
     return pts
 TRAIL = trail_pts()
 def dist_to_trail(x, y):
-    p = Vector((x, y, 0)); a_, b_ = TRAIL0, PAIRC
+    p = Vector((x, y, 0)); a_, b_ = TRAIL0, V
     ab = b_ - a_; t = max(0, min(1, (p - a_).dot(ab) / ab.length_squared)); return (a_ + ab * t - p).length
 
 def height(x, y):
@@ -292,181 +296,159 @@ ra = ring.data.attributes.new("sea", "FLOAT", "POINT"); ra.data.foreach_set("val
 # far sea floor under the ring so the water reads deep teal, not the HDRI ground
 mesh_obj("seafloor_far", [(v[0], v[1], -3.0) for v in ring_v], [(0, 4, 5, 1), (1, 5, 6, 2), (2, 6, 7, 3), (3, 7, 4, 0)], SAND)
 
-# ------------------------------------------------------------------ the held wave
-prof_plunge = [(-5, -.15), (-3, .12), (-1.6, .4), (-.8, .68), (-.3, .88), (.05, .98), (.3, 1.0), (.55, .95), (.72, .82), (.74, .74),
-               (.64, .76), (.48, .83), (.33, .8), (.2, .66), (.12, .45), (.12, .25), (.2, .08), (.45, -.15)]
-prof_spill = [(-5, -.15), (-3, .12), (-1.6, .4), (-.8, .68), (-.3, .88), (.05, .98), (.25, .97), (.4, .88), (.5, .74), (.56, .6),
-              (.6, .5), (.63, .42), (.66, .33), (.7, .24), (.76, .15), (.85, .07), (.95, 0.0), (.75, -.15)]
-LIP_IDX = 9; CREST_IDX = 5
-WL = 190.0; NR = 380
-wave_v = []; wave_f = []; foam = []; lipline = []; crestline = []
+# ------------------------------------------------------------------ the held wave (round 2: real plunging lip, metres)
+import numpy as np
+rng = np.random.default_rng(3)
+# closed cross-sections (u toward land, v up). Peak: face 2.8 m, lip thrown ~1.4 m, lip ~0.3 m thick (glows), hollow below.
+PLUNGE = [(-12, -.6), (-7, .15), (-4, .7), (-2.2, 1.4), (-1.0, 2.1), (-.2, 2.6), (.4, 2.85),
+          (1.0, 2.8), (1.5, 2.55), (1.75, 2.2), (1.6, 2.12), (1.25, 2.35), (.9, 2.45), (.55, 2.3), (.3, 1.9), (.15, 1.3), (.15, .7), (.3, .25), (.7, -.05), (1.4, -.6)]
+SPILL = [(-12, -.6), (-7, .15), (-4, .7), (-2.2, 1.4), (-1.0, 2.1), (-.2, 2.6), (.4, 2.85),
+         (1.0, 2.72), (1.35, 2.4), (1.55, 2.05), (1.62, 1.85), (1.66, 1.65), (1.7, 1.45), (1.74, 1.25), (1.8, 1.0), (1.9, .72), (2.05, .45), (2.3, .18), (2.65, -.08), (3.1, -.6)]
+LIP_IDX = 9; CREST_IDX = 6
+def catmull(pts, per=4):
+    out = []; n = len(pts)
+    for i in range(n - 1):
+        p0 = np.array(pts[max(i - 1, 0)]); p1 = np.array(pts[i]); p2 = np.array(pts[i + 1]); p3 = np.array(pts[min(i + 2, n - 1)])
+        for t in np.linspace(0, 1, per, endpoint=False):
+            out.append(0.5 * ((2 * p1) + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t * t + (-p0 + 3 * p1 - 3 * p2 + p3) * t ** 3))
+    out.append(np.array(pts[-1])); return np.array(out)
+PER = 4
+PP = catmull(PLUNGE, PER); PS = catmull(SPILL, PER); NP = len(PP)
+LIPI = LIP_IDX * PER; CRI = CREST_IDX * PER
+WL = 170.0; NR = 640
+wave_v = []; wave_f = []; foam = []; lipline = []; crestline = []; wwpts = []
 for k in range(NR + 1):
     w = -WL / 2 + WL * k / NR
-    e = math.exp(-(w / 9.0) ** 2) if w < 0 else math.exp(-(w / 22.0) ** 2)    # peak, longer shoulder peeling right
-    e *= 1 + 0.06 * noise.noise(Vector((w * 0.08, 0.5, 2.0)))
-    broken = smoothstep(-5.0, -14.0, w)                     # left of the peak the wave has already broken: low whitewater
-    env = (0.72 + 0.28 * e) if w >= 0 else max(e, 0.4 * (1 - smoothstep(-22.0, -40.0, w)))   # a long wall with a peak, not a dome
-    env *= 1 - smoothstep(40.0, 75.0, w)                    # the shoulder fades into the sea, no hard ends
-    hsc = WH * env + 0.03
-    c = math.exp(-((w + 2.0) / (5.0 if w < -2 else 9.0)) ** 2) * (0.85 + 0.15 * noise.noise(Vector((w * 0.3, 1.1, 0)))) * float(os.environ.get("CURL", "0.5"))   # the lip throws hardest at one point
+    c = math.exp(-((w) / (4.5 if w < 0 else 8.0)) ** 2) * (0.9 + 0.1 * noise.noise(Vector((w * 0.3, 1.1, 0))))   # plunging at the peak
+    broken = smoothstep(-4.0, -12.0, w)                                    # left of the peak: already broken
+    env = 1.0 if abs(w) < 3 else (0.82 + 0.18 * math.exp(-(w / 14.0) ** 2) if w > 0 else 1.0 - 0.6 * broken)
+    env *= 1 - smoothstep(35.0, 80.0, abs(w))                              # ends sink into the sea: no slabs
+    env *= 1 + 0.05 * noise.noise(Vector((w * 0.06, 0.5, 2.0)))
     base = C + TS * w
-    ring_pts = []
-    for idx, (pp, ps) in enumerate(zip(prof_plunge, prof_spill)):
-        u = ps[0] + (pp[0] - ps[0]) * c; v = ps[1] + (pp[1] - ps[1]) * c
-        jitter = (0.025 if idx < 8 else 0.012) * noise.noise(Vector((w * 0.25, idx * 0.37, 5.0)))
-        P = base + NL * (u * hsc) + Vector((0, 0, v * hsc + jitter * hsc))
-        if v < 0: P.z = v * 2.0      # sink the base below the water plane
+    prof = PS + (PP - PS) * (c * (1 - broken))
+    for idx, (u, v) in enumerate(prof):
+        jit = 0.04 * noise.noise(Vector((w * 0.2, idx * 0.13, 5.0))) if v > 0 else 0
+        vv = v * env - 0.7 * (1 - env)
+        P = base + NL * (u * (0.4 + 0.6 * env)) + Vector((0, 0, vv + jit))
         wave_v.append(P.to_tuple())
-        fm = 0.0
-        if idx in (8, 9): fm = 0.45 * c
-        if v < 0.16 and idx > 13: fm = 1.0
-        if v > -0.05: fm = max(fm, broken * 1.2)
+        fm = 0.35 * c if LIPI - 2 <= idx <= LIPI + 2 else 0.0
         foam.append(fm)
-    lipline.append((Vector(wave_v[-len(prof_plunge) + LIP_IDX]), e, w))
-    crestline.append((Vector(wave_v[-len(prof_plunge) + CREST_IDX]), e, w))
-NP = len(prof_plunge)
+    lipline.append((Vector(wave_v[k * NP + LIPI]), env * (0.3 + 0.7 * c), w))
+    crestline.append((Vector(wave_v[k * NP + CRI]), env, w))
+    # whitewater seeds: the broken section and the base of the face
+    if broken > 0.05 and env > 0.15:
+        for _ in range(int(60 * broken * env)):
+            uu = rng.uniform(0.0, 3.5); P = base + NL * uu + Vector((0, 0, rng.uniform(0.0, 1.6 * env * (1 - uu / 4.5))))
+            wwpts.append(P.to_tuple())
+    if env > 0.4:
+        for _ in range(6):
+            P = base + NL * rng.uniform(0.2, 2.2) + Vector((0, 0, abs(rng.normal(0, 0.18))))
+            wwpts.append(P.to_tuple())
 for k in range(NR):
     for i in range(NP):
-        a0 = k * NP + i; a1 = k * NP + (i + 1) % NP; b0 = a0 + NP; b1 = a1 + NP
-        wave_f.append((a0, a1, b1, b0))
+        a0 = k * NP + i; a1 = k * NP + (i + 1) % NP
+        wave_f.append((a0, a1, a1 + NP, a0 + NP))
 wave_f.append(tuple(range(NP))[::-1]); wave_f.append(tuple(range(NR * NP, NR * NP + NP)))
 mwv, N, L, bwv, mo = node_mat("wave_water")
-bwv.inputs["Base Color"].default_value = (0.85, 1.0, 0.95, 1); bwv.inputs["Transmission Weight"].default_value = 1.0; bwv.inputs["IOR"].default_value = 1.333
-bwv.inputs["Roughness"].default_value = 0.05
-vab = N.new("ShaderNodeVolumeAbsorption"); vab.inputs["Color"].default_value = (0.04, 0.55, 0.42, 1); vab.inputs["Density"].default_value = float(os.environ.get("ABS", "6.0"))
-vsc = N.new("ShaderNodeVolumeScatter"); vsc.inputs["Color"].default_value = (0.35, 0.9, 0.7, 1); vsc.inputs["Density"].default_value = 0.25; vsc.inputs["Anisotropy"].default_value = 0.75
-adv = N.new("ShaderNodeAddShader"); L.new(vab.outputs[0], adv.inputs[0]); L.new(vsc.outputs[0], adv.inputs[1])
-L.new(vab.outputs[0], mo.inputs["Volume"])   # absorption only: scatter inside a closed glass body gets no direct sun (no caustics) and went olive
-# whitewater: rough, translucent, ivory (never pure white); mask from per-vertex foam + noise
+bwv.inputs["Base Color"].default_value = (1, 1, 1, 1); bwv.inputs["Transmission Weight"].default_value = 1.0; bwv.inputs["IOR"].default_value = 1.333
+bwv.inputs["Roughness"].default_value = float(os.environ.get("ROUGH", "0.035"))
+# teal water: absorption (#1f7f80-ish) + a little forward scatter so the thin lip glows green-teal in the backlight
+vab = N.new("ShaderNodeVolumeAbsorption"); vab.inputs["Color"].default_value = (0.16, 0.62, 0.6, 1); vab.inputs["Density"].default_value = float(os.environ.get("ABS", "0.7"))
+vsc = N.new("ShaderNodeVolumeScatter"); vsc.inputs["Color"].default_value = (0.3, 0.86, 0.8, 1); vsc.inputs["Density"].default_value = float(os.environ.get("WSC", "2.5")); vsc.inputs["Anisotropy"].default_value = 0.5   # surf water is turbid (bubbles, sand): milky teal, not glass
+adv = N.new("ShaderNodeAddShader"); L.new(vab.outputs[0], adv.inputs[0]); L.new(vsc.outputs[0], adv.inputs[1]); L.new(adv.outputs[0], mo.inputs["Volume"])
 fa = N.new("ShaderNodeAttribute"); fa.attribute_name = "foam"
-fn_ = N.new("ShaderNodeTexNoise"); fn_.inputs["Scale"].default_value = 1.6; fn_.inputs["Detail"].default_value = 10; fn_.inputs["Roughness"].default_value = 0.7
+fn_ = N.new("ShaderNodeTexNoise"); fn_.inputs["Scale"].default_value = 3.0; fn_.inputs["Detail"].default_value = 10; fn_.inputs["Roughness"].default_value = 0.7
 fm_ = N.new("ShaderNodeMath"); fm_.operation = "MULTIPLY"; L.new(fa.outputs["Fac"], fm_.inputs[0]); L.new(fn_.outputs["Fac"], fm_.inputs[1])
-fr = N.new("ShaderNodeMapRange"); fr.inputs["From Min"].default_value = 0.2; fr.inputs["From Max"].default_value = 0.34; L.new(fm_.outputs[0], fr.inputs["Value"])
-foamb = N.new("ShaderNodeBsdfPrincipled"); foamb.inputs["Base Color"].default_value = (0.78, 0.78, 0.74, 1); foamb.inputs["Roughness"].default_value = 0.5
-trl = N.new("ShaderNodeBsdfTranslucent"); trl.inputs["Color"].default_value = (0.75, 0.8, 0.75, 1)
-fmix = N.new("ShaderNodeMixShader"); fmix.inputs[0].default_value = 0.45; L.new(foamb.outputs[0], fmix.inputs[1]); L.new(trl.outputs[0], fmix.inputs[2])
+fr = N.new("ShaderNodeMapRange"); fr.inputs["From Min"].default_value = 0.12; fr.inputs["From Max"].default_value = 0.2; L.new(fm_.outputs[0], fr.inputs["Value"])
+foamb = N.new("ShaderNodeBsdfPrincipled"); foamb.inputs["Base Color"].default_value = (0.8, 0.8, 0.77, 1); foamb.inputs["Roughness"].default_value = 0.5
+trl = N.new("ShaderNodeBsdfTranslucent"); trl.inputs["Color"].default_value = (0.8, 0.82, 0.8, 1)
+fmix = N.new("ShaderNodeMixShader"); fmix.inputs[0].default_value = 0.5; L.new(foamb.outputs[0], fmix.inputs[1]); L.new(trl.outputs[0], fmix.inputs[2])
 smix = N.new("ShaderNodeMixShader"); L.new(fr.outputs["Result"], smix.inputs[0]); L.new(bwv.outputs[0], smix.inputs[1]); L.new(fmix.outputs[0], smix.inputs[2])
+# foam lace: residual foam streaks drawn up the face (stretched voronoi edges), ~15 % coverage
+tcl = N.new("ShaderNodeTexCoord"); mpl_ = N.new("ShaderNodeMapping"); mpl_.inputs["Scale"].default_value = (1.4, 1.4, 0.45); L.new(tcl.outputs["Object"], mpl_.inputs["Vector"])
+vor_ = N.new("ShaderNodeTexVoronoi"); vor_.feature = "DISTANCE_TO_EDGE"; vor_.inputs["Scale"].default_value = 1.3; vor_.inputs["Randomness"].default_value = 1.0; L.new(mpl_.outputs["Vector"], vor_.inputs["Vector"])
+nl_ = N.new("ShaderNodeTexNoise"); nl_.inputs["Scale"].default_value = 0.6; L.new(tcl.outputs["Object"], nl_.inputs["Vector"])
+lace = N.new("ShaderNodeMapRange"); lace.inputs["From Min"].default_value = 0.06; lace.inputs["From Max"].default_value = 0.0; L.new(vor_.outputs["Distance"], lace.inputs["Value"])
+lm = N.new("ShaderNodeMath"); lm.operation = "MULTIPLY"; L.new(lace.outputs["Result"], lm.inputs[0])
+nlr = N.new("ShaderNodeMapRange"); nlr.inputs["From Min"].default_value = 0.42; nlr.inputs["From Max"].default_value = 0.62; L.new(nl_.outputs["Fac"], nlr.inputs["Value"]); L.new(nlr.outputs["Result"], lm.inputs[1])
+gz = N.new("ShaderNodeSeparateXYZ"); gg = N.new("ShaderNodeNewGeometry"); L.new(gg.outputs["Position"], gz.inputs["Vector"])
+zm = N.new("ShaderNodeMapRange"); zm.inputs["From Min"].default_value = 0.1; zm.inputs["From Max"].default_value = 0.6; L.new(gz.outputs["Z"], zm.inputs["Value"])
+lm2 = N.new("ShaderNodeMath"); lm2.operation = "MULTIPLY"; lm2.inputs[1].default_value = float(os.environ.get("LACE", "0.5")); L.new(lm.outputs[0], lm2.inputs[0])
+lmx = N.new("ShaderNodeMath"); lmx.operation = "MAXIMUM"; L.new(lm2.outputs[0], lmx.inputs[0]); L.new(fr.outputs["Result"], lmx.inputs[1])
+L.new(lmx.outputs[0], smix.inputs[0])
 L.new(smix.outputs[0], mo.inputs["Surface"])
-if os.environ.get("DBG") == "nofoam": L.new(bwv.outputs[0], mo.inputs["Surface"])
-if os.environ.get("DBG") == "novol": N.remove(adv)
-# water-face detail: vertical streaks (water drawn up the face) + wind chop; breaks the sky reflection like real water
 tcv = N.new("ShaderNodeTexCoord")
-mpv = N.new("ShaderNodeMapping"); mpv.inputs["Scale"].default_value = (1.6, 1.6, 0.22); L.new(tcv.outputs["Object"], mpv.inputs["Vector"])
+mpv = N.new("ShaderNodeMapping"); mpv.inputs["Scale"].default_value = (2.0, 2.0, 0.35); L.new(tcv.outputs["Object"], mpv.inputs["Vector"])
 nzw = N.new("ShaderNodeTexNoise"); nzw.inputs["Scale"].default_value = 1.0; nzw.inputs["Detail"].default_value = 8; nzw.inputs["Roughness"].default_value = 0.6
 L.new(mpv.outputs["Vector"], nzw.inputs["Vector"])
-nzc = N.new("ShaderNodeTexNoise"); nzc.inputs["Scale"].default_value = 6.0; nzc.inputs["Detail"].default_value = 6; nzc.inputs["Roughness"].default_value = 0.6; L.new(tcv.outputs["Object"], nzc.inputs["Vector"])
-wbp = N.new("ShaderNodeBump"); wbp.inputs["Strength"].default_value = 0.1; wbp.inputs["Distance"].default_value = 0.12; L.new(nzw.outputs["Fac"], wbp.inputs["Height"])
-wbc = N.new("ShaderNodeBump"); wbc.inputs["Strength"].default_value = 0.2; wbc.inputs["Distance"].default_value = 0.03; L.new(nzc.outputs["Fac"], wbc.inputs["Height"]); L.new(wbc.outputs["Normal"], wbp.inputs["Normal"])
+nzc = N.new("ShaderNodeTexNoise"); nzc.inputs["Scale"].default_value = 7.0; nzc.inputs["Detail"].default_value = 6; nzc.inputs["Roughness"].default_value = 0.6; L.new(tcv.outputs["Object"], nzc.inputs["Vector"])
+wbp = N.new("ShaderNodeBump"); wbp.inputs["Strength"].default_value = 0.12; wbp.inputs["Distance"].default_value = 0.1; L.new(nzw.outputs["Fac"], wbp.inputs["Height"])
+wbc = N.new("ShaderNodeBump"); wbc.inputs["Strength"].default_value = 0.35; wbc.inputs["Distance"].default_value = 0.03; L.new(nzc.outputs["Fac"], wbc.inputs["Height"]); L.new(wbc.outputs["Normal"], wbp.inputs["Normal"])
 L.new(wbp.outputs["Normal"], bwv.inputs["Normal"])
-shadow_transparent(mwv)   # sunlight reaches through the water body (attenuated by its absorption volume): the thin lip and foam glow like real backlit water
-if os.environ.get("DBG") == "wavegrey":
-    mwv = node_mat("dbg")[0]
+shadow_transparent(mwv)   # sunlight reaches through the water body (attenuated by its volume): thin lip glows
 wave = mesh_obj("wave", wave_v, wave_f, mwv, smooth=True)
 fat = wave.data.attributes.new("foam", "FLOAT", "POINT"); fat.data.foreach_set("value", foam)
-sd = wave.modifiers.new("sub", "SUBSURF"); sd.levels = 1; sd.render_levels = 2
+sd = wave.modifiers.new("sub", "SUBSURF"); sd.levels = 0; sd.render_levels = 1
 
-for (off, hh, ln, sh) in ():   # background swells removed (read as piers from the low vantage); sea chop does the job
-    sv = []; sf = []; nr = 120; prof = [(-6, -.15), (-3, .3), (-1, .8), (0, 1.0), (1.2, .7), (2.5, .2), (3.5, -.15)]
-    for k in range(nr + 1):
-        w = -ln / 2 + ln * k / nr; hk = hh * (0.55 + 0.45 * math.cos(w / ln * math.pi) ** 2) * (1 + 0.15 * noise.noise(Vector((w * 0.03, off, 1))))
-        for (u, v) in prof:
-            P = C + TS * (w + sh) + NL * (off + u * hk * 2.2) + Vector((0, 0, v * hk if v > 0 else v))
-            sv.append(P.to_tuple())
-    for k in range(nr):
-        for i in range(len(prof) - 1):
-            a0 = k * len(prof) + i; sf.append((a0, a0 + 1, a0 + 1 + len(prof), a0 + len(prof)))
-    sw = mesh_obj("swell", sv, sf, mwv, smooth=True)
-    swa = sw.data.attributes.new("foam", "FLOAT", "POINT"); swa.data.foreach_set("value", [0.0] * len(sv))
-
-# whitewater soup spreading over the water in front of the broken section (thin foam sheet, holes from noise)
-mfo, N, L, bfo, mo = node_mat("soup")
-bfo.inputs["Base Color"].default_value = (0.76, 0.76, 0.72, 1); bfo.inputs["Roughness"].default_value = 0.55
-tcf = N.new("ShaderNodeTexCoord"); mpf = N.new("ShaderNodeMapping"); mpf.inputs["Scale"].default_value = (0.35, 1.2, 1.0); mpf.inputs["Rotation"].default_value[2] = math.atan2(TS.y, TS.x)
-L.new(tcf.outputs["Object"], mpf.inputs["Vector"])
-nf = N.new("ShaderNodeTexNoise"); nf.inputs["Scale"].default_value = 1.1; nf.inputs["Detail"].default_value = 10; nf.inputs["Roughness"].default_value = 0.7; nf.inputs["Distortion"].default_value = 0.6
-L.new(mpf.outputs["Vector"], nf.inputs["Vector"])
-fade = N.new("ShaderNodeAttribute"); fade.attribute_name = "fade"
-mul_ = N.new("ShaderNodeMath"); mul_.operation = "MULTIPLY"; L.new(nf.outputs["Fac"], mul_.inputs[0]); L.new(fade.outputs["Fac"], mul_.inputs[1])
-thr = N.new("ShaderNodeMapRange"); thr.inputs["From Min"].default_value = 0.36; thr.inputs["From Max"].default_value = 0.46; L.new(mul_.outputs[0], thr.inputs["Value"])
-trn = N.new("ShaderNodeBsdfTransparent"); mxs = N.new("ShaderNodeMixShader"); L.new(thr.outputs["Result"], mxs.inputs[0]); L.new(trn.outputs[0], mxs.inputs[1]); L.new(bfo.outputs[0], mxs.inputs[2])
-L.new(mxs.outputs[0], mo.inputs["Surface"])
-sv_ = []; sf_ = []; fd = []; nw, nu = 90, 30
-for k in range(nw + 1):
-    w = -42 + 50 * k / nw
-    for i in range(nu + 1):
-        u = 0.2 * WH + 16.0 * i / nu
-        P = C + TS * w + NL * u; sv_.append((P.x, P.y, 0.012))
-        fd.append(smoothstep(-42, -30, w) * (1 - smoothstep(-2, 8, w)) * (1 - smoothstep(4, 16, u - 0.2 * WH)) * 1.25)
-for k in range(nw):
-    for i in range(nu):
-        q = k * (nu + 1) + i; sf_.append((q, q + 1, q + nu + 2, q + nu + 1))
-so_ = mesh_obj("soup", sv_, sf_, mfo, smooth=True)
-fa_ = so_.data.attributes.new("fade", "FLOAT", "POINT"); fa_.data.foreach_set("value", fd)
-
-# ------------------------------------------------------------------ spray: real water drops (points) + fine mist (bounded volume)
+# ------------------------------------------------------------------ spray: discrete water drops + elongated drops + thin mist
 mdrop, N, L, bd, mo = node_mat("drop")
 bd.inputs["Base Color"].default_value = (1, 1, 1, 1); bd.inputs["Transmission Weight"].default_value = 1.0; bd.inputs["IOR"].default_value = 1.333; bd.inputs["Roughness"].default_value = 0.0
 shadow_transparent(mdrop)
-if os.environ.get("DBG") == "dropred":
-    em = mdrop.node_tree.nodes.new("ShaderNodeEmission"); em.inputs["Color"].default_value = (1, 0, 0, 1); em.inputs["Strength"].default_value = 50
-    mdrop.node_tree.links.new(em.outputs[0], mdrop.node_tree.nodes["Material Output"].inputs["Surface"])
-
-def lognorm(mu, sig, lo, hi): return max(lo, min(hi, mu * math.exp(random.gauss(0, sig))))
-import numpy as np
-rng = np.random.default_rng(3)
 def np_in_sil(P):
     d = P - np.array(CAMV); dep = d @ np.array(cf)
     x = (d @ np.array(cr)) * D0 / dep; y = (d @ np.array(cu)) * D0 / dep
     inside = np.zeros(len(P), bool)
     for poly in SILP:
-        c = np.zeros(len(P), bool); n = len(poly)
+        c_ = np.zeros(len(P), bool); n = len(poly)
         for i in range(n):
             x1, y1 = poly[i]; x2, y2 = poly[(i + 1) % n]
-            cond = ((y1 > y) != (y2 > y)) & (x < (x2 - x1) * (y - y1) / (y2 - y1 + 1e-12) + x1)
-            c ^= cond
-        inside |= c
-    return inside & (np.abs(dep - D0) < 14)
+            c_ ^= ((y1 > y) != (y2 > y)) & (x < (x2 - x1) * (y - y1) / (y2 - y1 + 1e-12) + x1)
+        inside |= c_
+    return inside & (np.abs(dep - D0) < 6)
 LIPA = np.array([l[0].to_tuple() for l in lipline]); CRA = np.array([c_[0].to_tuple() for c_ in crestline]); EA = np.array([l[1] for l in lipline]); WA = np.array([l[2] for l in lipline])
 NLa, TSa = np.array(NL.to_tuple()), np.array(TS.to_tuple())
-def spray_curtain(n):
-    M = n * 4
-    p = EA ** 2.4; p /= p.sum(); k = rng.choice(len(EA), M, p=p)
+def spray_curtain(n, hscale=1.0):
+    """spray torn off the lip by the offshore wind: rises and feathers back over the crest."""
+    M = n * 5
+    p = np.clip(EA, 0, None) ** 2.5; p /= p.sum(); k = rng.choice(len(EA), M, p=p)
     e = EA[k]; w = WA[k]
-    hgt = WH * e * np.minimum(1.6, rng.exponential(0.34, M))
-    # feathered plumes: the offshore wind tears the crest into fingers
-    ph1, ph2, ph3 = rng.uniform(0, 6.28, 3)
-    plume = 0.5 + 0.25 * np.sin(w * 0.85 + ph1 + hgt * 0.3) + 0.25 * np.sin(w * 2.3 + ph2 - hgt * 0.8) * np.sin(w * 0.31 + ph3)
-    keep = rng.random(M) < np.clip(plume, 0, 1) ** 1.6
-    r = rng.random(M)[:, None] * 0.8
-    base = CRA[k] + (LIPA[k] - CRA[k]) * r
-    P = base + np.outer(hgt * 0.9, [0, 0, 1]) - np.outer(hgt * 0.6 + rng.normal(0, 0.3, M), NLa) + np.outer(rng.normal(0, 0.25, M), TSa)
-    P += rng.normal(0, 0.1, (M, 3)) * (1 + hgt[:, None] * 0.15)
+    hgt = 1.8 * e * hscale * np.minimum(2.2, rng.exponential(0.45, M))
+    ph1, ph2 = rng.uniform(0, 6.28, 2)
+    plume = 0.5 + 0.3 * np.sin(w * 0.9 + ph1 + hgt * 0.5) + 0.2 * np.sin(w * 2.7 + ph2)
+    keep = rng.random(M) < np.clip(plume, 0, 1) ** 1.5
+    base = CRA[k] + (LIPA[k] - CRA[k]) * rng.random(M)[:, None]
+    P = base + np.outer(hgt, [0, 0, 1]) - np.outer(hgt * 0.45 + rng.normal(0, 0.15, M), NLa) + np.outer(rng.normal(0, 0.15, M), TSa)
+    P += rng.normal(0, 0.05, (M, 3)) * (1 + hgt[:, None] * 0.2)
     keep &= ~np_in_sil(P)
-    P = P[keep][:n]; hk = hgt[keep][:n]
-    rad = np.clip(0.0055 * np.exp(rng.normal(0, 0.65, len(P))) * (1.25 - 0.1 * np.minimum(hk, 4)), 0.001, 0.03)
-    return P, rad
+    return P[keep][:n]
 def surfer_fan(n):
-    cxp, cyp = ph2plane(0.58, 0.42)
-    M = n * 3
-    cxp, cyp = ph2plane(0.6, 0.37)          # silhouette centre
-    tail = rng.random(M) < 0.4                # 40 %: the sheet thrown off the board toward lower right
-    x = np.where(tail, cxp + 1.3 + rng.normal(0, 1.4, M), cxp + rng.normal(0, 0.95, M))
-    y = np.where(tail, cyp - 0.9 + rng.normal(0, 0.8, M), cyp + rng.normal(-0.1, 0.95, M))
-    dep_ = D0 + rng.normal(0, 1.2, M)
+    """the sheet of water the board threw: dense around the absence, sharp-edged hole where the surfer and the board were."""
+    cxp, cyp = ph2plane(0.6, 0.40)
+    M = n * 4
+    tail = rng.random(M) < 0.55
+    x = np.where(tail, cxp + 1.4 + rng.normal(0, 1.1, M), cxp + rng.normal(0, float(os.environ.get("FANSIG", "1.0")), M))
+    y = np.where(tail, cyp + 0.6 + rng.normal(0, 0.8, M), cyp + rng.normal(0.1, 0.9 * float(os.environ.get("FANSIG", "1.0")), M))   # fan thrown up and back over the sun
+    # a wedge thrown off the board's tail (photo 0.75, 0.66) up and back: angles 35-115 deg, density falling with distance
+    wedge = rng.random(M) < float(os.environ.get("WEDGE", "0.5"))
+    tx, ty = ph2plane(0.74, 0.62); ang = np.radians(rng.uniform(35, 115, M)); rr = 0.4 + rng.gamma(2.0, 0.9, M)
+    x = np.where(wedge, tx + rr * np.cos(ang) + rng.normal(0, 0.12, M), x); y = np.where(wedge, ty + rr * np.sin(ang) * 1.1 + rng.normal(0, 0.12, M), y)
+    dep_ = D0 + rng.normal(0, 0.6, M)
     P = np.array(CAMV) + np.outer(dep_, cf) + np.outer(x * dep_ / D0, cr) + np.outer(y * dep_ / D0, cu)
-    keep = (y > CREST_U - 0.6) & ~np_in_sil(P)
-    P = P[keep][:n]
-    return P, np.clip(0.007 * np.exp(rng.normal(0, 0.6, len(P))), 0.0015, 0.035)
-if os.environ.get("DBGFAN"):
-    fpp, _ = surfer_fan(2000); d_ = fpp - np.array(CAMV); dep_ = d_ @ np.array(cf)
-    xx = (d_ @ np.array(cr)) * D0 / dep_; yy = (d_ @ np.array(cu)) * D0 / dep_
-    print("FAN n", len(fpp), "x", xx.min(), xx.max(), "y", yy.min(), yy.max(), "dep", dep_.min(), dep_.max())
-    allp = [p_ for poly in SILP for p_ in poly]; print("SIL x", min(p_[0] for p_ in allp), max(p_[0] for p_ in allp), "y", min(p_[1] for p_ in allp), max(p_[1] for p_ in allp), "CREST_U", CREST_U, "RECT", RECT)
-    import sys as _s; _s.exit(0)
-sp, sr = spray_curtain(int(os.environ.get("NSPRAY", 60000 if OVER else 160000)))
-fp, fr2 = surfer_fan(int(os.environ.get("NFAN", 15000 if OVER else 40000)))
-points_obj("spray", np.vstack([sp, fp]).tolist(), np.concatenate([sr, fr2]).tolist(), mdrop)
-
+    keep = (y > CREST_U - 0.4) & ~np_in_sil(P)
+    return P[keep][:n]
+NDROP = int(os.environ.get("NDROP", "5000"))
+dp1 = spray_curtain(int(NDROP * 0.45)); dp2 = surfer_fan(int(NDROP * 0.55))
+drops = np.vstack([dp1, dp2]); drad = np.clip(np.exp(rng.normal(np.log(0.005), 0.4, len(drops))), 0.002, 0.008)
+points_obj("spray_drops", drops.tolist(), drad.tolist(), mdrop)
+# ~300 elongated drops (1:3), aligned with the spray direction (up and away from the lip)
+el_v = []; el_f = []
+bm_ = bmesh.new(); bmesh.ops.create_uvsphere(bm_, u_segments=10, v_segments=6, radius=1.0); proto_v = [v.co.copy() for v in bm_.verts]; proto_f = [[v.index for v in f.verts] for f in bm_.faces]; bm_.free()
+src = np.vstack([dp2[:200], dp1[:100]])
+for P in src:
+    r_ = rng.uniform(0.003, 0.007); dirv = Vector((0, 0, 1)) - NL * 0.6 + Vector(tuple(rng.normal(0, 0.25, 3))); dirv.normalize()
+    Mx = Matrix.Translation(Vector(tuple(P))) @ dirv.to_track_quat("Z", "Y").to_matrix().to_4x4() @ Matrix.Diagonal((r_, r_, r_ * 3, 1))
+    b0 = len(el_v); el_v += [(Mx @ v).to_tuple() for v in proto_v]; el_f += [[b0 + i for i in f] for f in proto_f]
+mesh_obj("spray_ligaments", el_v, el_f, mdrop, smooth=True)
 def points_mist(name, P, radius, voxel, dens, aniso, color):
     me = bpy.data.meshes.new(name); me.vertices.add(len(P)); me.vertices.foreach_set("co", np.asarray(P, dtype=np.float32).ravel()); me.update()
     o = link(bpy.data.objects.new(name, me))
@@ -479,8 +461,7 @@ def points_mist(name, P, radius, voxel, dens, aniso, color):
     ng.interface.new_socket("Geometry", in_out="INPUT", socket_type="NodeSocketGeometry"); ng.interface.new_socket("Geometry", in_out="OUTPUT", socket_type="NodeSocketGeometry")
     Ng = ng.nodes; Lg = ng.links; gi = Ng.new("NodeGroupInput"); go = Ng.new("NodeGroupOutput")
     mp = Ng.new("GeometryNodeMeshToPoints"); pv2 = Ng.new("GeometryNodePointsToVolume")
-    try: pv2.resolution_mode = "VOXEL_SIZE"
-    except Exception: pass
+    pv2.inputs["Resolution Mode"].default_value = "Size"   # Blender 5: a menu socket (round-1 silently used "Amount" = 64 voxels across the bbox -> blobs)
     for k_, v_ in (("Voxel Size", voxel), ("Radius", radius), ("Density", 1.0)):
         if k_ in pv2.inputs: pv2.inputs[k_].default_value = v_
     sm = Ng.new("GeometryNodeSetMaterial"); sm.inputs["Material"].default_value = m
@@ -508,14 +489,18 @@ def mist_volume(name, centre, size, rot_z, dens, aniso, color, gen_falloff=True,
     o.scale = size; o.rotation_euler = (0, 0, rot_z); o.data.materials.append(m); o.visible_shadow = False
     return o
 
-# mist over the crest (fine spray too small to model as spheres): box along the wave, base at the crest
-mz = math.atan2(TS.y, TS.x)
+# thin mist (the sub-millimetre part of the spray), carved by the same absence; kept light so the drops carry the image
 if os.environ.get("NOMIST") != "1":
-    mp_, _ = spray_curtain(int(os.environ.get("NMIST", 120000)))
-    mf_, _ = surfer_fan(int(os.environ.get("NMISTF", 60000)))
-    points_mist("spray_mist", mp_, 0.22, 0.07, float(os.environ.get("MISTD", "0.35")), 0.85, (0.97, 0.98, 1.0))
-    points_mist("fan_mist", mf_, 0.07, 0.03, float(os.environ.get("MISTF", "1.2")), 0.8, (0.97, 0.98, 1.0))   # the board's spray, dense around the absence
-if False: mist_volume("crest_mist", C - NL * 1.5 + Vector((0, 0, WH * 0.75 + WH * 0.8)), (WL * 0.75, WH * 1.3, WH * 1.6), mz, 0.15, 0.82, (0.95, 0.97, 1.0), noise_scale=4.0)
+    mp_ = np.vstack([spray_curtain(int(os.environ.get("NMIST", 30000))), surfer_fan(int(os.environ.get("NMISTF", 45000)))])
+    if os.environ.get("DBGEXIT"):
+        fan_ = surfer_fan(2000); cur_ = spray_curtain(2000)
+        def pr(P): d = P - np.array(CAMV); dep = d @ np.array(cf); return np.c_[(d @ np.array(cr)) * D0 / dep, (d @ np.array(cu)) * D0 / dep, dep]
+        print("FAN n", len(fan_), np.percentile(pr(fan_), [5, 50, 95], axis=0)); print("CUR n", len(cur_), np.percentile(pr(cur_), [5, 50, 95], axis=0)); print("ph2plane", ph2plane(0.6, 0.4), "CREST_U", CREST_U); sys.exit()
+    points_mist("spray_mist", mp_, float(os.environ.get("MISTR", "0.09")), float(os.environ.get("MISTV", "0.03")), float(os.environ.get("MISTD", "1.2")), float(os.environ.get("MISTA", "0.85")), (0.97, 0.98, 1.0))
+# whitewater: dense churned foam where the wave has broken and at the foot of the face
+if wwpts:
+    points_mist("whitewater", np.array(wwpts), 0.32, float(os.environ.get("WWV", "0.06")), float(os.environ.get("WWD", "6.0")), float(os.environ.get("WWA", "0.3")), (0.92, 0.94, 0.95))
+mz = math.atan2(TS.y, TS.x)
 
 # ------------------------------------------------------------------ festival: stretched tapestry + confetti + water spray beneath
 def tapestry_mat():
@@ -577,6 +562,7 @@ def cyl(p0, p1, r, mat, verts=12):
     bv = o.modifiers.new("bv", "BEVEL"); bv.width = min(0.01, r * 0.3); bv.segments = 2
     return o
 
+def lognorm(mu, sig, lo, hi): return max(lo, min(hi, mu * math.exp(random.gauss(0, sig))))
 def build_canopy():
     cx_ = CANOPY
     # a 9 x 6 m tapestry stretched between 4 poles, tilted ~50 deg so its top faces the sun: the camera sees it backlit
@@ -640,90 +626,79 @@ def build_canopy():
 # ------------------------------------------------------------------ sport: ticker tape in floodlight beams over turf, ball held mid-air
 def build_ticker():
     c_ = TICK
-    rz = math.atan2(TS.y, TS.x)
-    # turf patch on a thin base, white touchline
+    rz = math.radians(YAW_O)          # the pitch faces the overview camera side-on
+    # turf: 18 x 12 m slab of real-looking grass colour (mowing stripes, blade-scale bump), chalk lines
     m, N, L, b, mo = node_mat("turf")
-    tc_ = N.new("ShaderNodeTexCoord"); wv_ = N.new("ShaderNodeTexWave"); wv_.wave_type = "BANDS"; wv_.inputs["Scale"].default_value = 3.0; wv_.inputs["Distortion"].default_value = 0.4
+    tc_ = N.new("ShaderNodeTexCoord"); wv_ = N.new("ShaderNodeTexWave"); wv_.wave_type = "BANDS"; wv_.inputs["Scale"].default_value = 3.0; wv_.inputs["Distortion"].default_value = 0.0
     L.new(tc_.outputs["Generated"], wv_.inputs["Vector"])
-    nz = N.new("ShaderNodeTexNoise"); nz.inputs["Scale"].default_value = 60; L.new(tc_.outputs["Object"], nz.inputs["Vector"])
-    r_ = N.new("ShaderNodeMapRange"); r_.inputs["To Min"].default_value = 0.75; r_.inputs["To Max"].default_value = 1.0; L.new(wv_.outputs["Fac"], r_.inputs["Value"])
-    mul = N.new("ShaderNodeMixRGB"); mul.blend_type = "MULTIPLY"; mul.inputs[0].default_value = 1.0; mul.inputs[1].default_value = (0.06, 0.16, 0.03, 1)
-    cmb = N.new("ShaderNodeCombineXYZ"); L.new(r_.outputs["Result"], cmb.inputs[0]); L.new(r_.outputs["Result"], cmb.inputs[1]); L.new(r_.outputs["Result"], cmb.inputs[2]); L.new(cmb.outputs[0], mul.inputs[2])
-    L.new(mul.outputs[0], b.inputs["Base Color"]); b.inputs["Roughness"].default_value = 0.8; b.inputs["Sheen Weight"].default_value = 0.6
-    bpn = N.new("ShaderNodeBump"); bpn.inputs["Strength"].default_value = 0.6; L.new(nz.outputs["Fac"], bpn.inputs["Height"]); L.new(bpn.outputs["Normal"], b.inputs["Normal"])
-    bpy.ops.mesh.primitive_cube_add(size=1, location=(c_.x, c_.y, 0.03)); o = bpy.context.object; o.scale = (20, 13, 0.06); o.rotation_euler = (0, 0, rz)
-    o.data.materials.append(m); bv = o.modifiers.new("bv", "BEVEL"); bv.width = 0.02
+    st_ = N.new("ShaderNodeMapRange"); st_.inputs["To Min"].default_value = 0.75; st_.inputs["To Max"].default_value = 1.05; L.new(wv_.outputs["Fac"], st_.inputs["Value"])
+    nz = N.new("ShaderNodeTexNoise"); nz.inputs["Scale"].default_value = 140; nz.inputs["Detail"].default_value = 4; L.new(tc_.outputs["Object"], nz.inputs["Vector"])
+    nzc = N.new("ShaderNodeTexNoise"); nzc.inputs["Scale"].default_value = 0.6; L.new(tc_.outputs["Object"], nzc.inputs["Vector"])
+    ramp = N.new("ShaderNodeValToRGB"); ramp.color_ramp.elements[0].color = (0.035, 0.12, 0.02, 1); ramp.color_ramp.elements[1].color = (0.11, 0.26, 0.05, 1); L.new(nzc.outputs["Fac"], ramp.inputs["Fac"])
+    mul = N.new("ShaderNodeMixRGB"); mul.blend_type = "MULTIPLY"; mul.inputs[0].default_value = 1.0; L.new(ramp.outputs["Color"], mul.inputs[1])
+    cmb = N.new("ShaderNodeCombineXYZ")
+    for i in range(3): L.new(st_.outputs["Result"], cmb.inputs[i])
+    L.new(cmb.outputs[0], mul.inputs[2]); L.new(mul.outputs[0], b.inputs["Base Color"]); b.inputs["Roughness"].default_value = 0.85; b.inputs["Sheen Weight"].default_value = 0.15; b.inputs["Sheen Tint"].default_value = (0.35, 0.6, 0.2, 1)   # round 2: white grazing sheen made the turf read beige
+    bpn = N.new("ShaderNodeBump"); bpn.inputs["Strength"].default_value = 0.8; bpn.inputs["Distance"].default_value = 0.01; L.new(nz.outputs["Fac"], bpn.inputs["Height"]); L.new(bpn.outputs["Normal"], b.inputs["Normal"])
+    bpy.ops.mesh.primitive_cube_add(size=1, location=(c_.x, c_.y, 0.035)); o = bpy.context.object; o.scale = (18, 12, 0.07); o.rotation_euler = (0, 0, rz)
+    o.data.materials.append(m); bv = o.modifiers.new("bv", "BEVEL"); bv.width = 0.03; bv.segments = 2
     lineM = node_mat("chalk")[0]; lineM.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (0.75, 0.75, 0.72, 1)
-    for off in (-6.2, 6.2):
-        bpy.ops.mesh.primitive_cube_add(size=1, location=(c_ + Vector((math.cos(rz + math.pi / 2), math.sin(rz + math.pi / 2), 0)) * off + Vector((0, 0, 0.062))))
-        l_ = bpy.context.object; l_.scale = (19.6, 0.12, 0.002); l_.rotation_euler = (0, 0, rz); l_.data.materials.append(lineM)
-    # two floodlight masts (galvanised steel) with Poly Haven flood_lights heads; real spot lights 5600 K-ish
+    perp = Vector((math.cos(rz + math.pi / 2), math.sin(rz + math.pi / 2), 0)); along = Vector((math.cos(rz), math.sin(rz), 0))
+    for off in (-5.6, 5.6):
+        bpy.ops.mesh.primitive_cube_add(size=1, location=(c_ + perp * off + Vector((0, 0, 0.071))))
+        l_ = bpy.context.object; l_.scale = (17.4, 0.12, 0.002); l_.rotation_euler = (0, 0, rz); l_.data.materials.append(lineM)
+    # two floodlight masts with lamp heads bolted onto a crossbar (no gaps), each head a real spot light
     steel = metal_mat("galv", (0.55, 0.56, 0.57), 0.45)
-    head = None
-    try:
-        bpy.ops.import_scene.gltf(filepath=PH + "flood_lights/flood_lights_1k.gltf")
-        imp = list(bpy.context.selected_objects)
-        meshes = [o_ for o_ in imp if o_.type == "MESH"]
-        for o_ in meshes:
-            mw_ = o_.matrix_world.copy(); o_.parent = None; o_.matrix_world = mw_
-        for o_ in imp:
-            if o_.type != "MESH": bpy.data.objects.remove(o_, do_unlink=True)
-        bpy.ops.object.select_all(action="DESELECT")
-        for o_ in meshes: o_.select_set(True)
-        bpy.context.view_layer.objects.active = meshes[0]; bpy.ops.object.join(); head = bpy.context.view_layer.objects.active
-    except Exception as ex:
-        print("flood_lights import failed", ex)
-    masts = []
+    housing = metal_mat("housing", (0.12, 0.12, 0.12), 0.5)
+    lensm, N, L, b, mo = node_mat("lamp_lens"); b.inputs["Base Color"].default_value = (0.9, 0.92, 0.95, 1); b.inputs["Emission Color"].default_value = (0.86, 0.92, 1.0, 1); b.inputs["Emission Strength"].default_value = 25.0
+    tops = []
     for side in (-1, 1):
-        pv_ = Vector((math.cos(math.radians(YAW_O - 90)), math.sin(math.radians(YAW_O - 90)), 0)); fv_ = Vector((math.cos(math.radians(YAW_O)), math.sin(math.radians(YAW_O)), 0))
-        base = c_ + pv_ * (side * 13.0) + fv_ * 7.0
-        top = base + Vector((0, 0, 19.0))
-        cyl(Vector((base.x, base.y, -0.5)), top, 0.22, steel, 16)
-        cyl(top + Vector((-1.4, 0, 0)), top + Vector((1.4, 0, 0)), 0.06, steel)
-        masts.append(top)
-    if head:
-        for i, top in enumerate(masts):
-            inst = head if i == 0 else head.copy()
-            if i: link(inst)
-            d = (c_ + Vector((0, 0, 5)) - top)
-            inst.location = top + Vector((0, 0, 0.05)); inst.scale = (1.4, 1.4, 1.4); inst.rotation_euler = (0, 0, math.atan2(d.y, d.x) - math.pi / 2)
-    for top in masts:
-        sl = bpy.data.lights.new("flood", "SPOT"); sl.energy = 50000; sl.spot_size = math.radians(34); sl.spot_blend = 0.35
-        sl.color = (0.86, 0.92, 1.0); sl.shadow_soft_size = 0.4
-        so = link(bpy.data.objects.new("flood", sl)); so.location = top + Vector((0, 0, 0.8)); look_at(so, c_ + Vector((0, 0, 4.5)))
-    # beam haze (stadium-like air around the lights), bounded box
+        base = c_ + perp * (side * 10.0) - along * 4.0
+        top = base + Vector((0, 0, 16.0))
+        cyl(Vector((base.x, base.y, -0.5)), top, 0.2, steel, 16)
+        aim = (c_ + Vector((0, 0, 4.0)) - top).normalized()
+        bar_dir = aim.cross(Vector((0, 0, 1))).normalized()
+        cyl(top - bar_dir * 1.3, top + bar_dir * 1.3, 0.06, steel)
+        for j in (-0.9, -0.3, 0.3, 0.9):
+            hc = top + bar_dir * j + aim * 0.18
+            bpy.ops.mesh.primitive_cube_add(size=1, location=hc); h_ = bpy.context.object; h_.scale = (0.5, 0.5, 0.28)
+            h_.rotation_euler = aim.to_track_quat("Z", "Y").to_euler(); h_.data.materials.append(housing)
+            bv = h_.modifiers.new("bv", "BEVEL"); bv.width = 0.02
+            bpy.ops.mesh.primitive_plane_add(size=0.44, location=hc + aim * 0.145); l_ = bpy.context.object
+            l_.rotation_euler = aim.to_track_quat("Z", "Y").to_euler(); l_.data.materials.append(lensm)
+        sl = bpy.data.lights.new("flood", "SPOT"); sl.energy = float(os.environ.get("FLOODE", "40000")); sl.spot_size = math.radians(26); sl.spot_blend = 0.3
+        sl.color = (0.86, 0.92, 1.0); sl.shadow_soft_size = 0.5
+        so = link(bpy.data.objects.new("flood", sl)); so.location = top + aim * 0.5; look_at(so, c_ + Vector((0, 0, 4.0)))
+        tops.append(top)
+    # beam haze: thin air volume around the pitch, so the two cones are visible and cross inside the cloud
     m, N, L, b, mo = node_mat("beam_haze"); N.remove(b)
-    sv = N.new("ShaderNodeVolumeScatter"); sv.inputs["Anisotropy"].default_value = 0.55
-    tcb = N.new("ShaderNodeTexCoord"); vs_ = N.new("ShaderNodeVectorMath"); vs_.operation = "SUBTRACT"; vs_.inputs[1].default_value = (0.5, 0.5, 0.5)
-    L.new(tcb.outputs["Generated"], vs_.inputs[0]); vl = N.new("ShaderNodeVectorMath"); vl.operation = "LENGTH"; L.new(vs_.outputs[0], vl.inputs[0])
-    fo = N.new("ShaderNodeMapRange"); fo.inputs["From Min"].default_value = 0.5; fo.inputs["From Max"].default_value = 0.15; fo.inputs["To Max"].default_value = 0.012
-    L.new(vl.outputs["Value"], fo.inputs["Value"]); L.new(fo.outputs["Result"], sv.inputs["Density"])
+    sv = N.new("ShaderNodeVolumeScatter"); sv.inputs["Anisotropy"].default_value = 0.5; sv.inputs["Density"].default_value = float(os.environ.get("BEAMD", "0.008"))
     L.new(sv.outputs[0], mo.inputs["Volume"])
-    bpy.ops.mesh.primitive_cube_add(size=1, location=(c_.x, c_.y, 11)); o = bpy.context.object; o.scale = (44, 44, 24); o.rotation_euler = (0, 0, rz)
+    bpy.ops.mesh.primitive_uv_sphere_add(radius=1, location=(c_.x, c_.y, 6)); o = bpy.context.object; o.scale = (17, 17, 11)
     o.data.materials.append(m); o.visible_shadow = False
-    # ticker tape: 1.8 cm paper strips, 40-110 cm, curled and twisted; Maccabi yellow (albedo capped at 0.8)
-    yel = paper_mat("ticker_paper", attr=False, col=(0.78, 0.52, 0.0))
+    # ticker tape: 2000 paper strips 3 x 25 cm, bent 10-30 deg, Maccabi yellow, translucent
+    yel = paper_mat("ticker_paper", attr=False, col=(0.95, 0.72, 0.0))
     tv = []; tf = []
-    for k in range(14000 if OVER else 600):
-        Pc = c_ + Vector((random.gauss(0, 4.2), random.gauss(0, 3.4), 1.0 + abs(random.gauss(4.0, 2.3))))
-        Lg = random.uniform(0.4, 1.1); nseg = 12
+    for k in range(int(os.environ.get("NTICK", "2000"))):
+        Pc = c_ + Vector((random.gauss(0, 3.0), random.gauss(0, 2.4), 1.2 + abs(random.gauss(3.2, 1.7))))
+        Lg = random.uniform(0.22, 0.28); nseg = 6
         ax = Vector((random.gauss(0, 1), random.gauss(0, 1), random.gauss(0, 1))).normalized()
         bx = ax.cross(Vector((0.3, 0.2, 1))).normalized(); cx2 = ax.cross(bx)
-        kk = random.uniform(2, 9); tw = random.uniform(-3, 3); amp = random.uniform(0.03, 0.15)
+        bend = math.radians(random.uniform(10, 30)); tw = random.uniform(-0.6, 0.6)
         b0 = len(tv)
-        for s in range(nseg + 1):
-            t = s / nseg; arc = (t - 0.5) * Lg
-            p = Pc + ax * arc + bx * (amp * math.sin(kk * arc)) + cx2 * (amp * (1 - math.cos(kk * arc)))
-            wdir = (bx * math.cos(tw * t) + cx2 * math.sin(tw * t)) * 0.02
+        for s_ in range(nseg + 1):
+            t = s_ / nseg - 0.5; ang = bend * t
+            p = Pc + ax * (Lg * math.sin(ang) / max(bend, 1e-3)) + cx2 * (Lg * (1 - math.cos(ang)) / max(bend, 1e-3))
+            wdir = (bx * math.cos(tw * t) + cx2 * math.sin(tw * t)) * 0.015
             tv.append((p - wdir).to_tuple()); tv.append((p + wdir).to_tuple())
-        for s in range(nseg):
-            q = b0 + 2 * s; tf.append((q, q + 1, q + 3, q + 2))
+        for s_ in range(nseg):
+            q = b0 + 2 * s_; tf.append((q, q + 1, q + 3, q + 2))
     mesh_obj("ticker_tape", tv, tf, yel, smooth=True)
     try:
         bpy.ops.import_scene.gltf(filepath=PH + "football/football_1k.gltf")
-        for o_ in bpy.context.selected_objects:
+        for o_ in list(bpy.context.selected_objects):
             if "deflated" in o_.name: bpy.data.objects.remove(o_, do_unlink=True)
-            else: o_.location = c_ + Vector((1.2, -0.5, 4.2)); o_.rotation_euler = (0.4, 0.2, 1.1)
+            else: o_.location = c_ + Vector((0.8, -0.4, 4.0)); o_.rotation_euler = (0.4, 0.2, 1.1); o_.scale = (1, 1, 1)
     except Exception as ex:
         print("football import failed", ex)
 
@@ -757,11 +732,13 @@ def build_pines():
     mist_volume("grove_dust", PINES + Vector((-4, -2, 3.5)), (40, 22, 7), math.radians(20), 0.035, 0.7, (0.95, 0.82, 0.62), noise_scale=2.5)
     # linen sheet lifted by the wind, held in the air
     nU, nV = 30, 20; verts = []; faces = []; uvs = []
-    base = PINES + Vector((6, -16, 0)); base.z = height(base.x, base.y) + 1.6
-    Mx = Matrix.Translation(base) @ Matrix.Rotation(math.radians(SUN_AZ + 200), 4, "Z") @ Matrix.Rotation(math.radians(70), 4, "X")
+    tocam = (Vector((O.x, O.y, 0)) - PINES); tocam.z = 0; tocam.normalize()
+    base = PINES + tocam * 16; base.z = height(base.x, base.y) + 2.2
+    caz = math.degrees(math.atan2(tocam.y, tocam.x))
+    Mx = Matrix.Translation(base) @ Matrix.Rotation(math.radians(caz - 270), 4, "Z") @ Matrix.Rotation(math.radians(55), 4, "X")   # lifted ~35 deg off vertical, facing the camera, sun behind
     for j in range(nV + 1):
         for i in range(nU + 1):
-            u = i / nU; v = j / nV; x = (u - .5) * 3.0; y = (v - .5) * 2.0
+            u = i / nU; v = j / nV; x = (u - .5) * 2.5; y = (v - .5) * 1.8
             z = 0.45 * math.sin(math.pi * u * 1.3 + v) * v + 0.25 * math.sin(3 * v + 2 * u) * v
             verts.append((Mx @ Vector((x, y, z))).to_tuple()); uvs.append((u, v))
     for j in range(nV):
@@ -806,7 +783,7 @@ mesh_obj("footprints", fv, ff, SAND, smooth=True)
 
 # ------------------------------------------------------------------ aerial haze (bounded box; a world volume would black out the sky)
 hz, N, L, b, mo = node_mat("haze"); N.remove(b)
-vol = N.new("ShaderNodeVolumePrincipled"); vol.inputs["Density"].default_value = float(os.environ.get("HAZE", "0.0004"))
+vol = N.new("ShaderNodeVolumePrincipled"); vol.inputs["Density"].default_value = float(os.environ.get("HAZE", "0.00015"))
 vol.inputs["Color"].default_value = (0.98, 0.86, 0.74, 1); vol.inputs["Anisotropy"].default_value = 0.7
 L.new(vol.outputs["Volume"], mo.inputs["Volume"])
 bpy.ops.mesh.primitive_cube_add(size=1, location=(O.x, O.y + 300, 30)); hb = bpy.context.object; hb.name = "haze"; hb.scale = (1000, 1000, 62)
@@ -815,18 +792,82 @@ hb.data.materials.append(hz); hb.visible_shadow = False
 if OVER:
     build_canopy(); build_ticker(); build_pines()
 
+# ------------------------------------------------------------------ one real photograph on Home: surf0001 held as a print where he stood
+def held_print(path, centre, width, face_to, tilt_deg=4):
+    im_ = bpy.data.images.load(path, check_existing=True); iw, ih = im_.size; hgt = width * ih / iw     # true aspect, never cropped
+    m, N, L, b, mo = node_mat("print_" + os.path.basename(path))
+    t_ = N.new("ShaderNodeTexImage"); t_.image = im_; t_.extension = "CLIP"
+    L.new(t_.outputs["Color"], b.inputs["Base Color"]); b.inputs["Roughness"].default_value = 0.45
+    tr = N.new("ShaderNodeBsdfTranslucent"); L.new(t_.outputs["Color"], tr.inputs["Color"])
+    mx = N.new("ShaderNodeMixShader"); mx.inputs[0].default_value = 0.35; L.new(b.outputs[0], mx.inputs[1]); L.new(tr.outputs[0], mx.inputs[2]); L.new(mx.outputs[0], mo.inputs["Surface"])
+    d = (Vector(face_to) - Vector(centre)); d.z = 0; d.normalize()
+    rot = Matrix.Rotation(math.atan2(d.y, d.x) - math.pi / 2, 4, "Z") @ Matrix.Rotation(math.radians(90 - tilt_deg), 4, "X")
+    hw, hh = width / 2, hgt / 2
+    o = mesh_obj("print", [(-hw, -hh, 0), (hw, -hh, 0), (hw, hh, 0), (-hw, hh, 0)], [(0, 1, 2, 3)], m)
+    uv = o.data.uv_layers.new(name="UV")
+    for li, (uu, vv) in zip(range(4), ((0, 0), (1, 0), (1, 1), (0, 1))): uv.data[li].uv = (uu, vv)
+    o.matrix_world = Matrix.Translation(Vector(centre)) @ rot
+    # thin ivory mount behind it (4 cm border, 6 mm board)
+    ivory = node_mat("ivory")[0]; ivory.node_tree.nodes["Principled BSDF"].inputs["Base Color"].default_value = (0.8, 0.77, 0.7, 1); ivory.node_tree.nodes["Principled BSDF"].inputs["Roughness"].default_value = 0.6
+    bpy.ops.mesh.primitive_cube_add(size=1); mb = bpy.context.object; mb.scale = (width + 0.08, hgt + 0.08, 0.006)
+    mb.matrix_world = Matrix.Translation(Vector(centre)) @ rot @ Matrix.Translation((0, 0, -0.005)) @ Matrix.Diagonal((width + 0.08, hgt + 0.08, 0.006, 1)); mb.data.materials.append(ivory)
+    return o
+if OVER and os.environ.get("NOPRINT") != "1":
+    held_print("/home/user/shiko-world2/media/photos/surf0001.jpg", V + Vector((0, 0, 1.55)), float(os.environ.get("PRINTW", "2.2")), O)
+
+# ------------------------------------------------------------------ foreground held confetti (8-15 m from the overview lens, defocused): scale + "time stopped"
+if OVER and os.environ.get("NOFG") != "1":
+    fgdir_az = YAW_O + float(os.environ.get("FGAZ", "17"))
+    cols = [(0.78, 0.46, 0.04), (0.62, 0.05, 0.3), (0.05, 0.42, 0.42), (0.78, 0.74, 0.62), (0.8, 0.6, 0.0)]
+    cv = []; cfc = []; ccol = []
+    for k in range(int(os.environ.get("NFG", "260"))):
+        dist = random.uniform(8, 15); az = fgdir_az + random.gauss(0, 5.5)
+        P = O + Vector((dist * math.cos(math.radians(az)), dist * math.sin(math.radians(az)), -dist * math.tan(math.radians(14)) + random.gauss(0, 1.0)))
+        q = Vector((random.random() - .5, random.random() - .5, random.random() - .5)).normalized(); rot = Matrix.Rotation(random.uniform(0, 6.28), 3, q)
+        b0 = len(cv)
+        for (x, y) in ((-0.0175, -0.0125), (0.0175, -0.0125), (0.0175, 0.0125), (-0.0175, 0.0125)):
+            cv.append((P + rot @ Vector((x, y, 0))).to_tuple())
+        cfc.append((b0, b0 + 1, b0 + 2, b0 + 3)); ccol.append(random.choice(cols))
+    o = mesh_obj("fg_confetti", cv, cfc, paper_mat("fg_paper"))
+    ca = o.data.color_attributes.new("col", "FLOAT_COLOR", "CORNER")
+    for poly in o.data.polygons:
+        for li in poly.loop_indices: ca.data[li].color = ccol[poly.index] + (1,)
+
+# ------------------------------------------------------------------ 30 big held drops in front of the photo edge (they overlap the print in the click)
+EDGE = []
+if not OVER:
+    edges = []
+    L_, T_, W_, H_ = RECT["left"], RECT["top"], RECT["w"], RECT["h"]
+    for k in range(int(os.environ.get("NEDGE", "32"))):
+        side = k % 4; t = rng.uniform(0.08, 0.92)
+        x, y = [(L_ + t * W_, T_), (L_ + W_, T_ - t * H_), (L_ + t * W_, T_ - H_), (L_, T_ - t * H_)][side]
+        x += rng.normal(0, 0.18); y += rng.normal(0, 0.18)
+        dep_ = rng.uniform(*[float(v) for v in os.environ.get("EDGEDEP", "5,9").split(",")])
+        P = CAMV + cf * dep_ + cr * (x * dep_ / D0) + cu * (y * dep_ / D0)
+        if P.z < 0.3: continue
+        edges.append(P.to_tuple())
+    er = np.clip(np.exp(rng.normal(np.log(0.0055), 0.25, len(edges))), 0.003, 0.008)   # real drop sizes (6-16 mm across)
+    EDGE.append(points_obj("edge_drops", edges, er.tolist(), mdrop))
+
 # ------------------------------------------------------------------ cameras
 cam_d = bpy.data.cameras.new("cam"); cam = link(bpy.data.objects.new("cam", cam_d)); sc.camera = cam
-cam_d.sensor_width = 36.0; cam_d.sensor_fit = "HORIZONTAL"; cam_d.clip_start = 0.05; cam_d.clip_end = 60000
+cam_d.sensor_width = 36.0; cam_d.sensor_fit = "AUTO"; cam_d.clip_start = 0.05; cam_d.clip_end = 60000
 if OVER:
-    cam.location = O; cam_d.lens = 35
-    pitch = math.radians(float(os.environ.get("PITCH", "-8")))
-    tgt = O + Vector((math.cos(math.radians(YAW_O)) * math.cos(pitch), math.sin(math.radians(YAW_O)) * math.cos(pitch), math.sin(pitch)))
+    cam.location = O; cam_d.lens = LENS_O
+    yaw = YAW_O + float(os.environ.get("YAWOFF", "0"))
+    pitch = math.radians(float(os.environ.get("PITCH", "-8.5")))
+    tgt = O + Vector((math.cos(math.radians(yaw)) * math.cos(pitch), math.sin(math.radians(yaw)) * math.cos(pitch), math.sin(pitch)))
     look_at(cam, tgt)
-    cam_d.dof.use_dof = True; cam_d.dof.focus_distance = 120; cam_d.dof.aperture_fstop = 11
+    cam_d.dof.use_dof = True; cam_d.dof.focus_distance = float(os.environ.get("FOCUS", "34")); cam_d.dof.aperture_fstop = float(os.environ.get("FSTOP", "2.8"))
 else:
-    cam.location = CAMV; cam_d.lens = 200; look_at(cam, T)
+    cam.location = CAMV; cam_d.lens = LENS_V; look_at(cam, T)
     cam_d.dof.use_dof = True; cam_d.dof.focus_distance = D0; cam_d.dof.aperture_fstop = 4.0
+# EDGE pass: only the 30 front drops are camera-visible (everything else indirect-only), transparent film -> overlay for the mock-up
+if os.environ.get("EDGEPASS") == "1":
+    sc.render.film_transparent = True
+    for o_ in sc.objects:
+        if o_.type in ("MESH", "POINTCLOUD", "VOLUME", "CURVES") and o_.name != "edge_drops":
+            o_.visible_camera = False
 if os.environ.get("CAMDBG"):
     tg = {"tick": TICK + Vector((0, 0, 5)), "canopy": CANOPY + Vector((0, 0, 3)), "pines": PINES + Vector((0, 0, 8))}[os.environ["CAMDBG"]]
     cam.location = tg + (O - tg).normalized() * 30 + Vector((0, 0, 2)); cam_d.lens = 35; look_at(cam, tg); cam_d.dof.use_dof = False

@@ -199,7 +199,7 @@ def terrain_mat():
     flute = B.n("ShaderNodeMapping"); flute.inputs["Scale"].default_value = (0.6, 0.6, 0.06); B.l(B.n("ShaderNodeTexCoord").outputs["Object"], flute.inputs["Vector"])
     rel = B.math("ADD", rel, B.math("MULTIPLY", B.noise(1.0, 4, 0.6, flute.outputs[0]).outputs[0], 0.8))
     B.l(rel, rb2.inputs["Height"]); B.l(nm.outputs[0], rb2.inputs["Normal"])
-    nmix = B.n("ShaderNodeMix", data_type="VECTOR"); B.l(steep, nmix.inputs[0]); B.l(bump.outputs[0], nmix.inputs[4]); B.l(rb2.outputs[0], nmix.inputs[5])
+    nmix = B.n("ShaderNodeMix", data_type="VECTOR"); B.l(steep, nmix.inputs[0]); B.l(bump.outputs[0], nmix.inputs[4]); B.l(rb2.outputs[0] if os.environ.get("RELIEF") else nm.outputs[0], nmix.inputs[5])
     B.l(nmix.outputs[1], b.inputs["Normal"])
     return B.m
 
@@ -218,14 +218,14 @@ def sea_mat():
     col = B.mix(foam, col, (0.8, 0.8, 0.78))
     B.l(col, b.inputs["Base Color"])
     cam_dist = B.n("ShaderNodeCameraData").outputs["View Distance"]
-    B.l(B.math("ADD", B.math("ADD", 0.02, B.math("MULTIPLY", B.ss(cam_dist, 60.0, 2500.0), 0.04)), B.math("MULTIPLY", foam, 0.8)), b.inputs["Roughness"])
+    B.l(B.math("ADD", B.math("ADD", 0.02, B.math("MULTIPLY", B.ss(cam_dist, 60.0, 2500.0), float(os.environ.get("WROUGH", "0.12")))), B.math("MULTIPLY", foam, 0.8)), b.inputs["Roughness"])
     b.inputs["IOR"].default_value = 1.33
     sw2 = B.math("SINE", B.math("MULTIPLY", B.math("DIVIDE", B.math("ADD", d, B.math("MULTIPLY", nz.outputs[0], 40.0)), 14.0), 6.2832))
     vec = B.n("ShaderNodeTexCoord").outputs["Object"]
     mp = B.n("ShaderNodeMapping"); mp.inputs["Scale"].default_value = (0.3, 2.2, 1.0); B.l(vec, mp.inputs["Vector"])
     chop = B.noise(0.6, 7, 0.66, mp.outputs[0]); chop2 = B.noise(4.0, 5, 0.6, mp.outputs[0])
     h = B.math("ADD", B.math("MULTIPLY", sw2, 0.2), B.math("ADD", chop.outputs[0], B.math("MULTIPLY", chop2.outputs[0], 0.15)))
-    bump = B.n("ShaderNodeBump"); bump.inputs["Strength"].default_value = float(os.environ.get("WBUMP", "0.9")); bump.inputs["Distance"].default_value = 0.6
+    bump = B.n("ShaderNodeBump"); bump.inputs["Strength"].default_value = float(os.environ.get("WBUMP", "0.55")); bump.inputs["Distance"].default_value = 0.6
     B.l(h, bump.inputs["Height"]); B.l(bump.outputs[0], b.inputs["Normal"])
     return B.m
 
@@ -371,7 +371,7 @@ for i, (off, dist, s) in enumerate(((-7.5, 12, 2.2), (-5.0, 16, 1.3), (-9.5, 19,
 
 # talus: fallen kurkar blocks along the foot of the headland, on the side facing us
 rt = random.Random(9)
-for k in range(80):
+for k in range(80 if os.environ.get("TALUS") else 0):   # round-1 test: blocks read as blobs stuck to the face, off by default
     p_ = HEAD_PTS[int(rt.uniform(0.72, 1.0) * 60)]
     q = Vector((p_.x, p_.y)); dv = (Vector((CAM.x, CAM.y)) - q).normalized()
     for st_ in range(120):

@@ -551,7 +551,7 @@ cam_d.sensor_width = 36; cam_d.clip_start = 0.05; cam_d.clip_end = 40000; cam.lo
 if VIEW == "desk":
     cam_d.lens = E("LENS", "50"); cam_d.sensor_fit = "HORIZONTAL"; pitch = E("PITCH", "-5")
 else:
-    cam_d.lens = E("LENS", "24"); cam_d.sensor_fit = "VERTICAL"; pitch = E("PITCH", "-4")
+    cam_d.lens = E("LENS", "22"); cam_d.sensor_fit = "VERTICAL"; pitch = E("PITCH", "-3")
 yaw = E("YAW", "0")
 cam.rotation_euler = (math.radians(90 + pitch), 0, math.radians(yaw)); cam_d.dof.use_dof = False   # base plate is all-sharp; focus states are layered composites
 

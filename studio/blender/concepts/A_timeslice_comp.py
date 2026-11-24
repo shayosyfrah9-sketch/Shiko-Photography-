@@ -9,6 +9,14 @@ PD, OUT = sys.argv[1], sys.argv[2]
 LABEL = sys.argv[3] if len(sys.argv) > 3 else None
 ORDER = ["dawn", "noon", "golden", "blue", "night"]
 P = [np.asarray(Image.open(f"{PD}/pass_{n}.png").convert("RGB"), dtype=np.float32) / 255.0 for n in ORDER]
+# light per-hour print grade (contrast / saturation / warmth), the way each hour would be developed on its own
+GRADE = {"dawn": (1.10, 1.10, (1.00, 0.98, 1.02)), "noon": (1.18, 1.08, (1.0, 1.0, 1.0)), "golden": (1.15, 1.15, (1.03, 0.99, 0.92)),
+         "blue": (1.05, 1.05, (1.0, 1.0, 1.0)), "night": (1.0, 1.0, (1.0, 1.0, 1.0))}
+def grade(im, c, sat, wb):
+    im = (im - 0.5) * c + 0.5
+    g = im.mean(-1, keepdims=True); im = g + (im - g) * sat
+    return np.clip(im * np.array(wb, dtype=np.float32), 0, 1)
+P = [grade(p, *GRADE[n]) for p, n in zip(P, ORDER)]
 import bpy   # PIL reads 16-bit RGBA PNGs as 8-bit: read the data pass through Blender's image loader instead
 _im = bpy.data.images.load(f"{PD}/pass_data.png"); _im.colorspace_settings.name = "Non-Color"
 _w, _h = _im.size; D = np.array(_im.pixels[:], dtype=np.float32).reshape(_h, _w, 4)[::-1]
