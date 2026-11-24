@@ -1,0 +1,16 @@
+{
+ "frame_w": 1600,
+ "frame_h": 900,
+ "x0": 393.584,
+ "y0": 157.66901333333334,
+ "w": 752.0,
+ "h": 620.6506666666667,
+ "removed_note": "drops whose projected centre falls in the traced surfer+board silhouette (+2 photo px) are removed",
+ "n_drops": 2714,
+ "n_mist": 1,
+ "n_bokeh": 22,
+ "mode": "hole",
+ "spp": 96,
+ "seconds": 284.7,
+ "look": "AgX - Punchy"
+}
