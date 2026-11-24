@@ -1,0 +1,171 @@
+<title>SHIKO Creative Studio</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@200;300;400&family=Rubik:wght@300;400;500&display=swap">
+<style>
+/* Layout: a single dark gallery wall. Hebrew RTL column, images run full width like prints on a wall. */
+:root{
+  --bg:#0c0b0a; --panel:#151311; --line:rgba(243,239,230,.14); --fg:#f3efe6; --muted:#b4ab9c; --gold:#d9b27a; --ok:#9fc79a; --warn:#e6b86a; --no:#d98a7a;
+  --f-he:"Rubik","Heebo",system-ui,sans-serif; --f-lat:"Jost","Futura","Avenir Next",system-ui,sans-serif;
+  color-scheme:dark;
+}
+body{background:var(--bg);color:var(--fg);font-family:var(--f-he);font-weight:300;line-height:1.65;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:1080px;margin:0 auto;padding-block:40px 80px;display:grid;gap:64px}
+h1,h2,h3{font-weight:300;text-wrap:balance;margin:0}
+.eyebrow{font-family:var(--f-lat);font-weight:300;letter-spacing:.32em;text-transform:uppercase;font-size:12px;color:var(--gold);direction:ltr;text-align:right}
+h1{font-family:var(--f-lat);font-weight:200;font-size:clamp(34px,6vw,64px);letter-spacing:.06em;line-height:1.05;direction:ltr;text-align:right}
+h2{font-size:clamp(22px,3vw,30px);margin-bottom:6px}
+p{margin:0;max-width:68ch}
+.lead{font-size:18px;color:var(--muted)}
+section{display:grid;gap:18px}
+.tag{display:inline-block;font-size:12px;border:1px solid var(--line);border-radius:2px;padding:1px 8px;color:var(--muted);white-space:nowrap}
+.tag.ok{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,transparent)}
+.tag.warn{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 40%,transparent)}
+.tag.no{color:var(--no);border-color:color-mix(in srgb,var(--no) 40%,transparent)}
+.cmp{position:relative;aspect-ratio:16/9;max-width:100%;overflow:hidden;border:1px solid var(--line);background:#000;user-select:none}
+.cmp img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.cmp .after{clip-path:inset(0 0 0 var(--x,50%))}
+.cmp input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:ew-resize;margin:0}
+.cmp .bar{position:absolute;top:0;bottom:0;left:var(--x,50%);width:1px;background:var(--fg);pointer-events:none}
+.cmp .lb{position:absolute;bottom:10px;font-size:12px;background:rgba(0,0,0,.55);padding:2px 8px}
+.cmp .lb.l{left:10px} .cmp .lb.r{right:10px}
+.rounds{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+figure{margin:0;display:grid;gap:8px;min-width:0}
+figure img{width:100%;aspect-ratio:16/9;object-fit:cover;border:1px solid var(--line);display:block}
+figcaption{font-size:14px;color:var(--muted);display:grid;gap:2px}
+figcaption b{color:var(--fg);font-weight:400}
+.score{font-family:var(--f-lat);font-size:28px;font-weight:200;color:var(--gold);direction:ltr;text-align:right}
+video{width:100%;border:1px solid var(--line);background:#000;display:block}
+.tbl{overflow-x:auto;border-top:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;font-size:15px}
+td,th{text-align:right;padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-weight:400;color:var(--muted);font-size:13px}
+td.lat{font-family:var(--f-lat);direction:ltr;text-align:right;white-space:nowrap}
+.agents{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
+.agents div{background:var(--bg);padding:14px;display:grid;gap:4px;min-width:0}
+.agents b{font-family:var(--f-lat);font-weight:400;font-size:13px;letter-spacing:.08em;direction:ltr;text-align:right}
+.agents span{font-size:14px;color:var(--muted)}
+ul{margin:0;padding-inline-start:20px;display:grid;gap:6px;max-width:72ch}
+.note{border-inline-start:2px solid var(--gold);padding-inline-start:14px;color:var(--muted)}
+:focus-visible{outline:1px solid var(--gold);outline-offset:3px}
+</style>
+
+<main dir="rtl" lang="he">
+  <header style="display:grid;gap:14px">
+    <div class="eyebrow">SHIKO WORLD 2.0 · 24.11.2026</div>
+    <h1>SHIKO CREATIVE STUDIO</h1>
+    <p class="lead">דוח הקמת סביבת העבודה: מה נבנה, מה נבדק בפועל, מה עוד לא זמין, ותוצאות ניסוי הרינדור עם הביקורת העצמאית. האתר החי לא שונה.</p>
+  </header>
+
+  <section>
+    <h2>האתר החי מוגן</h2>
+    <div class="tbl"><table>
+      <tr><th>מה</th><th>מצב</th></tr>
+      <tr><td>גרסה 153 באתר shikophotography.com</td><td><span class="tag ok">לא שונתה</span> הענף שממנו האתר עולה לא נגע בשום שינוי</td></tr>
+      <tr><td>נקודת שחזור ב־GitHub</td><td><span class="tag ok">קיימת</span> ענף backup-v153-live</td></tr>
+      <tr><td>עותק מלא מחוץ ל־GitHub</td><td><span class="tag ok">קיים</span> קובץ אחד (173MB) עם כל הקוד, התמונות, המודלים, הטקסטורות והמוזיקה, בתיקיית הפרויקט</td></tr>
+      <tr><td>תג גרסה קבוע v153-live</td><td><span class="tag warn">דורש אותך</span> סביבת הענן חוסמת יצירת תגים. ב־GitHub: Releases, תג חדש v153-live על הגרסה 775a28d</td></tr>
+      <tr><td>סביבת פיתוח נפרדת</td><td><span class="tag ok">פעילה</span> ענף world2-dev. האתר עולה רק מהענף הראשי, כך שאין חיבור אוטומטי</td></tr>
+      <tr><td>נעילה נגד העלאה בטעות</td><td><span class="tag ok">נבדקה</span> ניסיון דחיפה לענף הראשי נחסם אוטומטית</td></tr>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>הניסוי: לפני ואחרי</h2>
+    <p>מבנה עתידני על צוק מעל עמק, עם טבעת ברונזה בצורת צמצם בקצה. כל התמונות כאן הן <b>רינדור Blender / Cycles</b>, לא תצוגה בזמן אמת בדפדפן. הזיזו את הקו כדי להשוות בין הסבב הראשון לאחרון.</p>
+    <div class="cmp" id="cmp" style="--x:50%">
+      <img src="img/r1.jpg" alt="סבב 1">
+      <img class="after" src="img/r4.jpg" alt="סבב 4">
+      <div class="bar"></div>
+      <span class="lb l">סבב 1</span><span class="lb r">סבב 4</span>
+      <input type="range" id="cmpr" min="0" max="100" value="50" aria-label="השוואה בין סבב 1 לסבב 4">
+    </div>
+    <div class="rounds">
+      <figure><img src="img/r1.jpg" alt=""><figcaption><span class="score">3.0</span><b>סבב 1: ניסיון ראשון</b>קופסה על גבעה, אור צהריים שטוח, חומרים בסיסיים.</figcaption></figure>
+      <figure><img src="img/r2.jpg" alt=""><figcaption><span class="score">4.6</span><b>סבב 2</b>צוק אמיתי, טקסטורות Poly Haven, אובך. המבקר: זווית צד שטוחה, הטבעת לא נראית.</figcaption></figure>
+      <figure><img src="img/r3.jpg" alt=""><figcaption><span class="score">5.4</span><b>סבב 3</b>שמיים פיזיקליים, שמש נמוכה, מצלמה נמוכה. המבקר: מרכז ריק, חומרים שטוחים.</figcaption></figure>
+      <figure><img src="img/r4.jpg" alt=""><figcaption><span class="score">5.3</span><b>סבב 4</b>טבעת אייקונית, אדם לקנה מידה. המבקר: איבדנו את האובך ואת אור הזהב של סבב 3.</figcaption></figure>
+    </div>
+    <p class="note">שקיפות: הציונים ניתנו על ידי סוכן מבקר עצמאי שלא יצר את העבודה, לפי סולם של 10 קריטריונים. היעד הוא ממוצע 8. הגענו ל־5.4, כך שהניסוי עדיין לא ברמה שאפשר להציג כתוצר. הלקח המרכזי של המבקר: קופסת זכוכית על צוק היא קלישאה, והמקוריות צריכה להגיע מהרעיון עצמו ולא מהפרטים. זה בדיוק מה שנבנה עליו בקונספטים של SHIKO WORLD 2.0.</p>
+    <figure id="vidbox"><video id="vid" src="pavilion_move.mp4" controls muted playsinline loop preload="metadata" aria-label="תנועת מצלמה"></video><figcaption><b>תנועת מצלמה: ירידה איטית לעבר הצמצם</b>48 פריימים מרונדרים ב־Blender (שתי שניות). זו הדמיה מוקלטת, לא חוויה אינטראקטיבית.</figcaption></figure>
+  </section>
+
+  <section>
+    <h2>7 ה־Skills שנוצרו</h2>
+    <p>34 התחומים שביקשת אוחדו ל־7 Skills, כדי שכל אחד יהיה עמוק ולא חוזר על אחר. כל אחד כולל מטרה, הוראות עבודה, קריטריונים לאיכות, טעויות נפוצות ותהליך בדיקה.</p>
+    <div class="tbl"><table>
+      <tr><th>Skill</th><th>תחומים</th><th>בדיקה</th></tr>
+      <tr><td class="lat">shiko-art-direction</td><td>Premium Frontend, Art Direction, Award-Winning Web, Luxury Brand, UI/UX, Typography, Experimental Interaction</td><td><span class="tag ok">נטען</span></td></tr>
+      <tr><td class="lat">shiko-blender-worldbuilding</td><td>Blender, Archviz, Environment, Procedural, Materials, Modeling, Landscape, Water & Atmosphere</td><td><span class="tag ok">נטען, שימש בניסוי</span></td></tr>
+      <tr><td class="lat">shiko-cinematic-motion</td><td>Lighting, Camera, Motion, VFX, Storytelling, Transitions, Sound</td><td><span class="tag ok">נטען</span></td></tr>
+      <tr><td class="lat">shiko-realtime-webgl</td><td>Three.js, WebGL/WebGPU, GLSL, Real-Time Rendering, Responsive</td><td><span class="tag ok">נטען</span></td></tr>
+      <tr><td class="lat">shiko-asset-performance</td><td>Asset Optimization, Mobile Performance, יעדי ביצועים מדידים</td><td><span class="tag ok">נטען</span></td></tr>
+      <tr><td class="lat">shiko-visual-critique</td><td>Visual Critique, Photorealism Assessment, Innovation Review</td><td><span class="tag ok">הופעל בפועל 4 פעמים</span></td></tr>
+      <tr><td class="lat">shiko-qa-guardian</td><td>Automated Testing, Accessibility, הגנה על האתר החי</td><td><span class="tag ok">נטען</span></td></tr>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>צוות 12 ה־Agents</h2>
+    <p>לכל אחד הוגדרו תחומי אחריות, Skills רלוונטיים, הרשאות מינימליות וקריטריון הצלחה. המבקר, למשל, יכול רק לקרוא קבצים ולא לשנות אותם.</p>
+    <div class="agents">
+      <div><b>CREATIVE DIRECTOR</b><span>חזון, מקוריות, שער איכות אחרון</span></div>
+      <div><b>INNOVATION RESEARCHER</b><span>השראות וטכנולוגיות עם מקורות ורישיונות</span></div>
+      <div><b>SENIOR 3D ARCHITECT</b><span>מבנים אייקוניים, צללית, פרופורציות</span></div>
+      <div><b>ENVIRONMENT ARTIST</b><span>צוקים, מים, צמחייה, שמיים, אובך</span></div>
+      <div><b>MATERIALS & LIGHTING</b><span>חומרים אמינים ותאורה קולנועית</span></div>
+      <div><b>CINEMATIC DIRECTOR</b><span>מסך כניסה, מצלמה, מעברים</span></div>
+      <div><b>MOTION & VFX</b><span>חלקיקים, תנועה סביבתית, אפקטים</span></div>
+      <div><b>UI/UX DESIGNER</b><span>ממשק פרימיום, עברית ואנגלית, נגישות</span></div>
+      <div><b>WEBGL ENGINEER</b><span>הפיכת העולם לחוויה אמיתית בדפדפן</span></div>
+      <div><b>PERFORMANCE ENGINEER</b><span>טעינה, זיכרון, טלפונים</span></div>
+      <div><b>ART CRITIC</b><span>ביקורת עצמאית וקשוחה, קריאה בלבד</span></div>
+      <div><b>QA & SECURITY</b><span>בדיקות, שמירה על התוכן והאתר החי</span></div>
+    </div>
+    <p class="note">מה נבדק בפועל: המבקר הופעל 4 פעמים לפי ההגדרה שלו וביקר כל סבב. הצוות כקבוצה של "סוכנים בשם" ייטען רק בסשן חדש שנפתח על ענף הפיתוח, כי בסשן הזה הם נוצרו אחרי שהוא התחיל. זה ייבדק בתחילת השלב הבא.</p>
+  </section>
+
+  <section>
+    <h2>כלים וחיבורים</h2>
+    <div class="tbl"><table>
+      <tr><th>כלי</th><th>מצב</th><th>הערה</th></tr>
+      <tr><td>Blender 5.3 עם Cycles</td><td><span class="tag ok">עובד</span></td><td>כל הרינדורים בדוח. במעבד בלבד, אין כרטיס גרפי בענן</td></tr>
+      <tr><td>Poly Haven (HDRI, טקסטורות, מודלים)</td><td><span class="tag ok">עובד</span></td><td>רישיון CC0, חופשי לשימוש מסחרי</td></tr>
+      <tr><td>Playwright ובדיקות דפדפן</td><td><span class="tag ok">עובד</span></td><td>שימש לבדיקה המלאה של האתר החי</td></tr>
+      <tr><td>דחיסת glTF (meshopt)</td><td><span class="tag ok">עובד</span></td><td>העצים ירדו מ־10.8MB ל־1.9MB</td></tr>
+      <tr><td>ffmpeg לווידאו</td><td><span class="tag ok">עובד</span></td><td>סרטון תנועת המצלמה</td></tr>
+      <tr><td>GitHub</td><td><span class="tag ok">עובד חלקית</span></td><td>ענפים כן, תגים לא</td></tr>
+      <tr><td>Blender MCP</td><td><span class="tag">לא נדרש</span></td><td>מיועד לשליטה ב־Blender פתוח במחשב. כאן Blender מופעל ישירות</td></tr>
+      <tr><td>Figma MCP</td><td><span class="tag warn">דורש אישור</span></td><td>קיים בספריית החיבורים, צריך את חשבון ה־Figma שלך</td></tr>
+      <tr><td>דחיסת טקסטורות KTX2</td><td><span class="tag warn">דורש אישור</span></td><td>התקנה חיצונית. חוסכת פי 4 עד 6 בזיכרון של הטלפון</td></tr>
+      <tr><td>Three.js חדש ו־WebGPU</td><td><span class="tag warn">דורש אישור</span></td><td>התקנת חבילות. האתר הנוכחי משתמש בגרסה ישנה ויציבה</td></tr>
+      <tr><td>מדידת ביצועים במכשיר אמיתי</td><td><span class="tag warn">דורש אותך</span></td><td>בענן אין כרטיס גרפי, אז מהירות אמיתית נמדדת רק בטלפון או במחשב שלך</td></tr>
+      <tr><td>יצירת תמונות קונספט ב־AI</td><td><span class="tag no">לא זמין</span></td><td>אין כלי כזה מחובר. הקונספטים ייבנו ברינדור ובקוד</td></tr>
+      <tr><td>רינדור EEVEE / GPU</td><td><span class="tag no">לא זמין</span></td><td>רינדור איכותי לוקח 3 דקות לתמונה, וכ־17 שניות לפריים בווידאו</td></tr>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>מה דורש ממך החלטה</h2>
+    <ul>
+      <li>ליצור ב־GitHub את התג v153-live (חצי דקה, מסביר איך בהודעה).</li>
+      <li>לאשר התקנת כלי KTX2 ו־Three.js עדכני בסביבת הפיתוח בלבד.</li>
+      <li>לחבר את Figma, אם תרצה לעבוד גם על לוחות עיצוב שם.</li>
+      <li>לאשר בדיקות במכשירים שלך (טלפון ומחשב) לפני כל החלטת ביצועים.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>המלצות להמשך</h2>
+    <ul>
+      <li>להתחיל את שלב הקונספטים בסשן חדש על ענף הפיתוח, כך שכל 12 הסוכנים ייטענו בשמם.</li>
+      <li>לבנות רעיון מקורי לפני הפרטים: הניסוי הראה שליטוש לבד לא מוציא מבנה מהקלישאה.</li>
+      <li>לשמור על אובך מינימלי ותאורת קצה בכל רינדור, אחרי מה שלמדנו בסבב 4.</li>
+      <li>להפיק רינדורי גיבור ברזולוציה מלאה רק אחרי שהכיוון אושר, כי כל אחד לוקח דקות ארוכות במעבד.</li>
+    </ul>
+  </section>
+</main>
+<script>
+(function(){var c=document.getElementById("cmp"),r=document.getElementById("cmpr");function u(){c.style.setProperty("--x",r.value+"%");}r.addEventListener("input",u);u();
+var v=document.getElementById("vid");v.addEventListener("error",function(){document.getElementById("vidbox").hidden=true;});})();
+</script>
