@@ -1,0 +1,9 @@
+Concept C "WHERE HE STOOD" round 1: third-party assets (all CC0 1.0, Poly Haven, polyhaven.com, no attribution required)
+- HDRI  industrial_sunset_02_puresky (4k .hdr): sky; graded in the world shader (saturation x2, warm toward sun, cool/dimmer away from sun)
+- Texture damp_beach_sand (2k diff/rough/nor_gl): wet tidal flat
+- Texture rough_linen (2k diff/nor_gl): tapestry weave + linen sheet
+- Model pine_tree_01 (gltf 1k; one of its 3 variants, instanced x13): grove edge
+- Model flood_lights (gltf 1k): mast heads
+- Model football (gltf 1k, inflated variant): ball held in the ticker cloud
+Everything else is procedural (wave, spray, mist, confetti, ticker tape, turf, shade sail, footprints).
+Photograph media/photos/surf0001.jpg: (c) Shay / Shiko Photography, used unaltered (uncropped, true aspect) in the mock-up only.
