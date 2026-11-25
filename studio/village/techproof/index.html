@@ -358,7 +358,7 @@ async function applyPhotos(mode) {
   photoState.mode = mode; $('bPhoto').textContent = PHOTO_LABEL[mode]; $('bPhoto').setAttribute('aria-pressed', mode === 'adaptive' ? 'false' : 'true');
   if (mode === 'adaptive') {
     // 1) tiny blur-up placeholders for all frames, 2) the display-sized image (m or l, AVIF if supported)
-    const fmt = (await AVIF_OK) ? 'avif' : 'webp', need = innerWidth * Math.min(renderer.getPixelRatio(), 2), tag = need <= 900 ? 'm' : 'l'; // the photo can fill the screen when the camera is close, so size for the full drawing-buffer width photoState.chosen = { format: fmt, size: tag, neededPx: Math.round(need) };
+    const fmt = (await AVIF_OK) ? 'avif' : 'webp', need = innerWidth * Math.min(renderer.getPixelRatio(), 2), tag = need <= 900 ? 'm' : 'l'; photoState.chosen = { format: fmt, size: tag, neededPx: Math.round(need) }; // the photo can fill the screen when the camera is close, so size for the full drawing-buffer width
     const t0 = performance.now(); await Promise.all(photoMeshes.map(async (p) => { const t = performance.now(); setPhotoTex(p, await loadImgTex(photoUrl(p.id, 'xs', 'webp'))); photoState.loadMs['xs:' + p.id] = Math.round(performance.now() - t); })); mark('photos placeholder (xs) shown', { ms: Math.round(performance.now() - t0) });
     for (const p of photoMeshes) { const t = performance.now(); let tex; try { tex = await loadImgTex(photoUrl(p.id, tag, fmt)); } catch (_) { tex = await loadImgTex(photoUrl(p.id, tag, 'webp')); } setPhotoTex(p, tex); photoState.loadMs[`${tag}_${fmt}:${p.id}`] = Math.round(performance.now() - t); }
     mark('photos adaptive ' + tag + '/' + fmt); return;
