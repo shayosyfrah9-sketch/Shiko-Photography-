@@ -103,7 +103,7 @@ table.bench th:first-child, table.bench td:first-child { text-align: start; }
     <div class="grp" role="group" aria-label="תמונות"><span>תמונות</span>
       <button id="bPhoto" aria-pressed="false">KTX2</button>
     </div>
-    <div class="grp"><button id="bBench" class="primary">בדיקת ביצועים (כ־30 שניות)</button><button id="bCopy" class="primary">העתק תוצאות</button></div>
+    <div class="grp"><button id="bBench" class="primary">בדיקת ביצועים (כ־45 שניות)</button><button id="bCopy" class="primary">העתק תוצאות</button></div>
   </div>
   <textarea id="out" hidden readonly aria-label="תוצאות להעתקה"></textarea>
 </div>
@@ -131,6 +131,8 @@ const BASE = new URL('.', document.baseURI).href;
 const timeline = [];
 const mark = (name, extra) => { const t = Math.round(performance.now() - T0); timeline.push({ t, name, ...(extra || {}) }); };
 const TP = (window.__tp = { state: {}, mark });
+const stageMs = {}; // synchronous main-thread cost of build stages (real CPU cost on any device, independent of the GPU)
+const stageAdd = (n, ms) => { const o = stageMs[n] || (stageMs[n] = { calls: 0, ms: 0, maxMs: 0 }); o.calls++; o.ms += ms; o.maxMs = Math.max(o.maxMs, ms); };
 function fail(e) { console.error(e); $('errmsg').textContent = String(e && e.message || e); $('err').hidden = false; $('loading').classList.add('done'); }
 
 try {
@@ -188,7 +190,7 @@ const geoCache = new Map();
 function loadGeo(name) {
   if (geoCache.has(name)) return geoCache.get(name);
   const plainOnly = decoders.meshopt === false;
-  const p = (plainOnly ? Promise.resolve(null).then(() => gltfLoader.loadAsync(BASE + 'assets/' + name + '_plain.glb.png')) : gltfLoader.loadAsync(BASE + 'assets/' + name + '.glb.png')).then((g) => { decoders.meshopt = decoders.meshopt !== false; return g; }).catch((e) => { decoders.meshopt = false; decoders.meshoptError = String((e && e.message) || e).slice(0, 160); mark('meshopt failed, plain GLB fallback'); showNote('פענוח meshopt לא רץ בסביבה הזו. עברתי ל־GLB לא דחוס; מדדי המשקל של הגאומטריה לא תקפים.'); return gltfLoader.loadAsync(BASE + 'assets/' + name + '_plain.glb.png'); }).then((g) => { let geo = null; g.scene.updateMatrixWorld(true); g.scene.traverse((o) => { if (o.isMesh && !geo) { geo = o.geometry; for (const nm of ['position', 'normal', 'uv']) { const at = geo.attributes[nm]; if (at && at.array.constructor !== Float32Array) { const f = new Float32Array(at.count * at.itemSize); for (let i = 0; i < at.count; i++) for (let k = 0; k < at.itemSize; k++) f[i * at.itemSize + k] = at.getComponent(i, k); geo.setAttribute(nm, new THREE.BufferAttribute(f, at.itemSize)); } } geo.applyMatrix4(o.matrixWorld); geo.computeBoundingSphere(); } }); return geo; });
+  const p = (plainOnly ? Promise.resolve(null).then(() => gltfLoader.loadAsync(BASE + 'assets/' + name + '_plain.glb.png')) : gltfLoader.loadAsync(BASE + 'assets/' + name + '.glb.png')).then((g) => { decoders.meshopt = decoders.meshopt !== false; return g; }).catch((e) => { decoders.meshopt = false; decoders.meshoptError = String((e && e.message) || e).slice(0, 160); mark('meshopt failed, plain GLB fallback'); showNote('פענוח meshopt לא רץ בסביבה הזו. עברתי ל־GLB לא דחוס; מדדי המשקל של הגאומטריה לא תקפים.'); return gltfLoader.loadAsync(BASE + 'assets/' + name + '_plain.glb.png'); }).then((g) => { const _t0 = performance.now(); let geo = null; g.scene.updateMatrixWorld(true); g.scene.traverse((o) => { if (o.isMesh && !geo) { geo = o.geometry; for (const nm of ['position', 'normal', 'uv']) { const at = geo.attributes[nm]; if (at && at.array.constructor !== Float32Array) { const f = new Float32Array(at.count * at.itemSize); for (let i = 0; i < at.count; i++) for (let k = 0; k < at.itemSize; k++) f[i * at.itemSize + k] = at.getComponent(i, k); geo.setAttribute(nm, new THREE.BufferAttribute(f, at.itemSize)); } } geo.applyMatrix4(o.matrixWorld); geo.computeBoundingSphere(); } }); stageAdd('dequantizeGeometry', performance.now() - _t0); return geo; });
   geoCache.set(name, p); return p;
 }
 
@@ -199,7 +201,8 @@ const TIERS = [
   { name: 'גבוה', key: 'high', dpr: 1.5, shadow: 2048, shadowType: 1, mat: 'l', normals: 'l', terrain: 0, rock: 0, rocks: 220, grass: 24000, motes: 700, post: true, bloom: 0.35, rays: true, dof: false, smaa: true, msaa: 4, env: true },
   { name: 'אולטרה', key: 'ultra', dpr: 2, shadow: 4096, shadowType: 1, mat: 'l', normals: 'l', terrain: 0, rock: 0, rocks: 400, grass: 60000, motes: 1200, post: true, bloom: 0.45, rays: true, dof: true, smaa: true, msaa: 4, env: true },
 ];
-let tierIdx = PHONE ? 1 : 2, auto = true, tierCap = PHONE ? 2 : 3, blocked = new Set(), lastTierChange = 0;
+const QS = new URLSearchParams(location.search); // ?tier=0..3 fixes the start tier and disables auto (repeatable measurements)
+let tierIdx = QS.has('tier') ? Math.max(0, Math.min(3, +QS.get('tier') || 0)) : PHONE ? 1 : 2, auto = !QS.has('tier'), tierCap = PHONE ? 2 : 3, blocked = new Set(), lastTierChange = 0;
 
 /* ------------------------------------------------------------------ lighting / sky / zones */
 const sky = new Sky(); sky.scale.setScalar(5000); scene.add(sky);
@@ -224,7 +227,7 @@ function setSky(u) {
   scene.fog.color.copy(A.fog).lerp(B.fog, u); scene.fog.density = l(A.fogD, B.fogD);
   hemi.intensity = l(A.hemi, B.hemi); renderer.toneMappingExposure = l(A.exp, B.exp);
 }
-function buildEnv() {
+function _buildEnv() {
   if (envRT) envRT.dispose();
   const s = new THREE.Scene(); const sk = new Sky(); sk.scale.setScalar(5000); Object.keys(sk.material.uniforms).forEach((k) => { if (sky.material.uniforms[k]) sk.material.uniforms[k].value = sky.material.uniforms[k].value; }); s.add(sk);
   envRT = pmrem.fromScene(s, 0, 0.1, 1000); scene.environment = envRT.texture; scene.environmentIntensity = 0.55;
@@ -269,7 +272,7 @@ function scatterRocks(n, anchor, radius, avoid) {
   }
   return out;
 }
-function makeRocks(list, geo) {
+function _makeRocks(list, geo) {
   const m = new THREE.InstancedMesh(geo, MATS.rock, list.length); m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false;
   const o = new THREE.Object3D();
   list.forEach((r, i) => { o.position.set(r.x, groundAt(r.x, r.z) + r.s * 0.18, r.z); o.rotation.set(r.rx, r.ry, r.rz); o.scale.set(r.s, r.s * r.sy, r.s); o.updateMatrix(); m.setMatrixAt(i, o.matrix); });
@@ -287,7 +290,7 @@ grassMat.onBeforeCompile = (sh) => {
   sh.uniforms.uTime = windU;
   sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nuniform float uTime;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvec3 ip=vec3(instanceMatrix[3]);float k=transformed.y*transformed.y;transformed.x+=sin(uTime*1.6+ip.x*.35+ip.z*.2)*.22*k;transformed.z+=cos(uTime*1.3+ip.z*.3)*.12*k;');
 };
-function makeGrass(count, anchor, radius, tint, pav) {
+function _makeGrass(count, anchor, radius, tint, pav) {
   const m = new THREE.InstancedMesh(bladeGeo(), grassMat, count); m.frustumCulled = false; m.receiveShadow = false;
   const o = new THREE.Object3D(), c = new THREE.Color(), r = rng(anchor.x * 7 + 3);
   for (let i = 0; i < count; i++) {
@@ -305,7 +308,7 @@ function boxUV(w, h, d, tile = 2.6) { // box with world-scaled UVs so the wood t
   for (let f = 0; f < 6; f++) for (let v = 0; v < 4; v++) { const i = f * 4 + v; uv.setXY(i, uv.getX(i) * dims[f][0] / tile, uv.getY(i) * dims[f][1] / tile); }
   return g;
 }
-function pavilion(x, z, ry) {
+function _pavilion(x, z, ry) {
   const g = new THREE.Group(); const y0 = Math.max(groundAt(x - 6, z - 4), groundAt(x + 6, z + 4), groundAt(x - 6, z + 4), groundAt(x + 6, z - 4)) + 0.2;
   const add = (geo, px, py, pz, rx = 0, rz = 0) => { const m = new THREE.Mesh(geo, MATS.wood); m.position.set(px, py, pz); m.rotation.set(rx, 0, rz); m.castShadow = m.receiveShadow = true; g.add(m); return m; };
   add(boxUV(15, 2.4, 11), 0, -0.9, 0);                               // foundation / floor
@@ -314,12 +317,19 @@ function pavilion(x, z, ry) {
   const roofL = add(boxUV(9.4, 0.3, 12), -3.9, 5.2, 0, 0, 0.62), roofR = add(boxUV(9.4, 0.3, 12), 3.9, 5.2, 0, 0, -0.62);
   g.position.set(x, y0, z); g.rotation.y = ry; scene.add(g); return g;
 }
+const timed = (n, f) => function (...a) { const t = performance.now(); try { return f.apply(this, a); } finally { stageAdd(n, performance.now() - t); } };
+const buildEnv = timed('buildEnv', _buildEnv);
+const makeRocks = timed('makeRocks', _makeRocks);
+const makeGrass = timed('makeGrass', _makeGrass);
+const pavilion = timed('pavilion', _pavilion);
+const makePhotoFrames = timed('makePhotoFrames', _makePhotoFrames);
+const buildComposer = timed('buildComposer', _buildComposer);
 const pavA = pavilion(ZA.x, ZA.z, -0.35); pavA.visible = false;
 let pavB = null;
 // photos as frames (technology test of how a real photo sits inside the world)
 const PHOTOS = [['2w2a1130', 0.667], ['2w2a7966', 1.5], ['2w2a0403', 0.667]];
 const photoMeshes = [];
-function makePhotoFrames() {
+function _makePhotoFrames() {
   const spots = [[-92, -27, 0.5], [-84, -20, 0.2], [-56, -22, -0.4]];
   PHOTOS.forEach(([id, asp], i) => {
     const h = 3.1, w = h * asp, [x, z, ry] = spots[i], y = groundAt(x, z);
@@ -360,7 +370,7 @@ const RaysShader = { uniforms: { tDiffuse: { value: null }, sunPos: { value: new
 const GradeShader = { uniforms: { tDiffuse: { value: null }, uT: { value: 0 }, uAsp: { value: 1 } },
   vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
   fragmentShader: 'uniform sampler2D tDiffuse;uniform float uT;varying vec2 vUv;float h(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}void main(){vec4 c=texture2D(tDiffuse,vUv);vec2 q=vUv-.5;float v=smoothstep(.95,.25,length(q*vec2(1.,.9)));c.rgb*=mix(.72,1.,v);c.rgb+=(h(vUv*vec2(1731.,977.)+uT)-.5)*.022;gl_FragColor=c;}' };
-function buildComposer() {
+function _buildComposer() {
   if (composer) { composer.dispose(); composer = null; }
   const T = TIERS[tierIdx]; if (!T.post) return;
   const size = renderer.getDrawingBufferSize(new THREE.Vector2());
@@ -405,7 +415,7 @@ async function applyTier(idx, why) {
   terrain.visible = true;
   for (const k of ['A', 'B']) if (rocks[k] && rocks[k].geometry !== rg) rocks[k].geometry = rg;
   rocks.geo = rg;
-  mark('quality ' + T.key + ' ready', { ms: Math.round(performance.now() - t0) }); TP.state['ready_' + T.key] = true;
+  mark('quality ' + T.key + ' ready', { ms: Math.round(performance.now() - t0) }); TP.state['ready_' + T.key] = true; checkWorld();
   if (idx >= 1 && !TP.state.fullQuality) { TP.state.fullQuality = true; mark('full quality visible'); }
 }
 
@@ -418,7 +428,7 @@ async function streamZoneB() {
   grass.A = makeGrass(Math.floor(TIERS[3].grass / 2), ZA, 48, new THREE.Color(0x8d9a45), ZA); grass.B = makeGrass(Math.floor(TIERS[3].grass / 2), ZB, 48, new THREE.Color(0x5c7d58), ZB);
   scene.add(grass.A, grass.B); pavA.visible = true; pavB = pavilion(ZB.x, ZB.z, 2.6); applyTier(tierIdx, 'zone B content');
   await applyPhotos('ktx2');
-  zoneB.ms = Math.round(performance.now() - zoneB.t0); zoneB.state = 'ready'; mark('zone B ready', { ms: zoneB.ms }); TP.state.zoneBReady = true;
+  zoneB.ms = Math.round(performance.now() - zoneB.t0); zoneB.state = 'ready'; mark('zone B ready', { ms: zoneB.ms }); TP.state.zoneBReady = true; checkWorld();
   $('bFly').disabled = false; $('bFly').textContent = 'לאזור B';
 }
 
@@ -449,8 +459,31 @@ const endDrag = () => { drag = null; }; canvas.addEventListener('pointerup', end
 canvas.addEventListener('dblclick', () => { yawOff = pitchOff = 0; });
 
 /* ------------------------------------------------------------------ measurements */
-const ft = []; let lastNow = performance.now(), longTasks = 0, longTaskMs = 0;
-try { new PerformanceObserver((l) => { for (const e of l.getEntries()) { longTasks++; longTaskMs += e.duration; } }).observe({ entryTypes: ['longtask'] }); } catch (_) { /* not supported */ }
+const ft = []; let lastNow = performance.now();
+/* Absolute times (ms since navigation start) of the phases that matter to a visitor:
+   usefulContent = first frame with real (placeholder-quality) 3D on screen, interactive = first 1 s without a long task after that,
+   worldComplete = zone B streamed AND the active quality tier fully upgraded. */
+const ABS = (TP.abs = { module: T0, placeholder: null, firstFrame: null, worldComplete: null });
+const longTaskList = []; let longTaskSupported = true;
+try { new PerformanceObserver((l) => { for (const e of l.getEntries()) longTaskList.push({ s: e.startTime, d: e.duration }); }).observe({ type: 'longtask', buffered: true }); } catch (_) { longTaskSupported = false; }
+const r0 = (v) => (v == null ? null : Math.round(v));
+function ltSummary(from, to) { // long tasks starting inside [from, to) -> count, total ms, worst
+  const a = longTaskList.filter((t) => t.s >= from && t.s < to); return { count: a.length, ms: r0(a.reduce((s, t) => s + t.d, 0)), maxMs: r0(Math.max(0, ...a.map((t) => t.d))) };
+}
+function longTaskReport() {
+  if (!longTaskSupported) return { supported: false };
+  const now = performance.now(), ff = ABS.firstFrame ?? now, wc = ABS.worldComplete ?? now;
+  // time to a quiet main thread: first 1 s window with no long task, counted from the first frame
+  let tti = null; if (ABS.firstFrame != null) { let t = ABS.firstFrame; for (const k of [...longTaskList].filter((x) => x.s + x.d > ABS.firstFrame).sort((a, b) => a.s - b.s)) { if (k.s - t >= 1000) break; t = Math.max(t, k.s + k.d); } if (now - t >= 1000) tti = t; }
+  return { supported: true, boot: ltSummary(0, ff), loading: ltSummary(ff, wc), afterWorldComplete: ABS.worldComplete != null ? ltSummary(wc, Infinity) : null, session: ltSummary(0, Infinity), timeToQuietMainThreadMs: r0(tti), note: 'boot = until first frame; loading = first frame until world complete; session = everything since page start (cumulative)' };
+}
+function checkWorld() { if (ABS.worldComplete == null && TP.state.zoneBReady && TP.state['ready_' + TIERS[tierIdx].key]) { ABS.worldComplete = performance.now(); mark('world complete'); } }
+const phasesReport = () => ({ usefulContentMs: r0(ABS.firstFrame), placeholderAssetsMs: r0(ABS.placeholder), interactiveMs: longTaskReport().timeToQuietMainThreadMs ?? null, worldCompleteMs: r0(ABS.worldComplete), definitions: { usefulContent: 'first rendered frame with placeholder quality', interactive: 'first 1 s without a long task after the first frame', worldComplete: 'zone B streamed and active tier fully upgraded' } });
+// per-frame GPU time where the browser allows it (Chrome; not Safari)
+const gpuExt = gl2.getExtension('EXT_disjoint_timer_query_webgl2'); let gpuQ = null; const gpuMsLog = [];
+function gpuBegin() { if (!gpuExt || gpuQ) return; gpuQ = gl2.createQuery(); gl2.beginQuery(gpuExt.TIME_ELAPSED_EXT, gpuQ); }
+function gpuEnd() { if (gpuExt && gpuQ) { gl2.endQuery(gpuExt.TIME_ELAPSED_EXT); const q = gpuQ; gpuQ = null; const sink = benchSink; const poll = () => { if (!gl2.getQueryParameter(q, gl2.QUERY_RESULT_AVAILABLE)) return setTimeout(poll, 8); if (!gl2.getParameter(gpuExt.GPU_DISJOINT_EXT)) { const ms = gl2.getQueryParameter(q, gl2.QUERY_RESULT) / 1e6; if (sink) sink.gpu.push(ms); } gl2.deleteQuery(q); }; setTimeout(poll, 8); } }
+let benchSink = null; // when set, the main loop adds {cpu, gpu} per-frame samples here
 function fpsStats(window_ = 120) {
   const a = ft.slice(-window_); if (a.length < 5) return { fps: 0, low1: 0, ms: 0, n: a.length };
   const avg = a.reduce((s, v) => s + v, 0) / a.length, srt = [...a].sort((x, y) => x - y), p99 = srt[Math.min(srt.length - 1, Math.floor(srt.length * 0.99))];
@@ -466,7 +499,7 @@ function snapshot() {
   const i = renderer.info, T = TIERS[tierIdx], f = fpsStats(), rb = resourceBytes();
   return { tier: T.key, tierName: T.name, auto, dpr: renderer.getPixelRatio(), fps: +f.fps.toFixed(1), fps1pctLow: +f.low1.toFixed(1), frameMs: +f.ms.toFixed(1), frames: f.n,
     drawCalls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, shadowMap: T.shadow, postChain: T.post, ...rb,
-    longTasks, longTaskMs: Math.round(longTaskMs) };
+    longTasks: ltSummary(0, Infinity).count, longTaskMs: ltSummary(0, Infinity).ms };
 }
 const deviceInfo = () => ({ userAgent: navigator.userAgent, platform: navigator.platform, cores: navigator.hardwareConcurrency || null, deviceMemoryGB: navigator.deviceMemory || null,
   screen: { w: screen.width, h: screen.height, dpr: window.devicePixelRatio }, viewport: { w: innerWidth, h: innerHeight }, gpu: GPU, gpuVendor: GPUV, softwareRenderer: SOFTWARE, webgl: gl2.getParameter(gl2.VERSION),
@@ -476,7 +509,7 @@ function renderDetails() {
   const row = (k, v) => `<dt>${k}</dt><dd class="num">${v}</dd>`;
   const bench = TP.bench && TP.bench.length ? `<table class="bench"><tr><th>איכות</th><th>fps</th><th>1% נמוך</th><th>calls</th><th>tris</th></tr>${TP.bench.map((b) => `<tr><td>${b.tierName}</td><td>${b.fps ?? 'n/a'}</td><td>${b.fps1pctLow ?? 'n/a'}</td><td>${b.drawCalls}</td><td>${Math.round(b.triangles / 1000)}K</td></tr>`).join('')}</table>` : '<span class="chip">טרם הורצה בדיקת ביצועים</span>';
   $('detBody').innerHTML =
-    `<div><h4>מדידות בזמן אמת (נמדד)</h4><dl>${row('fps ממוצע', s.fps)}${row('fps, 1% הכי איטיים', s.fps1pctLow)}${row('זמן פריים (ms)', s.frameMs)}${row('draw calls', s.drawCalls)}${row('משולשים', s.triangles.toLocaleString('en'))}${row('גאומטריות / טקסטורות', s.geometries + ' / ' + s.textures)}${row('משימות ארוכות', s.longTasks + ' (' + s.longTaskMs + ' ms)')}</dl></div>` +
+    `<div><h4>מדידות בזמן אמת (נמדד)</h4><dl>${row('fps ממוצע', s.fps)}${row('fps, 1% הכי איטיים', s.fps1pctLow)}${row('זמן פריים (ms)', s.frameMs)}${row('draw calls', s.drawCalls)}${row('משולשים', s.triangles.toLocaleString('en'))}${row('גאומטריות / טקסטורות', s.geometries + ' / ' + s.textures)}${row('משימות ארוכות (כל הסשן, מצטבר)', s.longTasks + ' (' + s.longTaskMs + ' ms)')}${row('משימות ארוכות בזמן טעינה', (() => { const l = longTaskReport(); return l.supported ? l.loading.count + ' (' + l.loading.ms + ' ms)' : 'לא נתמך'; })())}</dl></div>` +
     `<div><h4>משקל שנטען (נמדד)</h4><dl>${row('נכסים (' + s.assetFiles + ' קבצים)', kb(s.assetsBytes))}${row('ספריות (' + s.libraryFiles + ' קבצים)', s.libraryBytes ? kb(s.libraryBytes) : 'לא זמין')}${row('אזור B נטען תוך', z.ms ? z.ms + ' ms' : '–')}${row('תמונות ' + photoState.mode.toUpperCase(), Object.entries(photoState.loadMs).filter(([k]) => k.startsWith(photoState.mode)).map(([, v]) => v + 'ms').join(' · ') || '–')}</dl></div>` +
     `<div><h4>ציר זמן (נמדד)</h4><dl>${timeline.slice(0, 14).map((e) => row(e.name, e.t + ' ms')).join('')}</dl></div>` +
     `<div><h4>מכשיר</h4><dl>${row('GPU', d.gpu.slice(0, 38))}${row('ליבות / זיכרון', (d.cores || '?') + ' / ' + (d.deviceMemoryGB || '?') + 'GB')}${row('מסך', d.screen.w + '×' + d.screen.h + ' @' + d.screen.dpr)}${row('WebGL', d.webgl.slice(0, 30))}${row('פענוח KTX2 / meshopt', (decoders.ktx2 === false ? '✗ JPG' : decoders.ktx2 ? '✓' : '…') + ' / ' + (decoders.meshopt === false ? '✗ plain' : decoders.meshopt ? '✓' : '…'))}${row('KTX2', d.compressedTextures.ktx2Transcode ? Object.entries(d.compressedTextures.ktx2Transcode).filter(([, v]) => v).map(([k]) => k.replace('Supported', '')).join(',') : '–')}</dl></div>` +
@@ -485,7 +518,15 @@ function renderDetails() {
 
 /* ------------------------------------------------------------------ results / benchmark / UI */
 function photoBytes() { const o = {}; for (const e of performance.getEntriesByType('resource')) { const m = /photo_(\w+)\.(ktx2|jpg)/.exec(e.name); if (m) o[m[0]] = e.encodedBodySize || e.transferSize || 0; } return o; }
-function results() { return { tool: 'Shiko tech proof v1', decoders, photoBytes: photoBytes(), time: new Date().toISOString(), device: deviceInfo(), current: snapshot(), benchmark: TP.bench || [], timeline, zoneBStreamMs: zoneB.ms || null, photoLoadMs: photoState.loadMs,
+function bytesByPhase() {
+  const cat = (n) => (/\/basis\//.test(n) ? 'transcoder' : /\/assets\/.*(photo_)/.test(n) ? 'photos' : /\.glb/.test(n) ? 'geometry' : /\/assets\//.test(n) ? 'textures' : /jsdelivr|unpkg|cdnjs/.test(n) ? 'threejs' : 'page');
+  const o = { total: 0, beforeFirstFrame: 0, beforeWorldComplete: 0, byCategory: {}, requests: 0, requestsBeforeFirstFrame: 0 };
+  for (const e of performance.getEntriesByType('resource')) { const b = e.encodedBodySize || e.transferSize || 0, c = cat(e.name); o.total += b; o.requests++; o.byCategory[c] = (o.byCategory[c] || 0) + b;
+    if (ABS.firstFrame != null && e.responseEnd <= ABS.firstFrame) { o.beforeFirstFrame += b; o.requestsBeforeFirstFrame++; } if (ABS.worldComplete != null && e.responseEnd <= ABS.worldComplete) o.beforeWorldComplete += b; }
+  const nav = performance.getEntriesByType('navigation')[0]; if (nav) o.page = { encodedBodySize: nav.encodedBodySize, responseEndMs: r0(nav.responseEnd), domContentLoadedMs: r0(nav.domContentLoadedEventEnd) };
+  return o;
+}
+function results() { return { tool: 'Shiko tech proof v2 (measurement build)', schema: 2, phases: phasesReport(), longTasks: longTaskReport(), bytes: bytesByPhase(), gpuTimerAvailable: !!gpuExt, decoders, photoBytes: photoBytes(), time: new Date().toISOString(), device: deviceInfo(), current: snapshot(), stageCostMs: Object.fromEntries(Object.entries(stageMs).map(([k, v]) => [k, { calls: v.calls, ms: Math.round(v.ms), maxMs: Math.round(v.maxMs) }])), benchmark: TP.bench || [], benchmarkMeta: TP.benchMeta || null, timeline, zoneBStreamMs: zoneB.ms || null, photoLoadMs: photoState.loadMs,
   note: SOFTWARE ? 'SOFTWARE RENDERER: fps values are not representative of a real GPU' : 'measured on this device' }; }
 async function copyResults() {
   const txt = JSON.stringify(results(), null, 1), out = $('out'); out.value = txt; out.hidden = false;
@@ -493,16 +534,55 @@ async function copyResults() {
   setTimeout(() => { $('bCopy').textContent = 'העתק תוצאות'; }, 2500);
 }
 let benchRunning = false;
+const BENCH_POSES = [{ name: 'A', t: 0.12 }, { name: 'mid', t: 0.5 }, { name: 'B', t: 0.9 }];
+const BENCH_CFG = { settleMinMs: 1500, settleMaxMs: 8000, quietMs: 800, poseSettleMs: 700, poseWindowMs: 3000, minFrames: 30 };
+const pct = (a, q) => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(s.length * q))]; };
+const mean = (a) => (a.length ? a.reduce((x, y) => x + y, 0) / a.length : null);
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const rnd1 = (v, d = 1) => (v == null ? null : +v.toFixed(d));
 async function runBench() {
-  if (benchRunning) return; benchRunning = true; const prevAuto = auto, prevTier = tierIdx, prevAP = autopilot; TP.bench = []; auto = false; autopilot = true; camT = 0.05; camDir = 1; flyTo = null; $('bBench').disabled = true;
-  for (let i = 0; i < 4; i++) {
-    if (i > tierCap + 1) break;
-    $('bBench').textContent = `בודק: ${TIERS[i].name} (${i + 1}/4)…`; await applyTier(i, 'benchmark'); await new Promise((r) => setTimeout(r, 1800)); ft.length = 0; renderer.info.reset();
-    const start = performance.now(); let calls = 0, tris = 0, nf = 0;
-    await new Promise((res) => { const iv = setInterval(() => { calls += renderer.info.render.calls; tris += renderer.info.render.triangles; nf++; const el = performance.now() - start; if ((el > 4000 && ft.length >= 90) || el > 12000) { clearInterval(iv); res(); } }, 250); });
-    const s = snapshot(); TP.bench.push({ tier: s.tier, tierName: s.tierName, fps: s.frames >= 30 ? s.fps : null, fps1pctLow: s.frames >= 30 ? s.fps1pctLow : null, insufficientFrames: s.frames < 30, frameMs: s.frameMs, drawCalls: s.drawCalls, triangles: s.triangles, frames: s.frames });
+  if (benchRunning) return; benchRunning = true;
+  const prevAuto = auto, prevTier = tierIdx, prevAP = autopilot, prevT = camT;
+  TP.bench = []; TP.benchMeta = { cfg: BENCH_CFG, startedAt: new Date().toISOString(), gpuTimer: !!gpuExt, poses: BENCH_POSES };
+  auto = false; autopilot = false; flyTo = null; yawOff = pitchOff = 0;
+  // lock every control: manual tier / camera / photo buttons cannot change the scene mid-measurement
+  const btns = [...document.querySelectorAll('button')], was = btns.map((b) => b.disabled); btns.forEach((b) => { b.disabled = true; }); document.body.classList.add('benching');
+  let bad = new Set(); const flag = (r) => () => { if (benchRunning) bad.add(r); };
+  const L = [['pointerdown', 'user input'], ['keydown', 'user input'], ['wheel', 'user input'], ['touchstart', 'user input'], ['resize', 'window resized'], ['visibilitychange', 'tab hidden/visible changed']].map(([ev, r]) => { const f = flag(r); addEventListener(ev, f, true); return [ev, f]; });
+  try {
+    $('bBench').textContent = 'ממתין להשלמת טעינת העולם…';
+    for (let i = 0; i < 300 && !TP.state.zoneBReady; i++) await sleep(200);
+    TP.benchMeta.worldCompleteBeforeStart = !!TP.state.zoneBReady;
+    for (let i = 0; i < 4; i++) {
+      bad = new Set(); const tierStart = performance.now(), tk = applyToken;
+      $('bBench').textContent = `בודק: ${TIERS[i].name} (${i + 1}/4)…`; await applyTier(i, 'benchmark');
+      // wait until decoding/upgrades have quietened (no long task for quietMs), so the window measures steady state
+      const s0 = performance.now(); for (;;) { const last = longTaskList.reduce((m, t) => Math.max(m, t.s + t.d), 0), n = performance.now(); if ((n - s0 >= BENCH_CFG.settleMinMs && n - last >= BENCH_CFG.quietMs) || n - s0 > BENCH_CFG.settleMaxMs) break; await sleep(100); }
+      const settled = performance.now() - s0, poses = [];
+      for (const P of BENCH_POSES) {
+        camT = P.t; await sleep(BENCH_CFG.poseSettleMs);
+        const sink = (benchSink = { ft: [], cpu: [], gpu: [], calls: 0, tris: 0 }); await sleep(BENCH_CFG.poseWindowMs); benchSink = null; await sleep(150);
+        const ft_ = sink.ft, m = mean(ft_);
+        poses.push({ pose: P.name, frames: ft_.length, fps: m ? rnd1(1000 / m) : null, p50Ms: rnd1(pct(ft_, 0.5)), p95Ms: rnd1(pct(ft_, 0.95)), p99Ms: rnd1(pct(ft_, 0.99)), fps1pctLow: ft_.length ? rnd1(1000 / pct(ft_, 0.99)) : null,
+          cpuMsAvg: rnd1(mean(sink.cpu), 2), cpuMsP95: rnd1(pct(sink.cpu, 0.95), 2), gpuMsAvg: sink.gpu.length ? rnd1(mean(sink.gpu), 2) : null, gpuMsP95: sink.gpu.length ? rnd1(pct(sink.gpu, 0.95), 2) : null, drawCalls: sink.calls, triangles: sink.tris });
+      }
+      if (applyToken !== tk + 1) bad.add('tier changed during test');
+      const T = TIERS[i], ok = poses.filter((p) => p.frames >= BENCH_CFG.minFrames), lt = ltSummary(tierStart, performance.now());
+      TP.bench.push({ tier: T.key, tierName: T.name, valid: bad.size === 0, invalidReasons: [...bad], insufficientFrames: ok.length < poses.length, settledMs: Math.round(settled),
+        fps: ok.length ? rnd1(mean(ok.map((p) => p.fps))) : null, fps1pctLow: ok.length ? Math.min(...ok.map((p) => p.fps1pctLow)) : null, frameMs: ok.length ? rnd1(mean(ok.map((p) => 1000 / p.fps))) : null,
+        worstP95Ms: ok.length ? Math.max(...ok.map((p) => p.p95Ms)) : null, cpuMsAvg: rnd1(mean(poses.map((p) => p.cpuMsAvg).filter((v) => v != null)), 2), gpuMsAvg: poses.some((p) => p.gpuMsAvg != null) ? rnd1(mean(poses.map((p) => p.gpuMsAvg).filter((v) => v != null)), 2) : null,
+        drawCalls: Math.max(...poses.map((p) => p.drawCalls)), triangles: Math.max(...poses.map((p) => p.triangles)), frames: poses.reduce((s, p) => s + p.frames, 0), longTasksDuringTier: lt, poses });
+    }
+    // display cap: fps that no tier can exceed is the refresh rate, not the GPU limit
+    const p50s = TP.bench.flatMap((b) => b.poses.filter((p) => p.frames >= BENCH_CFG.minFrames).map((p) => p.p50Ms)); const minP50 = p50s.length ? Math.min(...p50s) : null;
+    TP.benchMeta.refreshHzEstimate = minP50 ? Math.round(1000 / minP50) : null;
+    TP.bench.forEach((b) => { b.nearDisplayCap = !!(TP.benchMeta.refreshHzEstimate && b.fps && b.fps >= 0.92 * TP.benchMeta.refreshHzEstimate); });
+    TP.benchMeta.finishedAt = new Date().toISOString(); TP.benchMeta.allValid = TP.bench.every((b) => b.valid);
+  } finally {
+    benchSink = null; L.forEach(([ev, f]) => removeEventListener(ev, f, true)); btns.forEach((b, k) => { b.disabled = was[k]; }); document.body.classList.remove('benching');
+    auto = prevAuto; autopilot = prevAP; camT = prevT; benchRunning = false; // benchRunning must be false before the restore so applyTier is not blocked
+    await applyTier(Math.min(prevTier, tierCap), 'after benchmark'); $('bBench').textContent = 'בדיקת ביצועים (כ־45 שניות)'; mark('benchmark done'); renderDetails();
   }
-  auto = prevAuto; autopilot = prevAP; await applyTier(Math.min(prevTier, tierCap), 'after benchmark'); $('bBench').disabled = false; $('bBench').textContent = 'בדיקת ביצועים (כ־30 שניות)'; benchRunning = false; mark('benchmark done'); renderDetails();
 }
 document.querySelectorAll('[data-tier]').forEach((b) => b.addEventListener('click', () => { if (b.dataset.tier === 'auto') { auto = true; blocked.clear(); } else { auto = false; applyTier(+b.dataset.tier, 'manual'); } [...document.querySelectorAll('[data-tier]')].forEach((x) => x.setAttribute('aria-pressed', String((auto && x.dataset.tier === 'auto') || (!auto && x.dataset.tier === String(tierIdx))))); }));
 $('bPlay').addEventListener('click', () => { autopilot = !autopilot; flyTo = null; $('bPlay').setAttribute('aria-pressed', String(autopilot)); });
@@ -520,19 +600,21 @@ let lastStat = 0, lastAuto = 0, frame = 0; const sunScreen = new THREE.Vector3()
 function loop(now) {
   requestAnimationFrame(loop);
   if (document.hidden) { lastNow = now; return; }
-  const dt = Math.min(0.1, (now - lastNow) / 1000); if (frame > 0) ft.push(now - lastNow); if (ft.length > 600) ft.shift(); lastNow = now; frame++;
+  const dt = Math.min(0.1, (now - lastNow) / 1000); if (frame > 0) { ft.push(now - lastNow); if (benchSink) benchSink.ft.push(now - lastNow); } if (ft.length > 600) ft.shift(); lastNow = now; frame++;
   windU.value = now / 1000;
   const look = updateCamera(dt, now);
   // shadow frustum follows what the camera looks at
   if (sun.castShadow) { sun.target.position.copy(look); sun.position.copy(look).addScaledVector(sunDir, 140); const c = sun.shadow.camera, e = TIERS[tierIdx].shadow >= 4096 ? 90 : 70; if (c.right !== e) { c.left = -e; c.right = e; c.top = e; c.bottom = -e; c.near = 1; c.far = 320; c.updateProjectionMatrix(); } }
-  renderer.info.reset();
+  renderer.info.reset(); const cpu0 = benchSink || frame <= 4 ? performance.now() : 0; if (benchSink) gpuBegin();
   if (composer) {
     if (passes.rays) { tmpV.copy(camera.position).addScaledVector(sunDir, 500); sunScreen.copy(tmpV).project(camera); const facing = tmpV.sub(camera.position).dot(camera.getWorldDirection(new THREE.Vector3())) > 0; passes.rays.uniforms.sunPos.value.set(sunScreen.x * 0.5 + 0.5, sunScreen.y * 0.5 + 0.5); passes.rays.uniforms.strength.value = facing ? 1.0 : 0.0; }
     if (passes.dof) { const dist = camera.position.distanceTo(look); passes.dof.uniforms.focus.value = dist; }
     if (passes.grade) passes.grade.uniforms.uT.value = (now % 1000) / 1000;
     composer.render(dt);
   } else renderer.render(scene, camera);
-  if (frame === 3 && !TP.state.firstFrame) { TP.state.firstFrame = true; mark('first frame (placeholder quality)'); $('loading').classList.add('done'); }
+  if (frame <= 4) stageAdd('renderCall_frame' + frame, performance.now() - cpu0);
+  if (benchSink) { gpuEnd(); benchSink.cpu.push(performance.now() - cpu0); benchSink.calls = Math.max(benchSink.calls, renderer.info.render.calls); benchSink.tris = Math.max(benchSink.tris, renderer.info.render.triangles); }
+  if (frame === 3 && !TP.state.firstFrame) { TP.state.firstFrame = true; ABS.firstFrame = performance.now(); mark('first frame (placeholder quality)'); $('loading').classList.add('done'); }
   if (now - lastStat > 250) { lastStat = now; const s = fpsStats(60); $('stFps').textContent = (s.fps ? s.fps.toFixed(0) : '–') + ' fps'; $('stCalls').textContent = renderer.info.render.calls + ' draw calls'; $('chTier').textContent = 'איכות: ' + TIERS[tierIdx].name + (auto ? ' (אוטו)' : ''); if ($('details').open && now % 1000 < 260) renderDetails(); }
   // adaptive quality (only in auto mode, with hysteresis; never while benchmarking)
   if (auto && !benchRunning && now - lastAuto > 3000 && frame > 90 && now - lastTierChange > 3500) {
@@ -552,7 +634,7 @@ const startTier = tierIdx;
 {
   const [tg, rg] = await Promise.all([loadGeo('terrain_lod1'), loadGeo('rock_lod1')]);
   await Promise.all(['ground', 'rock', 'wood'].map((n) => upgradeMaterial(n, 's', null)));
-  terrain.geometry = tg; terrain.visible = true; mark('placeholder assets ready'); TP.state.placeholder = true;
+  terrain.geometry = tg; terrain.visible = true; mark('placeholder assets ready'); ABS.placeholder = performance.now(); TP.state.placeholder = true;
   rocks.A = makeRocks(rocks.listA.slice(0, 60), rg); scene.add(rocks.A); // a first handful of rocks, zone content follows
 }
 if (!(new URLSearchParams(location.search).has('manual'))) { /* normal start */ }
