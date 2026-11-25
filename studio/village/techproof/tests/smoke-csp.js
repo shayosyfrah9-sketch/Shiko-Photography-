@@ -1,0 +1,21 @@
+const { chromium, devices } = require('playwright');
+(async () => {
+  const kind = process.env.KIND || 'desktop';
+  const b = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+  const ctx = await b.newContext(kind === 'phone' ? { ...devices['iPhone 13'] } : { viewport: { width: 800, height: 500 } });
+  await ctx.route('https://cdn.jsdelivr.net/npm/three@0.181.0/**', (r) => r.fulfill({ response: undefined }).catch(() => {}));
+  await ctx.route('https://cdn.jsdelivr.net/npm/three@0.181.0/**', async (r) => { const u = new URL(r.request().url()); const resp = await fetch('http://localhost:8098/__three/' + u.pathname.replace('/npm/three@0.181.0/', '')); r.fulfill({ status: resp.status, body: Buffer.from(await resp.arrayBuffer()), headers: { 'content-type': 'text/javascript', 'access-control-allow-origin': '*', 'timing-allow-origin': '*' } }); });
+  const p = await ctx.newPage(); const logs = [];
+  p.on('console', (m) => { if (['error', 'warning'].includes(m.type())) logs.push(m.type() + ': ' + m.text().slice(0, 250)); });
+  p.on('pageerror', (e) => logs.push('PAGEERROR: ' + e.message.slice(0, 300)));
+  p.on('requestfailed', (r) => logs.push('REQFAIL ' + r.url().slice(0, 120)));
+  await p.goto('http://localhost:8098/', { waitUntil: 'domcontentloaded' });
+  const t0 = Date.now();
+  await p.waitForFunction(() => window.__tp && window.__tp.state && window.__tp.state.firstFrame, null, { timeout: 150000 }).catch(() => console.log('no first frame'));
+  console.log('first frame after', Date.now() - t0, 'ms', JSON.stringify(await p.evaluate(() => window.__tp.state)));
+  await p.waitForTimeout(8000);
+  console.log('state', JSON.stringify(await p.evaluate(() => window.__tp.state)));
+  console.log('snap', JSON.stringify(await p.evaluate(() => window.__tp.api && window.__tp.api.snapshot())));
+  await p.screenshot({ path: `/tmp/claude-0/tp/smoke-${kind}.png` });
+  console.log(logs.slice(0, 20).join('\n')); await b.close();
+})();

@@ -1,0 +1,563 @@
+<title>Shiko Tech Proof</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<style>
+/* Layout concept: a full-bleed real-time scene with a quiet instrument layer on top (status chip, tier dock, collapsible measurements).
+   Technology proof only: neutral geometry on purpose, no art direction decisions. */
+:root {
+  --bg: #0d0f12;
+  --fg: #eef0f3;
+  --muted: #9aa3ad;
+  --panel: rgba(18, 21, 26, .72);
+  --panel-solid: #14171c;
+  --line: rgba(255, 255, 255, .14);
+  --accent: #f0b35a;
+  --good: #6fd19a;
+  --warn: #f0b35a;
+  --bad: #ff7b6b;
+  --font-ui: "Rubik", "Heebo", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-num: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    --bg: #e9ecef; --fg: #14171c; --muted: #4d5661; --panel: rgba(255, 255, 255, .78); --panel-solid: #ffffff;
+    --line: rgba(0, 0, 0, .16); --accent: #a8590a; --good: #1c7a4a; --warn: #a8590a; --bad: #b3261e; color-scheme: light;
+  }
+}
+:root[data-theme="light"] {
+  --bg: #e9ecef; --fg: #14171c; --muted: #4d5661; --panel: rgba(255, 255, 255, .78); --panel-solid: #ffffff;
+  --line: rgba(0, 0, 0, .16); --accent: #a8590a; --good: #1c7a4a; --warn: #a8590a; --bad: #b3261e; color-scheme: light;
+}
+html, body { height: 100%; }
+body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--font-ui); overflow: hidden; }
+#gl { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; background: #0b0d10; }
+.layer { position: fixed; left: 0; right: 0; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); pointer-events: none; box-sizing: border-box; }
+.layer > * { pointer-events: auto; }
+#top { top: 0; padding-top: calc(env(safe-area-inset-top, 0px) + 10px); }
+#bottom { bottom: 0; padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 12px); display: flex; flex-direction: column; gap: 8px; }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+#status { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; padding: 8px 12px; max-width: 760px; }
+#status b { font-weight: 600; letter-spacing: .01em; }
+.num { font-family: var(--font-num); font-variant-numeric: tabular-nums; font-size: 12.5px; }
+.chip { font-size: 11.5px; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--line); color: var(--muted); }
+.chip.on { color: var(--fg); border-color: var(--accent); }
+#banner { margin-top: 8px; padding: 8px 12px; font-size: 12.5px; line-height: 1.5; max-width: 760px; border-inline-start: 3px solid var(--warn); }
+#banner[hidden] { display: none; }
+body.hide-ui #banner, body.hide-ui #bottom { display: none; }
+#banner { cursor: pointer; }
+.dock { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; padding: 8px; max-width: 920px; }
+.grp { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+.grp > span { font-size: 11.5px; color: var(--muted); padding-inline: 4px; }
+button { font: inherit; font-size: 13px; color: var(--fg); background: transparent; border: 1px solid var(--line); border-radius: 8px; padding: 7px 11px; cursor: pointer; min-height: 34px; }
+button:hover { border-color: var(--accent); }
+button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button[aria-pressed="true"] { background: var(--accent); color: #14100a; border-color: var(--accent); }
+button:disabled { opacity: .45; cursor: default; }
+button.primary { border-color: var(--accent); }
+#details { padding: 0; max-width: 920px; max-height: 42vh; overflow: auto; }
+#details summary { cursor: pointer; padding: 9px 12px; font-size: 13px; }
+#details .body { padding: 2px 12px 12px; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px 22px; }
+#details h4 { margin: 0 0 4px; font-size: 11.5px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+#details dl { margin: 0; display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; }
+#details dt { color: var(--muted); font-size: 12.5px; min-width: 0; }
+#details dd { margin: 0; text-align: end; direction: ltr; unicode-bidi: plaintext; }
+table.bench { border-collapse: collapse; width: 100%; font-size: 12.5px; }
+table.bench th, table.bench td { padding: 3px 6px; text-align: end; border-bottom: 1px solid var(--line); }
+table.bench th:first-child, table.bench td:first-child { text-align: start; }
+#loading { position: fixed; inset: 0; display: grid; place-items: center; background: #0b0d10; color: #cfd5dc; font-size: 14px; letter-spacing: .08em; transition: opacity .6s; z-index: 5; }
+#loading.done { opacity: 0; pointer-events: none; }
+#err { position: fixed; inset: 0; z-index: 6; display: grid; place-items: center; padding: 24px; background: var(--bg); color: var(--fg); text-align: center; }
+#err[hidden] { display: none; }
+#out { width: 100%; height: 90px; font-family: var(--font-num); font-size: 11px; background: var(--panel-solid); color: var(--fg); border: 1px solid var(--line); border-radius: 8px; box-sizing: border-box; }
+@media (max-width: 520px) { button { padding: 6px 9px; font-size: 12.5px; } .dock { padding: 6px; } }
+@media (prefers-reduced-motion: reduce) { #loading { transition: none; } }
+</style>
+
+<canvas id="gl" aria-label="Real-time 3D technology test scene"></canvas>
+<div id="loading" dir="rtl">טוען…</div>
+<div id="err" hidden dir="rtl"><div><h2>הדפדפן לא הצליח להריץ את הבדיקה</h2><p id="errmsg"></p></div></div>
+
+<div class="layer" id="top" dir="rtl">
+  <div class="card" id="status">
+    <b>הוכחת היתכנות טכנית</b>
+    <span class="chip" id="chTier">איכות: –</span>
+    <span class="num" id="stFps">– fps</span>
+    <span class="num" id="stCalls">– draw calls</span>
+    <span class="num" id="stZone">אזור A</span>
+    <button id="bHide" aria-pressed="false">הסתר ממשק</button>
+  </div>
+  <div class="card" id="banner" hidden></div>
+</div>
+
+<div class="layer" id="bottom" dir="rtl">
+  <details class="card" id="details">
+    <summary>מדידות ופרטי מכשיר</summary>
+    <div class="body" id="detBody"></div>
+  </details>
+  <div class="card dock">
+    <div class="grp" role="group" aria-label="איכות"><span>איכות</span>
+      <button data-tier="auto" aria-pressed="true">אוטו</button><button data-tier="0" aria-pressed="false">נמוך</button><button data-tier="1" aria-pressed="false">בינוני</button><button data-tier="2" aria-pressed="false">גבוה</button><button data-tier="3" aria-pressed="false">אולטרה</button>
+    </div>
+    <div class="grp" role="group" aria-label="מצלמה"><span>מצלמה</span>
+      <button id="bPlay" aria-pressed="true">מצלמה אוטומטית</button><button id="bFly">לאזור B</button>
+    </div>
+    <div class="grp" role="group" aria-label="תמונות"><span>תמונות</span>
+      <button id="bPhoto" aria-pressed="false">KTX2</button>
+    </div>
+    <div class="grp"><button id="bBench" class="primary">בדיקת ביצועים (כ־30 שניות)</button><button id="bCopy" class="primary">העתק תוצאות</button></div>
+  </div>
+  <textarea id="out" hidden readonly aria-label="תוצאות להעתקה"></textarea>
+</div>
+
+<script type="importmap">
+{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.181.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.181.0/examples/jsm/"}}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+import { Sky } from 'three/addons/objects/Sky.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
+import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
+
+const $ = (id) => document.getElementById(id);
+const T0 = performance.now();
+const BASE = new URL('.', document.baseURI).href;
+const timeline = [];
+const mark = (name, extra) => { const t = Math.round(performance.now() - T0); timeline.push({ t, name, ...(extra || {}) }); };
+const TP = (window.__tp = { state: {}, mark });
+function fail(e) { console.error(e); $('errmsg').textContent = String(e && e.message || e); $('err').hidden = false; $('loading').classList.add('done'); }
+
+try {
+/* ------------------------------------------------------------------ noise / terrain (identical to the generator that built the GLBs) */
+function rng(seed) { let s = seed >>> 0; return () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296); }
+function noise2(seed) {
+  const r = rng(seed), P = new Float32Array(256 * 256); for (let i = 0; i < P.length; i++) P[i] = r();
+  const at = (x, y) => P[((y & 255) << 8) | (x & 255)];
+  return (x, y) => { const xi = Math.floor(x), yi = Math.floor(y), xf = x - xi, yf = y - yi;
+    const u = xf * xf * (3 - 2 * xf), v = yf * yf * (3 - 2 * yf);
+    return at(xi, yi) * (1 - u) * (1 - v) + at(xi + 1, yi) * u * (1 - v) + at(xi, yi + 1) * (1 - u) * v + at(xi + 1, yi + 1) * u * v; };
+}
+const N7 = noise2(7);
+const fbm = (x, y) => { let a = 0.5, f = 1, s = 0; for (let o = 0; o < 5; o++) { s += a * N7(x * f, y * f); f *= 2; a *= 0.5; } return s; };
+const terrainH = (x, z) => (fbm(x * 0.012 + 3, z * 0.012 + 9) - 0.45) * 38 * (0.35 + 0.65 * Math.min(1, Math.hypot(x, z) / 120));
+
+/* ------------------------------------------------------------------ renderer */
+const canvas = $('gl');
+const gl2 = canvas.getContext('webgl2', { antialias: false, powerPreference: 'high-performance', alpha: false });
+if (!gl2) throw new Error('WebGL2 לא זמין בדפדפן הזה');
+const renderer = new THREE.WebGLRenderer({ canvas, context: gl2 });
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.5;
+renderer.info.autoReset = false;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFShadowMap;
+const dbg = gl2.getExtension('WEBGL_debug_renderer_info');
+const GPU = dbg ? gl2.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : 'לא ידוע';
+const GPUV = dbg ? gl2.getParameter(dbg.UNMASKED_VENDOR_WEBGL) : '';
+const SOFTWARE = /swiftshader|llvmpipe|software|softpipe/i.test(GPU);
+const PHONE = matchMedia('(pointer: coarse)').matches || Math.min(innerWidth, innerHeight) < 600;
+
+const scene = new THREE.Scene();
+scene.background = null;
+const camera = new THREE.PerspectiveCamera(52, 1, 0.3, 900);
+scene.add(camera);
+
+/* ------------------------------------------------------------------ loaders */
+const ktx2 = new KTX2Loader().setTranscoderPath(BASE + 'basis/').detectSupport(renderer);
+const gltfLoader = new GLTFLoader().setMeshoptDecoder(MeshoptDecoder);
+const texCache = new Map();
+const WASM_OK = (() => { try { new WebAssembly.Module(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0])); return true; } catch (_) { return false; } })();
+const decoders = { wasm: WASM_OK, ktx2: WASM_OK ? null : false, ktx2Error: WASM_OK ? null : 'WebAssembly blocked', meshopt: WASM_OK ? null : false, meshoptError: WASM_OK ? null : 'WebAssembly blocked' }; // filled at runtime; fallbacks keep the test alive if a sandbox blocks wasm/workers
+const finishTex = (t, srgb) => { t.wrapS = t.wrapT = THREE.RepeatWrapping; t.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy()); if (srgb) t.colorSpace = THREE.SRGBColorSpace; return t; };
+function loadTex(name, srgb) {
+  if (texCache.has(name)) return texCache.get(name);
+  const jpgUrl = BASE + 'assets/' + (name.startsWith('photo_') ? '' : 'fb/') + name + '.jpg';
+  const viaJpg = () => new THREE.TextureLoader().loadAsync(jpgUrl).then((t) => finishTex(t, srgb));
+  const p = (decoders.ktx2 === false ? viaJpg() : ktx2.loadAsync(BASE + 'assets/' + name + '.ktx2.png').then((t) => { decoders.ktx2 = true; return finishTex(t, srgb); })
+    .catch((e) => { decoders.ktx2 = false; decoders.ktx2Error = String((e && e.message) || e).slice(0, 160); mark('KTX2 failed, JPG fallback'); showNote('KTX2 לא רץ בסביבה הזו (' + decoders.ktx2Error + '). עברתי לקבצי JPG; מדדי המשקל של KTX2 לא תקפים.'); return viaJpg(); }));
+  texCache.set(name, p); return p;
+}
+function showNote(t) { const b = $('banner'); b.hidden = false; b.textContent = t; }
+const geoCache = new Map();
+function loadGeo(name) {
+  if (geoCache.has(name)) return geoCache.get(name);
+  const plainOnly = decoders.meshopt === false;
+  const p = (plainOnly ? Promise.resolve(null).then(() => gltfLoader.loadAsync(BASE + 'assets/' + name + '_plain.glb.png')) : gltfLoader.loadAsync(BASE + 'assets/' + name + '.glb.png')).then((g) => { decoders.meshopt = decoders.meshopt !== false; return g; }).catch((e) => { decoders.meshopt = false; decoders.meshoptError = String((e && e.message) || e).slice(0, 160); mark('meshopt failed, plain GLB fallback'); showNote('פענוח meshopt לא רץ בסביבה הזו. עברתי ל־GLB לא דחוס; מדדי המשקל של הגאומטריה לא תקפים.'); return gltfLoader.loadAsync(BASE + 'assets/' + name + '_plain.glb.png'); }).then((g) => { let geo = null; g.scene.updateMatrixWorld(true); g.scene.traverse((o) => { if (o.isMesh && !geo) { geo = o.geometry; for (const nm of ['position', 'normal', 'uv']) { const at = geo.attributes[nm]; if (at && at.array.constructor !== Float32Array) { const f = new Float32Array(at.count * at.itemSize); for (let i = 0; i < at.count; i++) for (let k = 0; k < at.itemSize; k++) f[i * at.itemSize + k] = at.getComponent(i, k); geo.setAttribute(nm, new THREE.BufferAttribute(f, at.itemSize)); } } geo.applyMatrix4(o.matrixWorld); geo.computeBoundingSphere(); } }); return geo; });
+  geoCache.set(name, p); return p;
+}
+
+/* ------------------------------------------------------------------ quality tiers */
+const TIERS = [
+  { name: 'נמוך', key: 'low', dpr: 1, shadow: 0, shadowType: 0, mat: 's', normals: null, terrain: 1, rock: 1, rocks: 40, grass: 0, motes: 0, post: false, bloom: 0, rays: false, dof: false, smaa: false, msaa: 0, env: false },
+  { name: 'בינוני', key: 'med', dpr: 1.25, shadow: 1024, shadowType: 0, mat: 'l', normals: 'etc_m', terrain: 0, rock: 0, rocks: 120, grass: 7000, motes: 300, post: true, bloom: 0.25, rays: false, dof: false, smaa: false, msaa: 0, env: true },
+  { name: 'גבוה', key: 'high', dpr: 1.5, shadow: 2048, shadowType: 1, mat: 'l', normals: 'l', terrain: 0, rock: 0, rocks: 220, grass: 24000, motes: 700, post: true, bloom: 0.35, rays: true, dof: false, smaa: true, msaa: 4, env: true },
+  { name: 'אולטרה', key: 'ultra', dpr: 2, shadow: 4096, shadowType: 1, mat: 'l', normals: 'l', terrain: 0, rock: 0, rocks: 400, grass: 60000, motes: 1200, post: true, bloom: 0.45, rays: true, dof: true, smaa: true, msaa: 4, env: true },
+];
+let tierIdx = PHONE ? 1 : 2, auto = true, tierCap = PHONE ? 2 : 3, blocked = new Set(), lastTierChange = 0;
+
+/* ------------------------------------------------------------------ lighting / sky / zones */
+const sky = new Sky(); sky.scale.setScalar(5000); scene.add(sky);
+const sun = new THREE.DirectionalLight(0xffe2b8, 3.2); sun.castShadow = true; sun.shadow.bias = -0.0004; sun.shadow.normalBias = 0.6;
+scene.add(sun, sun.target);
+const hemi = new THREE.HemisphereLight(0xbcd4ff, 0x4a4030, 0.42); scene.add(hemi);
+scene.fog = new THREE.FogExp2(0xd9b98c, 0.0042);
+const ZA = { x: -70, z: -40 }, ZB = { x: 95, z: 60 };
+const ZONE = {
+  A: { elev: 13, azim: 235, sunCol: new THREE.Color(0xffd9a8), sunI: 2.5, fog: new THREE.Color(0xc9ad84), fogD: 0.0042, turb: 6, ray: 1.6, mie: 0.006, exp: 0.5, hemi: 0.3 },
+  B: { elev: 4, azim: 285, sunCol: new THREE.Color(0xff9a66), sunI: 1.9, fog: new THREE.Color(0x6a5c66), fogD: 0.0036, turb: 3, ray: 1.6, mie: 0.003, exp: 0.5, hemi: 0.3 },
+};
+const sunDir = new THREE.Vector3();
+let envRT = null; const pmrem = new THREE.PMREMGenerator(renderer);
+function setSky(u) {
+  const A = ZONE.A, B = ZONE.B, l = (a, b) => a + (b - a) * u;
+  const elev = l(A.elev, B.elev), az = l(A.azim, B.azim);
+  const phi = THREE.MathUtils.degToRad(90 - elev), theta = THREE.MathUtils.degToRad(az);
+  sunDir.setFromSphericalCoords(1, phi, theta);
+  const U = sky.material.uniforms; U.sunPosition.value.copy(sunDir); U.turbidity.value = l(A.turb, B.turb); U.rayleigh.value = l(A.ray, B.ray); U.mieCoefficient.value = l(A.mie, B.mie); U.mieDirectionalG.value = 0.82;
+  sun.color.copy(A.sunCol).lerp(B.sunCol, u); sun.intensity = l(A.sunI, B.sunI);
+  scene.fog.color.copy(A.fog).lerp(B.fog, u); scene.fog.density = l(A.fogD, B.fogD);
+  hemi.intensity = l(A.hemi, B.hemi); renderer.toneMappingExposure = l(A.exp, B.exp);
+}
+function buildEnv() {
+  if (envRT) envRT.dispose();
+  const s = new THREE.Scene(); const sk = new Sky(); sk.scale.setScalar(5000); Object.keys(sk.material.uniforms).forEach((k) => { if (sky.material.uniforms[k]) sk.material.uniforms[k].value = sky.material.uniforms[k].value; }); s.add(sk);
+  envRT = pmrem.fromScene(s, 0, 0.1, 1000); scene.environment = envRT.texture; scene.environmentIntensity = 0.55;
+}
+
+/* ------------------------------------------------------------------ materials (placeholders first, upgraded progressively) */
+const MATS = {
+  ground: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1 }),
+  rock: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1 }),
+  wood: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 1 }),
+};
+const matLevel = {}; // name -> 'none'|'s'|'l'
+const normLevel = {};
+const SET = { ground: 'ground', rock: 'rock', wood: 'wood' };
+async function upgradeMaterial(name, level, normals) {
+  const set = SET[name], m = MATS[name];
+  if (matLevel[name] !== level) {
+    const [d, r] = await Promise.all([loadTex(`${set}_diff_${level}`, true), loadTex(`${set}_rough_${level}`, false)]);
+    m.map = d; m.roughnessMap = r; m.needsUpdate = true; matLevel[name] = level;
+  }
+  if (normals && normLevel[name] !== normals) {
+    const n = await loadTex(`${set}_nor_${normals}`, false); m.normalMap = n; m.normalScale.set(1, 1); m.needsUpdate = true; normLevel[name] = normals;
+  } else if (!normals && m.normalMap) { m.normalMap = null; m.needsUpdate = true; normLevel[name] = null; }
+}
+// terrain: macro tint so the tiled texture does not repeat visibly (shader tweak, no extra texture)
+MATS.ground.onBeforeCompile = (sh) => {
+  sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vWp;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvWp=(modelMatrix*vec4(transformed,1.)).xyz;');
+  sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nvarying vec3 vWp;\nfloat h21(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}\nfloat vn(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.-2.*f);return mix(mix(h21(i),h21(i+vec2(1,0)),f.x),mix(h21(i+vec2(0,1)),h21(i+vec2(1,1)),f.x),f.y);}')
+    .replace('#include <map_fragment>', '#include <map_fragment>\nfloat mv=vn(vWp.xz*.035)*.55+vn(vWp.xz*.11)*.3;diffuseColor.rgb*=mix(vec3(.78,.82,.7),vec3(1.12,1.04,.88),mv);');
+};
+
+/* ------------------------------------------------------------------ terrain + rocks + grass + props */
+const terrain = new THREE.Mesh(new THREE.BufferGeometry(), MATS.ground); terrain.receiveShadow = true; terrain.visible = false; scene.add(terrain);
+const rnd = rng(1234);
+const groundAt = (x, z) => terrainH(x, z);
+function scatterRocks(n, anchor, radius, avoid) {
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    const a = rnd() * Math.PI * 2, r = Math.sqrt(rnd()) * radius, x = anchor.x + Math.cos(a) * r, z = anchor.z + Math.sin(a) * r;
+    if (Math.hypot(x - avoid.x, z - avoid.z) < 11) { i--; continue; }
+    const s = 0.5 + Math.pow(rnd(), 2.2) * 3.4; out.push({ x, z, s, ry: rnd() * 6.28, rx: (rnd() - .5) * .5, rz: (rnd() - .5) * .5, sy: 0.6 + rnd() * 0.7 });
+  }
+  return out;
+}
+function makeRocks(list, geo) {
+  const m = new THREE.InstancedMesh(geo, MATS.rock, list.length); m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false;
+  const o = new THREE.Object3D();
+  list.forEach((r, i) => { o.position.set(r.x, groundAt(r.x, r.z) + r.s * 0.18, r.z); o.rotation.set(r.rx, r.ry, r.rz); o.scale.set(r.s, r.s * r.sy, r.s); o.updateMatrix(); m.setMatrixAt(i, o.matrix); });
+  m.instanceMatrix.needsUpdate = true; return m;
+}
+const rocks = { A: null, B: null, listA: scatterRocks(200, ZA, 60, ZA), listB: scatterRocks(200, ZB, 60, ZB) };
+function bladeGeo() {
+  const seg = 3, pos = [], idx = [], h = 1;
+  for (let i = 0; i <= seg; i++) { const t = i / seg, w = 0.06 * (1 - t * 0.92); pos.push(-w, t * h, 0, w, t * h, 0); if (i < seg) { const a = i * 2; idx.push(a, a + 1, a + 2, a + 1, a + 3, a + 2); } }
+  const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals(); return g;
+}
+const windU = { value: 0 };
+const grassMat = new THREE.MeshStandardMaterial({ roughness: 0.85, side: THREE.DoubleSide });
+grassMat.onBeforeCompile = (sh) => {
+  sh.uniforms.uTime = windU;
+  sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nuniform float uTime;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvec3 ip=vec3(instanceMatrix[3]);float k=transformed.y*transformed.y;transformed.x+=sin(uTime*1.6+ip.x*.35+ip.z*.2)*.22*k;transformed.z+=cos(uTime*1.3+ip.z*.3)*.12*k;');
+};
+function makeGrass(count, anchor, radius, tint, pav) {
+  const m = new THREE.InstancedMesh(bladeGeo(), grassMat, count); m.frustumCulled = false; m.receiveShadow = false;
+  const o = new THREE.Object3D(), c = new THREE.Color(), r = rng(anchor.x * 7 + 3);
+  for (let i = 0; i < count; i++) {
+    const a = r() * 6.283, d = Math.sqrt(r()) * radius, x = anchor.x + Math.cos(a) * d, z = anchor.z + Math.sin(a) * d;
+    if (Math.abs(x - pav.x) < 8 && Math.abs(z - pav.z) < 6) { o.scale.set(0, 0, 0); } else { o.scale.set(0.8 + r() * 0.6, 0.5 + r() * 1.1, 1); }
+    o.position.set(x, groundAt(x, z) - 0.02, z); o.rotation.set((r() - .5) * .25, r() * 6.283, 0); o.updateMatrix(); m.setMatrixAt(i, o.matrix);
+    c.copy(tint).offsetHSL((r() - .5) * 0.04, (r() - .5) * 0.15, (r() - .5) * 0.12); m.setColorAt(i, c);
+  }
+  m.instanceMatrix.needsUpdate = true; m.instanceColor.needsUpdate = true; return m;
+}
+const grass = { A: null, B: null };
+
+function boxUV(w, h, d, tile = 2.6) { // box with world-scaled UVs so the wood texture keeps a constant density
+  const g = new THREE.BoxGeometry(w, h, d), uv = g.attributes.uv, dims = [[d, h], [d, h], [w, d], [w, d], [w, h], [w, h]];
+  for (let f = 0; f < 6; f++) for (let v = 0; v < 4; v++) { const i = f * 4 + v; uv.setXY(i, uv.getX(i) * dims[f][0] / tile, uv.getY(i) * dims[f][1] / tile); }
+  return g;
+}
+function pavilion(x, z, ry) {
+  const g = new THREE.Group(); const y0 = Math.max(groundAt(x - 6, z - 4), groundAt(x + 6, z + 4), groundAt(x - 6, z + 4), groundAt(x + 6, z - 4)) + 0.2;
+  const add = (geo, px, py, pz, rx = 0, rz = 0) => { const m = new THREE.Mesh(geo, MATS.wood); m.position.set(px, py, pz); m.rotation.set(rx, 0, rz); m.castShadow = m.receiveShadow = true; g.add(m); return m; };
+  add(boxUV(15, 2.4, 11), 0, -0.9, 0);                               // foundation / floor
+  add(boxUV(15, 3.6, 0.35), 0, 1.5, -5.4); add(boxUV(0.35, 3.6, 10.8), -7.3, 1.5, 0); add(boxUV(0.35, 3.6, 10.8), 7.3, 1.5, 0); // walls
+  add(boxUV(5.4, 3.6, 0.35), -4.8, 1.5, 5.4); add(boxUV(5.4, 3.6, 0.35), 4.8, 1.5, 5.4); add(boxUV(4.2, 1.1, 0.35), 0, 2.8, 5.4); // front with door gap
+  const roofL = add(boxUV(9.4, 0.3, 12), -3.9, 5.2, 0, 0, 0.62), roofR = add(boxUV(9.4, 0.3, 12), 3.9, 5.2, 0, 0, -0.62);
+  g.position.set(x, y0, z); g.rotation.y = ry; scene.add(g); return g;
+}
+const pavA = pavilion(ZA.x, ZA.z, -0.35); pavA.visible = false;
+let pavB = null;
+// photos as frames (technology test of how a real photo sits inside the world)
+const PHOTOS = [['2w2a1130', 0.667], ['2w2a7966', 1.5], ['2w2a0403', 0.667]];
+const photoMeshes = [];
+function makePhotoFrames() {
+  const spots = [[-92, -27, 0.5], [-84, -20, 0.2], [-56, -22, -0.4]];
+  PHOTOS.forEach(([id, asp], i) => {
+    const h = 3.1, w = h * asp, [x, z, ry] = spots[i], y = groundAt(x, z);
+    const g = new THREE.Group(); g.position.set(x, y, z); g.rotation.y = ry;
+    const post = new THREE.Mesh(boxUV(w + 0.5, h + 0.5, 0.25), MATS.wood); post.position.y = h / 2 + 0.9; post.castShadow = true; g.add(post);
+    const mat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.55, emissive: 0xffffff, emissiveIntensity: 0.55 });
+    const pic = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat); pic.position.set(0, h / 2 + 0.9, 0.14); g.add(pic);
+    scene.add(g); photoMeshes.push({ id, mat, g });
+  });
+}
+makePhotoFrames();
+const photoState = { mode: 'ktx2', loadMs: {}, bytes: {} };
+async function applyPhotos(mode) {
+  photoState.mode = mode; $('bPhoto').textContent = mode === 'ktx2' ? 'KTX2' : 'JPG'; $('bPhoto').setAttribute('aria-pressed', mode === 'jpg' ? 'true' : 'false');
+  for (const p of photoMeshes) {
+    const t0 = performance.now();
+    let tex;
+    if (mode === 'ktx2') tex = await loadTex('photo_' + p.id, true);
+    else tex = await new Promise((res, rej) => new THREE.TextureLoader().load(BASE + 'assets/photo_' + p.id + '.jpg', res, undefined, rej));
+    tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8; if (mode === 'jpg') { tex.generateMipmaps = true; tex.needsUpdate = true; }
+    p.mat.map = tex; p.mat.emissiveMap = tex; p.mat.needsUpdate = true; const k = mode + ':' + p.id; if (!(k in photoState.loadMs)) photoState.loadMs[k] = Math.round(performance.now() - t0);
+  }
+  mark('photos ' + mode);
+}
+// floating motes (atmosphere / depth cue)
+const moteGeo = new THREE.BufferGeometry(); { const n = 1200, p = new Float32Array(n * 3), ph = new Float32Array(n); const r = rng(5); for (let i = 0; i < n; i++) { p[i * 3] = (r() - .5) * 360; p[i * 3 + 1] = 1 + r() * 26; p[i * 3 + 2] = (r() - .5) * 360; ph[i] = r() * 6.28; } moteGeo.setAttribute('position', new THREE.BufferAttribute(p, 3)); moteGeo.setAttribute('ph', new THREE.BufferAttribute(ph, 1)); }
+const moteMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: { uT: windU, uCol: { value: new THREE.Color(0xffd9a8) } },
+  vertexShader: 'attribute float ph;uniform float uT;varying float vA;void main(){vec3 p=position;p.x+=sin(uT*.15+ph*3.)*4.;p.y+=sin(uT*.2+ph)*1.6;p.z+=cos(uT*.12+ph*2.)*4.;vec4 mv=modelViewMatrix*vec4(p,1.);gl_PointSize=clamp(90./-mv.z,1.,5.);vA=.35+.65*fract(ph*7.);gl_Position=projectionMatrix*mv;}',
+  fragmentShader: 'uniform vec3 uCol;varying float vA;void main(){float d=length(gl_PointCoord-.5);if(d>.5)discard;gl_FragColor=vec4(uCol,(1.-d*2.)*vA*.55);}' });
+const motes = new THREE.Points(moteGeo, moteMat); motes.frustumCulled = false; scene.add(motes);
+
+/* ------------------------------------------------------------------ post chain */
+const rtOpts = { type: THREE.HalfFloatType, samples: 0 };
+let composer = null, passes = {};
+const RaysShader = { uniforms: { tDiffuse: { value: null }, sunPos: { value: new THREE.Vector2(0.5, 0.5) }, strength: { value: 0.0 } },
+  vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+  fragmentShader: 'uniform sampler2D tDiffuse;uniform vec2 sunPos;uniform float strength;varying vec2 vUv;void main(){vec2 d=(vUv-sunPos)/22.*.95;vec2 uv=vUv;vec3 acc=vec3(0.);float w=1.;for(int i=0;i<22;i++){uv-=d;vec3 s=texture2D(tDiffuse,uv).rgb;float l=max(dot(s,vec3(.3,.59,.11))-.9,0.);acc+=s*l*w;w*=.935;}gl_FragColor=vec4(texture2D(tDiffuse,vUv).rgb+acc*strength*.045,1.);}' };
+const GradeShader = { uniforms: { tDiffuse: { value: null }, uT: { value: 0 }, uAsp: { value: 1 } },
+  vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+  fragmentShader: 'uniform sampler2D tDiffuse;uniform float uT;varying vec2 vUv;float h(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}void main(){vec4 c=texture2D(tDiffuse,vUv);vec2 q=vUv-.5;float v=smoothstep(.95,.25,length(q*vec2(1.,.9)));c.rgb*=mix(.72,1.,v);c.rgb+=(h(vUv*vec2(1731.,977.)+uT)-.5)*.022;gl_FragColor=c;}' };
+function buildComposer() {
+  if (composer) { composer.dispose(); composer = null; }
+  const T = TIERS[tierIdx]; if (!T.post) return;
+  const size = renderer.getDrawingBufferSize(new THREE.Vector2());
+  const rt = new THREE.WebGLRenderTarget(size.x, size.y, { type: THREE.HalfFloatType, samples: T.msaa });
+  composer = new EffectComposer(renderer, rt); composer.setPixelRatio(1); composer.setSize(size.x, size.y);
+  composer.addPass(new RenderPass(scene, camera));
+  passes = {};
+  if (T.rays) { passes.rays = new ShaderPass(RaysShader); composer.addPass(passes.rays); }
+  if (T.dof) { passes.dof = new BokehPass(scene, camera, { focus: 40, aperture: 0.00006, maxblur: 0.006 }); composer.addPass(passes.dof); }
+  if (T.bloom) { passes.bloom = new UnrealBloomPass(new THREE.Vector2(size.x / 2, size.y / 2), T.bloom, 0.6, 1.0); composer.addPass(passes.bloom); }
+  composer.addPass(new OutputPass());
+  if (tierIdx >= 2) { passes.grade = new ShaderPass(GradeShader); composer.addPass(passes.grade); }
+  if (T.smaa) { passes.smaa = new SMAAPass(); composer.addPass(passes.smaa); }
+}
+
+/* ------------------------------------------------------------------ applying a tier (progressive: show immediately, upgrade in background) */
+let applyToken = 0;
+function resize() {
+  const T = TIERS[tierIdx], dpr = Math.min(window.devicePixelRatio || 1, T.dpr);
+  renderer.setPixelRatio(dpr); renderer.setSize(innerWidth, innerHeight, false); camera.aspect = innerWidth / innerHeight; camera.updateProjectionMatrix();
+  if (composer) { const s = renderer.getDrawingBufferSize(new THREE.Vector2()); composer.setSize(s.x, s.y); }
+}
+addEventListener('resize', resize);
+async function applyTier(idx, why) {
+  const token = ++applyToken, T = TIERS[idx]; tierIdx = idx; lastTierChange = performance.now();
+  mark('tier ' + T.key, { why: why || '' });
+  // cheap, immediate changes
+  sun.castShadow = T.shadow > 0; renderer.shadowMap.enabled = T.shadow > 0;
+  if (T.shadow) { if (sun.shadow.mapSize.x !== T.shadow || !sun.shadow.map) { sun.shadow.mapSize.set(T.shadow, T.shadow); if (sun.shadow.map) { sun.shadow.map.dispose(); sun.shadow.map = null; } } renderer.shadowMap.type = T.shadowType ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap; }
+  motes.visible = T.motes > 0; moteGeo.setDrawRange(0, T.motes);
+  scene.environment = T.env ? envRT && envRT.texture : null; if (T.env && !envRT) buildEnv();
+  for (const k of ['A', 'B']) { if (rocks[k]) rocks[k].count = Math.min(rocks[k].instanceMatrix.count, Math.floor(T.rocks / 2)); if (grass[k]) { grass[k].visible = T.grass > 0; grass[k].count = Math.min(grass[k].instanceMatrix.count, Math.floor(T.grass / 2)); } }
+  resize(); buildComposer();
+  [...document.querySelectorAll('[data-tier]')].forEach((b) => b.setAttribute('aria-pressed', String((auto && b.dataset.tier === 'auto') || (!auto && b.dataset.tier === String(idx)))));
+  // heavier, asynchronous upgrades: textures, normal maps, high-detail geometry
+  const t0 = performance.now();
+  await Promise.all(['ground', 'rock', 'wood'].map((n) => upgradeMaterial(n, T.mat, T.normals)));
+  if (token !== applyToken) return;
+  const [tg, rg] = await Promise.all([loadGeo(T.terrain ? 'terrain_lod1' : 'terrain_lod0'), loadGeo(T.rock ? 'rock_lod1' : 'rock_lod0')]);
+  if (token !== applyToken) return;
+  if (terrain.geometry !== tg) { terrain.geometry = tg; }
+  terrain.visible = true;
+  for (const k of ['A', 'B']) if (rocks[k] && rocks[k].geometry !== rg) rocks[k].geometry = rg;
+  rocks.geo = rg;
+  mark('quality ' + T.key + ' ready', { ms: Math.round(performance.now() - t0) }); TP.state['ready_' + T.key] = true;
+  if (idx >= 1 && !TP.state.fullQuality) { TP.state.fullQuality = true; mark('full quality visible'); }
+}
+
+/* ------------------------------------------------------------------ zone B (streamed after the first interactive frame) */
+let zoneB = { state: 'idle', t0: 0, ms: 0 };
+async function streamZoneB() {
+  if (zoneB.state !== 'idle') return; zoneB.state = 'loading'; zoneB.t0 = performance.now(); mark('zone B stream start'); $('bFly').disabled = true; $('bFly').textContent = 'אזור B נטען…';
+  const rg = await loadGeo(TIERS[tierIdx].rock ? 'rock_lod1' : 'rock_lod0');
+  rocks.A = makeRocks(rocks.listA, rg); rocks.B = makeRocks(rocks.listB, rg); scene.add(rocks.A, rocks.B);
+  grass.A = makeGrass(Math.floor(TIERS[3].grass / 2), ZA, 48, new THREE.Color(0x8d9a45), ZA); grass.B = makeGrass(Math.floor(TIERS[3].grass / 2), ZB, 48, new THREE.Color(0x5c7d58), ZB);
+  scene.add(grass.A, grass.B); pavA.visible = true; pavB = pavilion(ZB.x, ZB.z, 2.6); applyTier(tierIdx, 'zone B content');
+  await applyPhotos('ktx2');
+  zoneB.ms = Math.round(performance.now() - zoneB.t0); zoneB.state = 'ready'; mark('zone B ready', { ms: zoneB.ms }); TP.state.zoneBReady = true;
+  $('bFly').disabled = false; $('bFly').textContent = 'לאזור B';
+}
+
+/* ------------------------------------------------------------------ camera: authored path + handheld + free look */
+const POSES = [ // [eyeXZ, height above ground, lookXZ, look height]
+  [[-112, -8], 9, [-70, -40], 4], [[-84, -24], 2.4, [-62, -40], 3.6], [[-20, 12], 14, [32, 32], 7],
+  [[42, 50], 7, [95, 60], 5], [[76, 40], 2.6, [98, 62], 4], [[138, 92], 10, [95, 60], 5],
+];
+const posCurve = new THREE.CatmullRomCurve3(POSES.map(([e, h]) => new THREE.Vector3(e[0], groundAt(e[0], e[1]) + h, e[1])), false, 'catmullrom', 0.5);
+const lookCurve = new THREE.CatmullRomCurve3(POSES.map(([, , l, h]) => new THREE.Vector3(l[0], groundAt(l[0], l[1]) + h, l[1])), false, 'catmullrom', 0.5);
+let camT = 0, camDir = 1, autopilot = true, flyTo = null, holdUntil = 0, yawOff = 0, pitchOff = 0, drag = null, fov = 52;
+const ease = (x) => 0.5 - 0.5 * Math.cos(Math.PI * Math.min(1, Math.max(0, x)));
+function updateCamera(dt, tNow) {
+  if (flyTo) { const d = flyTo.to - camT; const step = dt / 13; if (Math.abs(d) <= step) { camT = flyTo.to; flyTo = null; } else camT += Math.sign(d) * step; }
+  else if (autopilot && tNow > holdUntil) { camT += camDir * dt / 24; if (camT >= 1) { camT = 1; camDir = -1; holdUntil = tNow + 2500; } else if (camT <= 0) { camT = 0; camDir = 1; holdUntil = tNow + 2500; } }
+  const u = ease(camT), p = posCurve.getPoint(u), l = lookCurve.getPoint(u);
+  const s = tNow / 1000; p.x += Math.sin(s * 0.7) * 0.05; p.y += Math.sin(s * 1.1) * 0.04; l.y += Math.sin(s * 0.9 + 1) * 0.05; // handheld breath
+  camera.position.copy(p); camera.lookAt(l);
+  if (yawOff || pitchOff) { camera.rotateOnWorldAxis(new THREE.Vector3(0, 1, 0), yawOff); camera.rotateX(pitchOff); }
+  const fv = 52 + 6 * Math.sin(Math.min(1, camT) * Math.PI); if (Math.abs(fv - fov) > 0.01) { fov = fv; camera.fov = fov; camera.updateProjectionMatrix(); }
+  setSky(THREE.MathUtils.smoothstep(camT, 0.38, 0.66));
+  $('stZone').textContent = camT < 0.5 ? 'אזור A' : 'אזור B';
+  return l;
+}
+canvas.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY, y0: yawOff, p0: pitchOff }; canvas.setPointerCapture(e.pointerId); });
+canvas.addEventListener('pointermove', (e) => { if (!drag) return; yawOff = THREE.MathUtils.clamp(drag.y0 + (e.clientX - drag.x) * 0.004, -1.1, 1.1); pitchOff = THREE.MathUtils.clamp(drag.p0 + (e.clientY - drag.y) * 0.003, -0.5, 0.5); });
+const endDrag = () => { drag = null; }; canvas.addEventListener('pointerup', endDrag); canvas.addEventListener('pointercancel', endDrag);
+canvas.addEventListener('dblclick', () => { yawOff = pitchOff = 0; });
+
+/* ------------------------------------------------------------------ measurements */
+const ft = []; let lastNow = performance.now(), longTasks = 0, longTaskMs = 0;
+try { new PerformanceObserver((l) => { for (const e of l.getEntries()) { longTasks++; longTaskMs += e.duration; } }).observe({ entryTypes: ['longtask'] }); } catch (_) { /* not supported */ }
+function fpsStats(window_ = 120) {
+  const a = ft.slice(-window_); if (a.length < 5) return { fps: 0, low1: 0, ms: 0, n: a.length };
+  const avg = a.reduce((s, v) => s + v, 0) / a.length, srt = [...a].sort((x, y) => x - y), p99 = srt[Math.min(srt.length - 1, Math.floor(srt.length * 0.99))];
+  return { fps: 1000 / avg, low1: 1000 / p99, ms: avg, n: a.length };
+}
+function resourceBytes() {
+  let assets = 0, lib = 0, n = 0, libN = 0;
+  for (const e of performance.getEntriesByType('resource')) { const b = e.encodedBodySize || e.transferSize || 0; if (/\/assets\/|\/basis\//.test(e.name)) { assets += b; n++; } else if (/jsdelivr|unpkg|cdnjs/.test(e.name)) { lib += b; libN++; } }
+  return { assetsBytes: assets, assetFiles: n, libraryBytes: lib, libraryFiles: libN };
+}
+const kb = (b) => (b / 1024 >= 1024 ? (b / 1048576).toFixed(2) + ' MB' : Math.round(b / 1024) + ' KB');
+function snapshot() {
+  const i = renderer.info, T = TIERS[tierIdx], f = fpsStats(), rb = resourceBytes();
+  return { tier: T.key, tierName: T.name, auto, dpr: renderer.getPixelRatio(), fps: +f.fps.toFixed(1), fps1pctLow: +f.low1.toFixed(1), frameMs: +f.ms.toFixed(1), frames: f.n,
+    drawCalls: i.render.calls, triangles: i.render.triangles, geometries: i.memory.geometries, textures: i.memory.textures, shadowMap: T.shadow, postChain: T.post, ...rb,
+    longTasks, longTaskMs: Math.round(longTaskMs) };
+}
+const deviceInfo = () => ({ userAgent: navigator.userAgent, platform: navigator.platform, cores: navigator.hardwareConcurrency || null, deviceMemoryGB: navigator.deviceMemory || null,
+  screen: { w: screen.width, h: screen.height, dpr: window.devicePixelRatio }, viewport: { w: innerWidth, h: innerHeight }, gpu: GPU, gpuVendor: GPUV, softwareRenderer: SOFTWARE, webgl: gl2.getParameter(gl2.VERSION),
+  maxTextureSize: gl2.getParameter(gl2.MAX_TEXTURE_SIZE), compressedTextures: { astc: !!gl2.getExtension('WEBGL_compressed_texture_astc'), etc2: !!gl2.getExtension('WEBGL_compressed_texture_etc'), bc: !!gl2.getExtension('EXT_texture_compression_bptc') || !!gl2.getExtension('WEBGL_compressed_texture_s3tc'), ktx2Transcode: ktx2.workerConfig || null }, phoneHeuristic: PHONE });
+function renderDetails() {
+  const s = snapshot(), d = deviceInfo(), z = zoneB;
+  const row = (k, v) => `<dt>${k}</dt><dd class="num">${v}</dd>`;
+  const bench = TP.bench && TP.bench.length ? `<table class="bench"><tr><th>איכות</th><th>fps</th><th>1% נמוך</th><th>calls</th><th>tris</th></tr>${TP.bench.map((b) => `<tr><td>${b.tierName}</td><td>${b.fps ?? 'n/a'}</td><td>${b.fps1pctLow ?? 'n/a'}</td><td>${b.drawCalls}</td><td>${Math.round(b.triangles / 1000)}K</td></tr>`).join('')}</table>` : '<span class="chip">טרם הורצה בדיקת ביצועים</span>';
+  $('detBody').innerHTML =
+    `<div><h4>מדידות בזמן אמת (נמדד)</h4><dl>${row('fps ממוצע', s.fps)}${row('fps, 1% הכי איטיים', s.fps1pctLow)}${row('זמן פריים (ms)', s.frameMs)}${row('draw calls', s.drawCalls)}${row('משולשים', s.triangles.toLocaleString('en'))}${row('גאומטריות / טקסטורות', s.geometries + ' / ' + s.textures)}${row('משימות ארוכות', s.longTasks + ' (' + s.longTaskMs + ' ms)')}</dl></div>` +
+    `<div><h4>משקל שנטען (נמדד)</h4><dl>${row('נכסים (' + s.assetFiles + ' קבצים)', kb(s.assetsBytes))}${row('ספריות (' + s.libraryFiles + ' קבצים)', s.libraryBytes ? kb(s.libraryBytes) : 'לא זמין')}${row('אזור B נטען תוך', z.ms ? z.ms + ' ms' : '–')}${row('תמונות ' + photoState.mode.toUpperCase(), Object.entries(photoState.loadMs).filter(([k]) => k.startsWith(photoState.mode)).map(([, v]) => v + 'ms').join(' · ') || '–')}</dl></div>` +
+    `<div><h4>ציר זמן (נמדד)</h4><dl>${timeline.slice(0, 14).map((e) => row(e.name, e.t + ' ms')).join('')}</dl></div>` +
+    `<div><h4>מכשיר</h4><dl>${row('GPU', d.gpu.slice(0, 38))}${row('ליבות / זיכרון', (d.cores || '?') + ' / ' + (d.deviceMemoryGB || '?') + 'GB')}${row('מסך', d.screen.w + '×' + d.screen.h + ' @' + d.screen.dpr)}${row('WebGL', d.webgl.slice(0, 30))}${row('פענוח KTX2 / meshopt', (decoders.ktx2 === false ? '✗ JPG' : decoders.ktx2 ? '✓' : '…') + ' / ' + (decoders.meshopt === false ? '✗ plain' : decoders.meshopt ? '✓' : '…'))}${row('KTX2', d.compressedTextures.ktx2Transcode ? Object.entries(d.compressedTextures.ktx2Transcode).filter(([, v]) => v).map(([k]) => k.replace('Supported', '')).join(',') : '–')}</dl></div>` +
+    `<div style="grid-column:1/-1"><h4>בדיקת ביצועים לפי איכות</h4>${bench}</div>`;
+}
+
+/* ------------------------------------------------------------------ results / benchmark / UI */
+function photoBytes() { const o = {}; for (const e of performance.getEntriesByType('resource')) { const m = /photo_(\w+)\.(ktx2|jpg)/.exec(e.name); if (m) o[m[0]] = e.encodedBodySize || e.transferSize || 0; } return o; }
+function results() { return { tool: 'Shiko tech proof v1', decoders, photoBytes: photoBytes(), time: new Date().toISOString(), device: deviceInfo(), current: snapshot(), benchmark: TP.bench || [], timeline, zoneBStreamMs: zoneB.ms || null, photoLoadMs: photoState.loadMs,
+  note: SOFTWARE ? 'SOFTWARE RENDERER: fps values are not representative of a real GPU' : 'measured on this device' }; }
+async function copyResults() {
+  const txt = JSON.stringify(results(), null, 1), out = $('out'); out.value = txt; out.hidden = false;
+  try { await navigator.clipboard.writeText(txt); $('bCopy').textContent = 'הועתק ✓'; } catch (_) { out.focus(); out.select(); $('bCopy').textContent = 'סמן והעתק ידנית'; }
+  setTimeout(() => { $('bCopy').textContent = 'העתק תוצאות'; }, 2500);
+}
+let benchRunning = false;
+async function runBench() {
+  if (benchRunning) return; benchRunning = true; const prevAuto = auto, prevTier = tierIdx, prevAP = autopilot; TP.bench = []; auto = false; autopilot = true; camT = 0.05; camDir = 1; flyTo = null; $('bBench').disabled = true;
+  for (let i = 0; i < 4; i++) {
+    if (i > tierCap + 1) break;
+    $('bBench').textContent = `בודק: ${TIERS[i].name} (${i + 1}/4)…`; await applyTier(i, 'benchmark'); await new Promise((r) => setTimeout(r, 1800)); ft.length = 0; renderer.info.reset();
+    const start = performance.now(); let calls = 0, tris = 0, nf = 0;
+    await new Promise((res) => { const iv = setInterval(() => { calls += renderer.info.render.calls; tris += renderer.info.render.triangles; nf++; const el = performance.now() - start; if ((el > 4000 && ft.length >= 90) || el > 12000) { clearInterval(iv); res(); } }, 250); });
+    const s = snapshot(); TP.bench.push({ tier: s.tier, tierName: s.tierName, fps: s.frames >= 30 ? s.fps : null, fps1pctLow: s.frames >= 30 ? s.fps1pctLow : null, insufficientFrames: s.frames < 30, frameMs: s.frameMs, drawCalls: s.drawCalls, triangles: s.triangles, frames: s.frames });
+  }
+  auto = prevAuto; autopilot = prevAP; await applyTier(Math.min(prevTier, tierCap), 'after benchmark'); $('bBench').disabled = false; $('bBench').textContent = 'בדיקת ביצועים (כ־30 שניות)'; benchRunning = false; mark('benchmark done'); renderDetails();
+}
+document.querySelectorAll('[data-tier]').forEach((b) => b.addEventListener('click', () => { if (b.dataset.tier === 'auto') { auto = true; blocked.clear(); } else { auto = false; applyTier(+b.dataset.tier, 'manual'); } [...document.querySelectorAll('[data-tier]')].forEach((x) => x.setAttribute('aria-pressed', String((auto && x.dataset.tier === 'auto') || (!auto && x.dataset.tier === String(tierIdx))))); }));
+$('bPlay').addEventListener('click', () => { autopilot = !autopilot; flyTo = null; $('bPlay').setAttribute('aria-pressed', String(autopilot)); });
+$('bFly').addEventListener('click', () => { const toB = camT < 0.5; flyTo = { to: toB ? 1 : 0 }; autopilot = false; $('bPlay').setAttribute('aria-pressed', 'false'); $('bFly').textContent = toB ? 'לאזור A' : 'לאזור B'; mark('fly to ' + (toB ? 'B' : 'A')); });
+$('bPhoto').addEventListener('click', () => applyPhotos(photoState.mode === 'ktx2' ? 'jpg' : 'ktx2'));
+$('bHide').addEventListener('click', () => { const h = document.body.classList.toggle('hide-ui'); $('bHide').setAttribute('aria-pressed', String(h)); $('bHide').textContent = h ? 'הצג ממשק' : 'הסתר ממשק'; });
+$('banner').addEventListener('click', () => { $('banner').hidden = true; });
+$('bBench').addEventListener('click', runBench); $('bCopy').addEventListener('click', copyResults);
+$('details').addEventListener('toggle', () => { if ($('details').open) renderDetails(); });
+if (SOFTWARE) { $('banner').hidden = false; $('banner').innerHTML = 'זוהה רינדור תוכנתי (<bdi>' + GPU.slice(0, 40).replace(/</g, '') + '</bdi>). מספרי ה־fps כאן אינם מייצגים כרטיס מסך אמיתי. מספרי משקל, draw calls ומשולשים כן מדויקים.'; }
+else if (PHONE) { $('banner').hidden = false; $('banner').textContent = 'זו בדיקת טכנולוגיה בלבד: הגיאומטריה ניטרלית בכוונה ואינה כיוון עיצובי. לחץ "בדיקת ביצועים" ואז "העתק תוצאות".'; }
+
+/* ------------------------------------------------------------------ main loop */
+let lastStat = 0, lastAuto = 0, frame = 0; const sunScreen = new THREE.Vector3(); const tmpV = new THREE.Vector3();
+function loop(now) {
+  requestAnimationFrame(loop);
+  if (document.hidden) { lastNow = now; return; }
+  const dt = Math.min(0.1, (now - lastNow) / 1000); if (frame > 0) ft.push(now - lastNow); if (ft.length > 600) ft.shift(); lastNow = now; frame++;
+  windU.value = now / 1000;
+  const look = updateCamera(dt, now);
+  // shadow frustum follows what the camera looks at
+  if (sun.castShadow) { sun.target.position.copy(look); sun.position.copy(look).addScaledVector(sunDir, 140); const c = sun.shadow.camera, e = TIERS[tierIdx].shadow >= 4096 ? 90 : 70; if (c.right !== e) { c.left = -e; c.right = e; c.top = e; c.bottom = -e; c.near = 1; c.far = 320; c.updateProjectionMatrix(); } }
+  renderer.info.reset();
+  if (composer) {
+    if (passes.rays) { tmpV.copy(camera.position).addScaledVector(sunDir, 500); sunScreen.copy(tmpV).project(camera); const facing = tmpV.sub(camera.position).dot(camera.getWorldDirection(new THREE.Vector3())) > 0; passes.rays.uniforms.sunPos.value.set(sunScreen.x * 0.5 + 0.5, sunScreen.y * 0.5 + 0.5); passes.rays.uniforms.strength.value = facing ? 1.0 : 0.0; }
+    if (passes.dof) { const dist = camera.position.distanceTo(look); passes.dof.uniforms.focus.value = dist; }
+    if (passes.grade) passes.grade.uniforms.uT.value = (now % 1000) / 1000;
+    composer.render(dt);
+  } else renderer.render(scene, camera);
+  if (frame === 3 && !TP.state.firstFrame) { TP.state.firstFrame = true; mark('first frame (placeholder quality)'); $('loading').classList.add('done'); }
+  if (now - lastStat > 250) { lastStat = now; const s = fpsStats(60); $('stFps').textContent = (s.fps ? s.fps.toFixed(0) : '–') + ' fps'; $('stCalls').textContent = renderer.info.render.calls + ' draw calls'; $('chTier').textContent = 'איכות: ' + TIERS[tierIdx].name + (auto ? ' (אוטו)' : ''); if ($('details').open && now % 1000 < 260) renderDetails(); }
+  // adaptive quality (only in auto mode, with hysteresis; never while benchmarking)
+  if (auto && !benchRunning && now - lastAuto > 3000 && frame > 90 && now - lastTierChange > 3500) {
+    lastAuto = now; const s = fpsStats(90);
+    if (s.fps && s.fps < 42 && tierIdx > 0) { blocked.add(tierIdx); applyTier(tierIdx - 1, 'auto down: ' + s.fps.toFixed(0) + ' fps'); }
+    else if (s.fps > 57 && tierIdx < tierCap && !blocked.has(tierIdx + 1) && TP.state['ready_' + TIERS[tierIdx].key]) applyTier(tierIdx + 1, 'auto up: ' + s.fps.toFixed(0) + ' fps');
+  }
+}
+
+/* ------------------------------------------------------------------ boot */
+TP.dbg = { terrain, scene, rocks, sky };
+TP.api = { setTier: (i) => { auto = false; return applyTier(i, 'api'); }, setT: (t) => { camT = t; autopilot = false; flyTo = null; }, snapshot, results, applyPhotos, runBench, tiers: TIERS, streamZoneB, setAuto: (v) => { auto = v; } };
+setSky(0); resize();
+if (!WASM_OK) showNote('WebAssembly חסום בסביבה הזו, ולכן KTX2 ו־meshopt לא יכולים לרוץ. הבדיקה עברה לקבצי JPG ו־GLB לא דחוסים (משקל גדול יותר). מדדי המשקל של הדחיסה לא תקפים כאן; כדאי לפתוח גם בלשונית רגילה.');
+const startTier = tierIdx;
+// placeholder level first: tiny textures + low-poly terrain, so something real is on screen almost immediately
+{
+  const [tg, rg] = await Promise.all([loadGeo('terrain_lod1'), loadGeo('rock_lod1')]);
+  await Promise.all(['ground', 'rock', 'wood'].map((n) => upgradeMaterial(n, 's', null)));
+  terrain.geometry = tg; terrain.visible = true; mark('placeholder assets ready'); TP.state.placeholder = true;
+  rocks.A = makeRocks(rocks.listA.slice(0, 60), rg); scene.add(rocks.A); // a first handful of rocks, zone content follows
+}
+if (!(new URLSearchParams(location.search).has('manual'))) { /* normal start */ }
+requestAnimationFrame(loop);
+await applyTier(startTier, 'start');
+setTimeout(() => { if (rocks.A) { scene.remove(rocks.A); rocks.A.dispose(); rocks.A = null; } streamZoneB(); }, 1200);
+} catch (e) { fail(e); }
+</script>

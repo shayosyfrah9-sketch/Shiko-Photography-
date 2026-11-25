@@ -1,0 +1,144 @@
+{
+ "pass": [
+  {
+   "n": "first frame",
+   "ok": true
+  },
+  {
+   "n": "zone B streamed",
+   "ok": true,
+   "d": 4788
+  },
+  {
+   "n": "tier 0 loads",
+   "ok": true,
+   "d": {
+    "calls": 17,
+    "tris": 35476,
+    "tex": 32,
+    "geo": 39,
+    "assets": 3314488
+   }
+  },
+  {
+   "n": "tier 1 loads",
+   "ok": true,
+   "d": {
+    "calls": 48,
+    "tris": 680534,
+    "tex": 45,
+    "geo": 40,
+    "assets": 3314488
+   }
+  },
+  {
+   "n": "tier 2 loads",
+   "ok": true,
+   "d": {
+    "calls": 53,
+    "tris": 1252929,
+    "tex": 53,
+    "geo": 45,
+    "assets": 7231583
+   }
+  },
+  {
+   "n": "tier 3 loads",
+   "ok": true,
+   "d": {
+    "calls": 82,
+    "tris": 4631228,
+    "tex": 56,
+    "geo": 45,
+    "assets": 7231583
+   }
+  },
+  {
+   "n": "fly button flips",
+   "ok": true
+  },
+  {
+   "n": "photo toggle to JPG",
+   "ok": true,
+   "d": 1
+  },
+  {
+   "n": "benchmark finishes (4 tiers)",
+   "ok": true,
+   "d": {
+    "sec": 65,
+    "bench": [
+     {
+      "tier": "low",
+      "tierName": "נמוך",
+      "fps": 19.7,
+      "fps1pctLow": 12,
+      "insufficientFrames": false,
+      "frameMs": 50.9,
+      "drawCalls": 6,
+      "triangles": 35354,
+      "frames": 94
+     },
+     {
+      "tier": "med",
+      "tierName": "בינוני",
+      "fps": null,
+      "fps1pctLow": null,
+      "insufficientFrames": true,
+      "frameMs": 455.3,
+      "drawCalls": 48,
+      "triangles": 680534,
+      "frames": 28
+     },
+     {
+      "tier": "high",
+      "tierName": "גבוה",
+      "fps": null,
+      "fps1pctLow": null,
+      "insufficientFrames": true,
+      "frameMs": 1627,
+      "drawCalls": 47,
+      "triangles": 1252867,
+      "frames": 8
+     },
+     {
+      "tier": "ultra",
+      "tierName": "אולטרה",
+      "fps": null,
+      "fps1pctLow": null,
+      "insufficientFrames": true,
+      "frameMs": 0,
+      "drawCalls": 74,
+      "triangles": 4631132,
+      "frames": 4
+     }
+    ]
+   }
+  },
+  {
+   "n": "copy results produces valid JSON",
+   "ok": true,
+   "d": {
+    "keys": [
+     "tool",
+     "photoBytes",
+     "time",
+     "device",
+     "current",
+     "benchmark",
+     "timeline",
+     "zoneBStreamMs",
+     "photoLoadMs",
+     "note"
+    ],
+    "bytes": 4926
+   }
+  },
+  {
+   "n": "no page errors",
+   "ok": true,
+   "d": []
+  }
+ ],
+ "logs": []
+}

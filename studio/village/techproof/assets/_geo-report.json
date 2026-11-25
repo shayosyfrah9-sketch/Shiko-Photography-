@@ -1,0 +1,50 @@
+[
+ {
+  "file": "terrain_lod1_plain.glb",
+  "bytes": 133032,
+  "tris": 4608,
+  "verts": 2401
+ },
+ {
+  "file": "terrain_lod0_plain.glb",
+  "bytes": 2077620,
+  "tris": 73728,
+  "verts": 37249
+ },
+ {
+  "file": "rock_lod1_plain.glb",
+  "bytes": 25720,
+  "tris": 768,
+  "verts": 486
+ },
+ {
+  "file": "rock_lod0_plain.glb",
+  "bytes": 72380,
+  "tris": 2352,
+  "verts": 1350
+ },
+ {
+  "file": "terrain_lod1.glb",
+  "bytes": 36492,
+  "tris": 4608,
+  "verts": 2401
+ },
+ {
+  "file": "terrain_lod0.glb",
+  "bytes": 484668,
+  "tris": 73728,
+  "verts": 37249
+ },
+ {
+  "file": "rock_lod1.glb",
+  "bytes": 11816,
+  "tris": 768,
+  "verts": 486
+ },
+ {
+  "file": "rock_lod0.glb",
+  "bytes": 27960,
+  "tris": 2352,
+  "verts": 1350
+ }
+]

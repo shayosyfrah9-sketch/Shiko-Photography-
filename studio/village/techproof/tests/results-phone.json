@@ -1,0 +1,288 @@
+{
+ "tool": "Shiko tech proof v1",
+ "photoBytes": {
+  "photo_2w2a1130.ktx2": 345697,
+  "photo_2w2a7966.ktx2": 252960,
+  "photo_2w2a0403.ktx2": 276353,
+  "photo_2w2a1130.jpg": 292805,
+  "photo_2w2a7966.jpg": 154910,
+  "photo_2w2a0403.jpg": 169654
+ },
+ "time": "2026-11-25T14:52:15.160Z",
+ "device": {
+  "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 15_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Mobile/15E148 Safari/604.1",
+  "platform": "Linux x86_64",
+  "cores": 4,
+  "deviceMemoryGB": 16,
+  "screen": {
+   "w": 390,
+   "h": 844,
+   "dpr": 3
+  },
+  "viewport": {
+   "w": 390,
+   "h": 664
+  },
+  "gpu": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+  "gpuVendor": "Google Inc. (Google)",
+  "softwareRenderer": true,
+  "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+  "maxTextureSize": 8192,
+  "compressedTextures": {
+   "astc": true,
+   "etc2": true,
+   "bc": true,
+   "ktx2Transcode": {
+    "astcSupported": true,
+    "astcHDRSupported": false,
+    "etc1Supported": true,
+    "etc2Supported": true,
+    "dxtSupported": true,
+    "bptcSupported": true,
+    "pvrtcSupported": false
+   }
+  },
+  "phoneHeuristic": true
+ },
+ "current": {
+  "tier": "med",
+  "tierName": "בינוני",
+  "auto": false,
+  "dpr": 1.25,
+  "fps": 0.3,
+  "fps1pctLow": 0.2,
+  "frameMs": 3713.7,
+  "frames": 6,
+  "drawCalls": 41,
+  "triangles": 680450,
+  "geometries": 45,
+  "textures": 57,
+  "shadowMap": 1024,
+  "postChain": true,
+  "assetsBytes": 7848952,
+  "assetFiles": 30,
+  "libraryBytes": 1144117,
+  "libraryFiles": 25,
+  "longTasks": 247,
+  "longTaskMs": 162133
+ },
+ "benchmark": [
+  {
+   "tier": "low",
+   "tierName": "נמוך",
+   "fps": 19.7,
+   "fps1pctLow": 12,
+   "insufficientFrames": false,
+   "frameMs": 50.9,
+   "drawCalls": 6,
+   "triangles": 35354,
+   "frames": 94
+  },
+  {
+   "tier": "med",
+   "tierName": "בינוני",
+   "fps": null,
+   "fps1pctLow": null,
+   "insufficientFrames": true,
+   "frameMs": 455.3,
+   "drawCalls": 48,
+   "triangles": 680534,
+   "frames": 28
+  },
+  {
+   "tier": "high",
+   "tierName": "גבוה",
+   "fps": null,
+   "fps1pctLow": null,
+   "insufficientFrames": true,
+   "frameMs": 1627,
+   "drawCalls": 47,
+   "triangles": 1252867,
+   "frames": 8
+  },
+  {
+   "tier": "ultra",
+   "tierName": "אולטרה",
+   "fps": null,
+   "fps1pctLow": null,
+   "insufficientFrames": true,
+   "frameMs": 0,
+   "drawCalls": 74,
+   "triangles": 4631132,
+   "frames": 4
+  }
+ ],
+ "timeline": [
+  {
+   "t": 291,
+   "name": "placeholder assets ready"
+  },
+  {
+   "t": 292,
+   "name": "tier med",
+   "why": "start"
+  },
+  {
+   "t": 4489,
+   "name": "first frame (placeholder quality)"
+  },
+  {
+   "t": 6780,
+   "name": "quality med ready",
+   "ms": 6436
+  },
+  {
+   "t": 6780,
+   "name": "full quality visible"
+  },
+  {
+   "t": 8322,
+   "name": "zone B stream start"
+  },
+  {
+   "t": 8361,
+   "name": "tier med",
+   "why": "zone B content"
+  },
+  {
+   "t": 8365,
+   "name": "quality med ready",
+   "ms": 1
+  },
+  {
+   "t": 13110,
+   "name": "photos ktx2"
+  },
+  {
+   "t": 13110,
+   "name": "zone B ready",
+   "ms": 4788
+  },
+  {
+   "t": 13856,
+   "name": "tier low",
+   "why": "manual"
+  },
+  {
+   "t": 13860,
+   "name": "quality low ready",
+   "ms": 0
+  },
+  {
+   "t": 17291,
+   "name": "tier med",
+   "why": "manual"
+  },
+  {
+   "t": 17295,
+   "name": "quality med ready",
+   "ms": 0
+  },
+  {
+   "t": 21698,
+   "name": "tier high",
+   "why": "manual"
+  },
+  {
+   "t": 28229,
+   "name": "quality high ready",
+   "ms": 6522
+  },
+  {
+   "t": 34347,
+   "name": "tier ultra",
+   "why": "manual"
+  },
+  {
+   "t": 34359,
+   "name": "quality ultra ready",
+   "ms": 0
+  },
+  {
+   "t": 81834,
+   "name": "tier med",
+   "why": "api"
+  },
+  {
+   "t": 81846,
+   "name": "quality med ready",
+   "ms": 0
+  },
+  {
+   "t": 85906,
+   "name": "fly to B"
+  },
+  {
+   "t": 90721,
+   "name": "photos jpg"
+  },
+  {
+   "t": 93591,
+   "name": "photos ktx2"
+  },
+  {
+   "t": 102497,
+   "name": "tier low",
+   "why": "benchmark"
+  },
+  {
+   "t": 102504,
+   "name": "quality low ready",
+   "ms": 0
+  },
+  {
+   "t": 109169,
+   "name": "tier med",
+   "why": "benchmark"
+  },
+  {
+   "t": 109174,
+   "name": "quality med ready",
+   "ms": 0
+  },
+  {
+   "t": 124143,
+   "name": "tier high",
+   "why": "benchmark"
+  },
+  {
+   "t": 124148,
+   "name": "quality high ready",
+   "ms": 0
+  },
+  {
+   "t": 140511,
+   "name": "tier ultra",
+   "why": "benchmark"
+  },
+  {
+   "t": 140522,
+   "name": "quality ultra ready",
+   "ms": 0
+  },
+  {
+   "t": 167255,
+   "name": "tier med",
+   "why": "after benchmark"
+  },
+  {
+   "t": 167265,
+   "name": "quality med ready",
+   "ms": 0
+  },
+  {
+   "t": 167265,
+   "name": "benchmark done"
+  }
+ ],
+ "zoneBStreamMs": 4788,
+ "photoLoadMs": {
+  "ktx2:2w2a1130": 1905,
+  "ktx2:2w2a7966": 1706,
+  "ktx2:2w2a0403": 1135,
+  "jpg:2w2a1130": 780,
+  "jpg:2w2a7966": 687,
+  "jpg:2w2a0403": 762
+ },
+ "note": "SOFTWARE RENDERER: fps values are not representative of a real GPU"
+}

@@ -1,0 +1,145 @@
+{
+ "pass": [
+  {
+   "n": "first frame",
+   "ok": true
+  },
+  {
+   "n": "zone B streamed",
+   "ok": true,
+   "d": 5401
+  },
+  {
+   "n": "tier 0 loads",
+   "ok": true,
+   "d": {
+    "calls": 19,
+    "tris": 35490,
+    "tex": 44,
+    "geo": 40,
+    "assets": 3314488
+   }
+  },
+  {
+   "n": "tier 1 loads",
+   "ok": true,
+   "d": {
+    "calls": 51,
+    "tris": 680560,
+    "tex": 57,
+    "geo": 41,
+    "assets": 3314488
+   }
+  },
+  {
+   "n": "tier 2 loads",
+   "ok": true,
+   "d": {
+    "calls": 61,
+    "tris": 1253025,
+    "tex": 75,
+    "geo": 45,
+    "assets": 7231583
+   }
+  },
+  {
+   "n": "tier 3 loads",
+   "ok": true,
+   "d": {
+    "calls": 98,
+    "tris": 4631420,
+    "tex": 91,
+    "geo": 45,
+    "assets": 7231583
+   }
+  },
+  {
+   "n": "fly button flips",
+   "ok": true
+  },
+  {
+   "n": "photo toggle to JPG",
+   "ok": true,
+   "d": 1
+  },
+  {
+   "n": "benchmark finishes (4 tiers)",
+   "ok": true,
+   "d": {
+    "sec": 64,
+    "bench": [
+     {
+      "tier": "low",
+      "tierName": "נמוך",
+      "fps": 16.3,
+      "fps1pctLow": 12,
+      "insufficientFrames": false,
+      "frameMs": 61.2,
+      "drawCalls": 13,
+      "triangles": 35448,
+      "frames": 91
+     },
+     {
+      "tier": "med",
+      "tierName": "בינוני",
+      "fps": 2.5,
+      "fps1pctLow": 2.3,
+      "insufficientFrames": false,
+      "frameMs": 395.1,
+      "drawCalls": 41,
+      "triangles": 680450,
+      "frames": 31
+     },
+     {
+      "tier": "high",
+      "tierName": "גבוה",
+      "fps": null,
+      "fps1pctLow": null,
+      "insufficientFrames": true,
+      "frameMs": 1353.3,
+      "drawCalls": 46,
+      "triangles": 1252855,
+      "frames": 10
+     },
+     {
+      "tier": "ultra",
+      "tierName": "אולטרה",
+      "fps": null,
+      "fps1pctLow": null,
+      "insufficientFrames": true,
+      "frameMs": 3216.5,
+      "drawCalls": 74,
+      "triangles": 4631132,
+      "frames": 5
+     }
+    ]
+   }
+  },
+  {
+   "n": "copy results produces valid JSON",
+   "ok": true,
+   "d": {
+    "keys": [
+     "tool",
+     "decoders",
+     "photoBytes",
+     "time",
+     "device",
+     "current",
+     "benchmark",
+     "timeline",
+     "zoneBStreamMs",
+     "photoLoadMs",
+     "note"
+    ],
+    "bytes": 5022
+   }
+  },
+  {
+   "n": "no page errors",
+   "ok": true,
+   "d": []
+  }
+ ],
+ "logs": []
+}

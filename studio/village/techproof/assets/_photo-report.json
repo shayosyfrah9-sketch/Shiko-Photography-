@@ -1,0 +1,47 @@
+[
+ {
+  "file": "photo_2w2a1130",
+  "w": 1068,
+  "h": 1600,
+  "ktx2": 345697,
+  "jpg": 292805
+ },
+ {
+  "file": "photo_2w2a7966",
+  "w": 1600,
+  "h": 1068,
+  "ktx2": 252960,
+  "jpg": 154910
+ },
+ {
+  "file": "photo_2w2a0403",
+  "w": 1068,
+  "h": 1600,
+  "ktx2": 276353,
+  "jpg": 169654
+ },
+ {
+  "file": "terrain_lod1.glb",
+  "bytes": 36492,
+  "tris": 4608,
+  "verts": 2401
+ },
+ {
+  "file": "terrain_lod0.glb",
+  "bytes": 484668,
+  "tris": 73728,
+  "verts": 37249
+ },
+ {
+  "file": "rock_lod1.glb",
+  "bytes": 11816,
+  "tris": 768,
+  "verts": 486
+ },
+ {
+  "file": "rock_lod0.glb",
+  "bytes": 27960,
+  "tris": 2352,
+  "verts": 1350
+ }
+]
