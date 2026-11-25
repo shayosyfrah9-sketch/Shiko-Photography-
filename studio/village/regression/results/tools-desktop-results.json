@@ -1,0 +1,112 @@
+{
+ "kind": "desktop",
+ "steps": [
+  {
+   "n": "gate → village",
+   "ok": true
+  },
+  {
+   "n": "WhatsApp link correct",
+   "ok": true,
+   "d": "https://wa.me/972544351955"
+  },
+  {
+   "n": "Matcha link correct",
+   "ok": true,
+   "d": "https://matcha.photo/"
+  },
+  {
+   "n": "About opens",
+   "ok": true,
+   "d": "הכול התחיל באוקטובר 2025, כשעמדתי מול נוף יפה ופתאום ראיתי א"
+  },
+  {
+   "n": "About closes",
+   "ok": true
+  },
+  {
+   "n": "Booking opens",
+   "ok": true
+  },
+  {
+   "n": "Booking WhatsApp button href",
+   "ok": true,
+   "d": "https://wa.me/972544351955?text=%D7%94%D7%99%D7%99%20%D7%A9%D7%99%D7%A7%D7%95%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A4%D7%A8%D7%98%D7%99%D7%9D%20%D7%A2%D7%9C%20%D7%A6%D7%99%D7%9C%D7%95%D7%9D"
+  },
+  {
+   "n": "Booking phone link",
+   "ok": true,
+   "d": [
+    "tel:+972544351955"
+   ]
+  },
+  {
+   "n": "Booking Instagram link",
+   "ok": true,
+   "d": [
+    "https://www.instagram.com/shiko.photography_/"
+   ]
+  },
+  {
+   "n": "Booking wizard submit builds WhatsApp link to correct number (blocked at network, nothing sent)",
+   "ok": true,
+   "d": [
+    "https://wa.me/972544351955?text=%D7%94%D7%99%D7%99%20%D7%A9%D7%99%D7%A7%D7%95%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%",
+    "chrome-error://chromewebdata/"
+   ]
+  },
+  {
+   "n": "Wizard end state shown",
+   "ok": true
+  },
+  {
+   "n": "Booking closes",
+   "ok": true
+  },
+  {
+   "n": "Language HE→EN",
+   "ok": true,
+   "d": {
+    "before": {
+     "btn": "EN",
+     "dir": "rtl",
+     "lang": "he",
+     "bodyDir": ""
+    },
+    "after": {
+     "btn": "עב",
+     "dir": "ltr",
+     "lang": "en",
+     "hub": "Booking",
+     "about": "Who I am",
+     "enter": "Enter"
+    }
+   }
+  },
+  {
+   "n": "Language EN→HE",
+   "ok": true,
+   "d": {
+    "btn": "EN",
+    "dir": "rtl"
+   }
+  }
+ ],
+ "log": {
+  "pageerrors": [],
+  "console": [
+   "Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED"
+  ],
+  "failed": [
+   "https://api.open-meteo.com/v1/forecast?latitude=46.02&longitude=7.75&elevation=1620&current=temperature_2m,weather_code&timezone=auto net::ERR_TUNNEL_CONNECTION_FAILED",
+   "https://shikophotography.com/a3/mus/village.mp3 net::ERR_ABORTED"
+  ],
+  "http": [],
+  "popups": [
+   "chrome-error://chromewebdata/"
+  ],
+  "waReq": [
+   "https://wa.me/972544351955?text=%D7%94%D7%99%D7%99%20%D7%A9%D7%99%D7%A7%D7%95%2C%20%D7%90%D7%A9%D7%9E%D7%97%20%D7%9C%D7%A4%D7%A8%D7%98%D7%99%D7%9D%20%D7%A2%D7%9C%20%D7%A6%D7%99%D7%9C%D7%95%D7%9D%3A%0A%D7%A9%D7%9D%3A%20Regression%20Test%0A%D7%98%D7%9C%D7%A4%D7%95%D7%9F%3A%200500000000%0A%D7%A1%D7%95%D7%92%3A%20%D7%A4%D7%A1%D7%98%D7%99%D7%91%D7%9C%20%2F%20%D7%9E%D7%A1%D7%99%D7%91%D7%94%0A%D7%9E%D7%99%D7%A7%D7%95%D7%9D%3A%20Test%0A%D7%A4%D7%A8%D7%98%D7%99%D7%9D%3A%20regression%20test%20-%20do%20not%20answer"
+  ]
+ }
+}

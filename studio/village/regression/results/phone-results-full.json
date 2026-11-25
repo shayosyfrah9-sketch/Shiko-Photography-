@@ -1,0 +1,515 @@
+{
+ "R": {
+  "kind": "phone",
+  "steps": [
+   {
+    "n": "gate → village",
+    "ok": true
+   },
+   {
+    "n": "hamburger present (phone menu)",
+    "ok": true
+   }
+  ],
+  "rooms": [
+   {
+    "hall": "fest",
+    "id": "freeearth",
+    "title": "FreeEarth",
+    "expected": 11,
+    "lang": "he",
+    "checks": {
+     "noError": false
+    },
+    "error": "page.waitForSelector: Timeout 8000ms exceeded."
+   },
+   {
+    "hall": "fest",
+    "id": "ozora",
+    "title": "Ozora",
+    "expected": 15,
+    "lang": "he",
+    "checks": {
+     "count": true,
+     "order": true,
+     "allLoaded": true,
+     "title": true,
+     "galleryLink": true,
+     "bookBtn": true,
+     "lightbox": true,
+     "closes": true
+    },
+    "menuTitle": "Ozora",
+    "n": 15,
+    "broken": 0,
+    "dir": "rtl",
+    "endBtns": [
+     "הזמנות",
+     "לגלריה המלאה · ב־Matcha",
+     "לאירוע הבא: Zoodana",
+     "חזרה"
+    ],
+    "gal": [
+     "https://matcha.photo/g/preview/nL-4dUKJHeX4TCjdM3Wiw15tXVEi7Ach3oJy9ozav6w"
+    ]
+   },
+   {
+    "hall": "fest",
+    "id": "zoodana",
+    "title": "Zoodana",
+    "expected": 23,
+    "lang": "he",
+    "checks": {
+     "count": true,
+     "order": true,
+     "allLoaded": true,
+     "title": true,
+     "galleryLink": true,
+     "bookBtn": true,
+     "lightbox": true,
+     "closes": true
+    },
+    "menuTitle": "Zoodana",
+    "n": 23,
+    "broken": 0,
+    "dir": "rtl",
+    "endBtns": [
+     "הזמנות",
+     "לגלריה המלאה",
+     "לאירוע הבא: Goaland",
+     "חזרה"
+    ],
+    "gal": [
+     "https://drive.google.com/drive/folders/1dXHjTlNmW-bS1gmnrZGxtuIH2gwf07CH?usp=sharing"
+    ]
+   },
+   {
+    "hall": "fest",
+    "id": "goaland",
+    "title": "Goaland",
+    "expected": 20,
+    "lang": "he",
+    "checks": {
+     "count": true,
+     "order": true,
+     "allLoaded": true,
+     "title": true,
+     "galleryLink": true,
+     "bookBtn": true,
+     "lightbox": true,
+     "closes": true
+    },
+    "menuTitle": "Goaland",
+    "n": 20,
+    "broken": 0,
+    "dir": "rtl",
+    "endBtns": [
+     "הזמנות",
+     "לגלריה המלאה",
+     "לאירוע הבא: Bardak",
+     "חזרה"
+    ],
+    "gal": [
+     "https://shikophotography.pixieset.com/goaland/"
+    ]
+   },
+   {
+    "hall": "fest",
+    "id": "bardak",
+    "title": "Bardak",
+    "expected": 20,
+    "lang": "he",
+    "checks": {
+     "count": true,
+     "order": true,
+     "allLoaded": true,
+     "title": true,
+     "galleryLink": true,
+     "bookBtn": true,
+     "lightbox": true,
+     "closes": true
+    },
+    "menuTitle": "Bardak",
+    "n": 20,
+    "broken": 0,
+    "dir": "rtl",
+    "endBtns": [
+     "הזמנות",
+     "לגלריה המלאה",
+     "לאירוע הבא: Hippietipi",
+     "חזרה"
+    ],
+    "gal": [
+     "https://shikophotography.pixieset.com/bardak/"
+    ]
+   },
+   {
+    "hall": "fest",
+    "id": "hippietipi",
+    "title": "Hippietipi",
+    "expected": 20,
+    "lang": "he",
+    "checks": {
+     "count": true,
+     "order": true,
+     "allLoaded": true,
+     "title": true,
+     "galleryLink": true,
+     "bookBtn": true,
+     "lightbox": true,
+     "closes": true
+    },
+    "menuTitle": "Hippietipi",
+    "n": 20,
+    "broken": 0,
+    "dir": "rtl",
+    "endBtns": [
+     "הזמנות",
+     "לגלריה המלאה",
+     "לאירוע הבא: Sounds of Love",
+     "חזרה"
+    ],
+    "gal": [
+     "https://shikophotography.pixieset.com/hippietipi/"
+    ]
+   },
+   {
+    "hall": "fest",
+    "id": "soundsoflove",
+    "title": "Sounds of Love",
+    "expected": 20,
+    "lang": "he",
+    "checks": {
+     "count": true,
+     "order": true,
+     "allLoaded": true,
+     "title": true,
+     "galleryLink": true,
+     "bookBtn": true,
+     "lightbox": true,
+     "closes": true
+    },
+    "menuTitle": "Sounds of Love",
+    "n": 20,
+    "broken": 0,
+    "dir": "rtl",
+    "endBtns": [
+     "הזמנות",
+     "לגלריה המלאה",
+     "חזרה"
+    ],
+    "gal": [
+     "https://shikophotography.pixieset.com/soundsoflove/"
+    ]
+   },
+   {
+    "hall": "sport",
+    "id": "matchday",
+    "title": "מכבי תל אביב",
+    "expected": 8,
+    "lang": "he",
+    "checks": {
+     "count": true,
+     "order": true,
+     "allLoaded": true,
+     "title": true,
+     "galleryLink": true,
+     "bookBtn": true,
+     "lightbox": true,
+     "closes": true
+    },
+    "menuTitle": "כדורגל מכבי תל אביב",
+    "n": 8,
+    "broken": 0,
+    "dir": "rtl",
+    "endBtns": [
+     "הזמנות",
+     "לאירוע הבא: מכבי ראשון",
+     "חזרה"
+    ],
+    "gal": []
+   },
+   {
+    "hall": "sport",
+    "id": "rishon",
+    "title": "מכבי ראשון",
+    "expected": 20,
+    "lang": "he",
+    "checks": {
+     "count": true,
+     "order": true,
+     "allLoaded": true,
+     "title": true,
+     "galleryLink": true,
+     "bookBtn": true,
+     "lightbox": true,
+     "closes": true
+    },
+    "menuTitle": "כדורסל מכבי ראשון",
+    "n": 20,
+    "broken": 0,
+    "dir": "rtl",
+    "endBtns": [
+     "הזמנות",
+     "לגלריה המלאה",
+     "לאירוע הבא: ליגת המילואימניקים",
+     "חזרה"
+    ],
+    "gal": [
+     "https://shikophotography.pixieset.com/mkbyrashvnltsyvnbaryqb/"
+    ]
+   },
+   {
+    "hall": "sport",
+    "id": "miluim",
+    "title": "ליגת המילואימניקים",
+    "expected": 11,
+    "lang": "he",
+    "checks": {
+     "count": true,
+     "order": true,
+     "allLoaded": true,
+     "title": true,
+     "galleryLink": true,
+     "bookBtn": true,
+     "lightbox": true,
+     "closes": true
+    },
+    "menuTitle": "כדורסל ליגת המילואימניקים",
+    "n": 11,
+    "broken": 0,
+    "dir": "rtl",
+    "endBtns": [
+     "הזמנות",
+     "לאירוע הבא: Surfing",
+     "חזרה"
+    ],
+    "gal": []
+   },
+   {
+    "hall": "sport",
+    "id": "surf",
+    "title": "Surfing",
+    "expected": 7,
+    "lang": "he",
+    "checks": {
+     "count": true,
+     "order": true,
+     "allLoaded": true,
+     "title": true,
+     "galleryLink": true,
+     "bookBtn": true,
+     "lightbox": true,
+     "closes": true
+    },
+    "menuTitle": "Surfing",
+    "n": 7,
+    "broken": 0,
+    "dir": "rtl",
+    "endBtns": [
+     "הזמנות",
+     "חזרה"
+    ],
+    "gal": []
+   },
+   {
+    "hall": "model",
+    "id": "maya",
+    "title": "Mayu Portraits",
+    "expected": 39,
+    "lang": "he",
+    "checks": {
+     "count": true,
+     "order": true,
+     "allLoaded": true,
+     "title": true,
+     "galleryLink": true,
+     "bookBtn": true,
+     "lightbox": true,
+     "closes": true
+    },
+    "menuTitle": "Mayu Portraits",
+    "n": 39,
+    "broken": 0,
+    "dir": "rtl",
+    "endBtns": [
+     "הזמנות",
+     "לגלריה המלאה",
+     "לאירוע הבא: Maya Portraits",
+     "חזרה"
+    ],
+    "gal": [
+     "https://shikophotography.pixieset.com/mayuportraits"
+    ]
+   },
+   {
+    "hall": "model",
+    "id": "maya2",
+    "title": "Maya Portraits",
+    "expected": 25,
+    "lang": "he",
+    "checks": {
+     "count": true,
+     "order": true,
+     "allLoaded": true,
+     "title": true,
+     "galleryLink": true,
+     "bookBtn": true,
+     "lightbox": true,
+     "closes": true
+    },
+    "menuTitle": "Maya Portraits",
+    "n": 25,
+    "broken": 0,
+    "dir": "rtl",
+    "endBtns": [
+     "הזמנות",
+     "לגלריה המלאה",
+     "לאירוע הבא: Amit",
+     "חזרה"
+    ],
+    "gal": [
+     "https://shikophotography.pixieset.com/mayaportraits/"
+    ]
+   },
+   {
+    "hall": "model",
+    "id": "amit",
+    "title": "Amit",
+    "expected": 12,
+    "lang": "he",
+    "checks": {
+     "count": true,
+     "order": true,
+     "allLoaded": true,
+     "title": true,
+     "galleryLink": true,
+     "bookBtn": true,
+     "lightbox": true,
+     "closes": true
+    },
+    "menuTitle": "Amit",
+    "n": 12,
+    "broken": 0,
+    "dir": "rtl",
+    "endBtns": [
+     "הזמנות",
+     "לגלריה המלאה",
+     "לאירוע הבא: Shira",
+     "חזרה"
+    ],
+    "gal": [
+     "https://shikophotography.pixieset.com/httpswame972544351955/"
+    ]
+   },
+   {
+    "hall": "model",
+    "id": "shira",
+    "title": "Shira",
+    "expected": 42,
+    "lang": "he",
+    "checks": {
+     "count": true,
+     "order": true,
+     "allLoaded": true,
+     "title": true,
+     "galleryLink": true,
+     "bookBtn": true,
+     "lightbox": true,
+     "closes": true
+    },
+    "menuTitle": "Shira",
+    "n": 42,
+    "broken": 0,
+    "dir": "rtl",
+    "endBtns": [
+     "הזמנות",
+     "לאירוע הבא: Noa",
+     "חזרה"
+    ],
+    "gal": []
+   },
+   {
+    "hall": "model",
+    "id": "noa",
+    "title": "Noa",
+    "expected": 40,
+    "lang": "he",
+    "checks": {
+     "count": true,
+     "order": true,
+     "allLoaded": true,
+     "title": true,
+     "galleryLink": true,
+     "bookBtn": true,
+     "lightbox": true,
+     "closes": true
+    },
+    "menuTitle": "Noa",
+    "n": 40,
+    "broken": 0,
+    "dir": "rtl",
+    "endBtns": [
+     "הזמנות",
+     "לאירוע הבא: Eden",
+     "חזרה"
+    ],
+    "gal": []
+   },
+   {
+    "hall": "model",
+    "id": "eden",
+    "title": "Eden",
+    "expected": 25,
+    "lang": "he",
+    "checks": {
+     "count": true,
+     "order": true,
+     "allLoaded": true,
+     "title": true,
+     "galleryLink": true,
+     "bookBtn": true,
+     "lightbox": true,
+     "closes": true
+    },
+    "menuTitle": "Eden",
+    "n": 25,
+    "broken": 0,
+    "dir": "rtl",
+    "endBtns": [
+     "הזמנות",
+     "חזרה"
+    ],
+    "gal": []
+   },
+   {
+    "hall": "video",
+    "id": "video-soon",
+    "title": "Showreel",
+    "expected": 0,
+    "lang": "he",
+    "checks": {
+     "noCrash": true
+    },
+    "menuTitle": "Showreel",
+    "view": "v-room phone | mroomHidden=true"
+   }
+  ],
+  "t0": "2026-11-25T12:53:24.000Z"
+ },
+ "log": {
+  "pageerrors": [],
+  "console": [
+   "Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED"
+  ],
+  "failed": [
+   "https://api.open-meteo.com/v1/forecast?latitude=46.02&longitude=7.75&elevation=1620&current=temperature_2m,weather_code&timezone=auto net::ERR_TUNNEL_CONNECTION_FAILED",
+   "https://shikophotography.com/a3/mus/village.mp3 net::ERR_ABORTED",
+   "https://shikophotography.com/a3/mus/fest.mp3 net::ERR_ABORTED",
+   "https://shikophotography.com/a3/mus/sport.mp3 net::ERR_ABORTED"
+  ],
+  "http": [],
+  "popups": [],
+  "waReq": []
+ }
+}

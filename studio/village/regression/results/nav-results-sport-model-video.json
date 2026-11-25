@@ -1,0 +1,259 @@
+{
+ "kind": "desktop-nav",
+ "steps": [
+  {
+   "n": "gate → village",
+   "ok": true
+  },
+  {
+   "n": "select house sport",
+   "ok": true
+  },
+  {
+   "n": "house sport shows 3 sport groups (football/basketball/surfing)",
+   "ok": true,
+   "d": [
+    "01כדורגלאירוע אחד",
+    "02כדורסל2 אירועים",
+    "03Surfing7 תמונות"
+   ]
+  },
+  {
+   "n": "house sport → home (button) returns to village",
+   "ok": true
+  },
+  {
+   "n": "select house model",
+   "ok": true
+  },
+  {
+   "n": "house model shows 6 room cards",
+   "ok": true,
+   "d": [
+    "01Mayu Portraits",
+    "02Maya Portraits",
+    "03Amit",
+    "04Shira",
+    "05Noa",
+    "06Eden"
+   ]
+  },
+  {
+   "n": "house model → home (button) returns to village",
+   "ok": true
+  },
+  {
+   "n": "select house video",
+   "ok": true
+  },
+  {
+   "n": "video house enters (empty/coming soon room)",
+   "ok": true,
+   "d": "v-hall"
+  }
+ ],
+ "rooms": [
+  {
+   "id": "matchday",
+   "checks": {
+    "entersRoom": true,
+    "counter": true,
+    "stepsForward": true,
+    "stepsBack": true,
+    "gridOpens": true,
+    "gridOrder": true,
+    "gridTitle": true,
+    "fullGalleryLink": true,
+    "backToHouse": true
+   },
+   "sCount": "01 / 08",
+   "gridIds": 8,
+   "gridBroken": 0
+  },
+  {
+   "id": "rishon",
+   "checks": {
+    "entersRoom": true,
+    "counter": true,
+    "stepsForward": true,
+    "stepsBack": true,
+    "gridOpens": true,
+    "gridOrder": true,
+    "gridTitle": true,
+    "fullGalleryLink": true,
+    "backToHouse": true
+   },
+   "sCount": "01 / 20",
+   "gridIds": 20,
+   "gridBroken": 0
+  },
+  {
+   "id": "miluim",
+   "checks": {
+    "entersRoom": true,
+    "counter": true,
+    "stepsForward": true,
+    "stepsBack": true,
+    "gridOpens": true,
+    "gridOrder": false,
+    "gridTitle": true,
+    "fullGalleryLink": true,
+    "backToHouse": true
+   },
+   "sCount": "01 / 11",
+   "gridIds": 12,
+   "gridBroken": 0,
+   "gridNote": {
+    "got": 12,
+    "want": 11,
+    "srcsSample": [
+     "media/th/2w2a7966.jpg",
+     "media/th/2w2a8009.jpg",
+     "media/th/2w2a8099.jpg"
+    ]
+   }
+  },
+  {
+   "id": "surf",
+   "checks": {
+    "entersRoom": true,
+    "counter": true,
+    "stepsForward": true,
+    "stepsBack": true,
+    "gridOpens": true,
+    "gridOrder": true,
+    "gridTitle": true,
+    "fullGalleryLink": true,
+    "backToHouse": true
+   },
+   "sCount": "01 / 07",
+   "gridIds": 7,
+   "gridBroken": 0
+  },
+  {
+   "id": "maya",
+   "checks": {
+    "entersRoom": true,
+    "counter": true,
+    "stepsForward": true,
+    "stepsBack": true,
+    "gridOpens": true,
+    "gridOrder": true,
+    "gridTitle": true,
+    "fullGalleryLink": true,
+    "backToHouse": true
+   },
+   "sCount": "01 / 39",
+   "gridIds": 39,
+   "gridBroken": 0
+  },
+  {
+   "id": "maya2",
+   "checks": {
+    "entersRoom": true,
+    "counter": true,
+    "stepsForward": true,
+    "stepsBack": true,
+    "gridOpens": true,
+    "gridOrder": true,
+    "gridTitle": true,
+    "fullGalleryLink": true,
+    "backToHouse": true
+   },
+   "sCount": "01 / 25",
+   "gridIds": 25,
+   "gridBroken": 0
+  },
+  {
+   "id": "amit",
+   "checks": {
+    "entersRoom": true,
+    "counter": true,
+    "stepsForward": true,
+    "stepsBack": true,
+    "gridOpens": true,
+    "gridOrder": true,
+    "gridTitle": true,
+    "fullGalleryLink": true,
+    "backToHouse": true
+   },
+   "sCount": "01 / 12",
+   "gridIds": 12,
+   "gridBroken": 0
+  },
+  {
+   "id": "shira",
+   "checks": {
+    "entersRoom": true,
+    "counter": true,
+    "stepsForward": true,
+    "stepsBack": true,
+    "gridOpens": true,
+    "gridOrder": true,
+    "gridTitle": true,
+    "fullGalleryLink": true,
+    "backToHouse": true
+   },
+   "sCount": "01 / 42",
+   "gridIds": 42,
+   "gridBroken": 0
+  },
+  {
+   "id": "noa",
+   "checks": {
+    "entersRoom": true,
+    "counter": true,
+    "stepsForward": true,
+    "stepsBack": true,
+    "gridOpens": true,
+    "gridOrder": true,
+    "gridTitle": true,
+    "fullGalleryLink": true,
+    "backToHouse": true
+   },
+   "sCount": "01 / 40",
+   "gridIds": 40,
+   "gridBroken": 0
+  },
+  {
+   "id": "eden",
+   "checks": {
+    "entersRoom": true,
+    "counter": true,
+    "stepsForward": true,
+    "stepsBack": true,
+    "gridOpens": true,
+    "gridOrder": false,
+    "gridTitle": true,
+    "fullGalleryLink": true,
+    "backToHouse": true
+   },
+   "sCount": "01 / 25",
+   "gridIds": 26,
+   "gridBroken": 0,
+   "gridNote": {
+    "got": 26,
+    "want": 25,
+    "srcsSample": [
+     "media/th/eden7441.jpg",
+     "media/th/eden7416.jpg",
+     "media/th/eden7492.jpg"
+    ]
+   }
+  }
+ ],
+ "log": {
+  "pageerrors": [],
+  "console": [
+   "Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED"
+  ],
+  "failed": [
+   "https://api.open-meteo.com/v1/forecast?latitude=46.02&longitude=7.75&elevation=1620&current=temperature_2m,weather_code&timezone=auto net::ERR_TUNNEL_CONNECTION_FAILED",
+   "https://shikophotography.com/a3/mus/village.mp3 net::ERR_ABORTED",
+   "https://shikophotography.com/a3/mus/sport.mp3 net::ERR_ABORTED"
+  ],
+  "http": [],
+  "popups": [],
+  "waReq": []
+ }
+}

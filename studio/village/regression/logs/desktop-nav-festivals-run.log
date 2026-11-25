@@ -1,0 +1,15 @@
+PASS gate → village 
+PASS select house fest 
+PASS house fest shows 7 room cards ["01FreeEarth","02Ozora","03Zoodana","04Goaland","05Bardak","06Hippietipi","07Sounds of Love"]
+PASS room freeearth 01 / 11 grid 11/11  
+PASS room ozora 01 / 15 grid 15/15  
+PASS room zoodana 01 / 23 grid 23/23  
+PASS room goaland 01 / 20 grid 20/20  
+PASS room bardak 01 / 20 grid 20/20  
+PASS room hippietipi 01 / 20 grid 20/20  
+FAIL room soundsoflove 01 / 20 grid 21/20 gridOrder 
+PASS house fest → home (button) returns to village 
+PASS select house sport 
+FAIL house sport shows 4 room cards ["01Mayu Portraits","02Maya Portraits","03Amit","04Shira","05Noa","06Eden"]
+FAIL room matchday 01 / 39 grid 0/8 counter,gridOrder,gridTitle,fullGalleryLink 
+FAIL room rishon 01 / 25 grid 0/20 counter,gridOrder,gridTitle,fullGalleryLink 

@@ -1,0 +1,21 @@
+PASS gate → village 
+PASS select house sport 
+PASS house sport shows 3 sport groups (football/basketball/surfing) ["01כדורגלאירוע אחד","02כדורסל2 אירועים","03Surfing7 תמונות"]
+PASS room matchday 01 / 08 grid 8/8  
+PASS room rishon 01 / 20 grid 20/20  
+FAIL room miluim 01 / 11 grid 12/11 gridOrder 
+PASS room surf 01 / 07 grid 7/7  
+PASS house sport → home (button) returns to village 
+PASS select house model 
+PASS house model shows 6 room cards ["01Mayu Portraits","02Maya Portraits","03Amit","04Shira","05Noa","06Eden"]
+PASS room maya 01 / 39 grid 39/39  
+PASS room maya2 01 / 25 grid 25/25  
+PASS room amit 01 / 12 grid 12/12  
+PASS room shira 01 / 42 grid 42/42  
+PASS room noa 01 / 40 grid 40/40  
+FAIL room eden 01 / 25 grid 26/25 gridOrder 
+PASS house model → home (button) returns to village 
+PASS select house video 
+PASS video house enters (empty/coming soon room) "v-hall"
+LOG {"pageerrors":[],"console":["Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED"],"failed":["https://api.open-meteo.com/v1/forecast?latitude=46.02&longitude=7.75&elevation=1620&current=temperature_2m,weather_code&timezone=auto net::ERR_TUNNEL_CONNECTION_FAILED","https://shikophotography.com/a3/mus/village.mp3 net::ERR_ABORTED","https://shikophotography.com/a3/mus/sport.mp3 net::ERR_ABORTED"],"http":[]}
+done

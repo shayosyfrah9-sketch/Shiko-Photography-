@@ -1,0 +1,62 @@
+{
+ "R": {
+  "kind": "phone",
+  "steps": [
+   {
+    "n": "gate → village",
+    "ok": true
+   },
+   {
+    "n": "hamburger present (phone menu)",
+    "ok": true
+   }
+  ],
+  "rooms": [
+   {
+    "hall": "fest",
+    "id": "freeearth",
+    "title": "FreeEarth",
+    "expected": 11,
+    "lang": "he",
+    "checks": {
+     "count": true,
+     "order": true,
+     "allLoaded": true,
+     "title": true,
+     "galleryLink": true,
+     "bookBtn": true,
+     "lightbox": true,
+     "closes": true
+    },
+    "menuTitle": "FreeEarth",
+    "n": 11,
+    "broken": 0,
+    "dir": "rtl",
+    "endBtns": [
+     "הזמנות",
+     "לגלריה המלאה · ב־Matcha",
+     "לאירוע הבא: Ozora",
+     "חזרה"
+    ],
+    "gal": [
+     "https://matcha.photo/g/preview/cSkYXQLIHUmHdjJbrnpwLabesEyTwSQ7BF-8uFf98Eg"
+    ]
+   }
+  ],
+  "t0": "2026-11-25T13:01:58.537Z",
+  "menuRetries": 2
+ },
+ "log": {
+  "pageerrors": [],
+  "console": [
+   "Failed to load resource: net::ERR_TUNNEL_CONNECTION_FAILED"
+  ],
+  "failed": [
+   "https://api.open-meteo.com/v1/forecast?latitude=46.02&longitude=7.75&elevation=1620&current=temperature_2m,weather_code&timezone=auto net::ERR_TUNNEL_CONNECTION_FAILED",
+   "https://shikophotography.com/a3/mus/village.mp3 net::ERR_ABORTED"
+  ],
+  "http": [],
+  "popups": [],
+  "waReq": []
+ }
+}
