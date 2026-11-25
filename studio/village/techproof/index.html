@@ -101,13 +101,26 @@ table.bench th:first-child, table.bench td:first-child { text-align: start; }
       <button id="bPlay" aria-pressed="true">מצלמה אוטומטית</button><button id="bFly">לאזור B</button>
     </div>
     <div class="grp" role="group" aria-label="תמונות"><span>תמונות</span>
-      <button id="bPhoto" aria-pressed="false">KTX2</button>
+      <button id="bPhoto" aria-pressed="false">AVIF/WebP מותאם</button>
     </div>
     <div class="grp"><button id="bBench" class="primary">בדיקת ביצועים (כ־45 שניות)</button><button id="bCopy" class="primary">העתק תוצאות</button></div>
   </div>
   <textarea id="out" hidden readonly aria-label="תוצאות להעתקה"></textarea>
 </div>
 
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.181.0/build/three.module.min.js" crossorigin>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.181.0/build/three.core.min.js" crossorigin>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.181.0/examples/jsm/loaders/GLTFLoader.js" crossorigin>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.181.0/examples/jsm/utils/BufferGeometryUtils.js" crossorigin>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.181.0/examples/jsm/loaders/KTX2Loader.js" crossorigin>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.181.0/examples/jsm/libs/ktx-parse.module.js" crossorigin>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.181.0/examples/jsm/libs/zstddec.module.js" crossorigin>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.181.0/examples/jsm/math/ColorSpaces.js" crossorigin>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.181.0/examples/jsm/utils/WorkerPool.js" crossorigin>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.181.0/examples/jsm/libs/meshopt_decoder.module.js" crossorigin>
+<link rel="modulepreload" href="https://cdn.jsdelivr.net/npm/three@0.181.0/examples/jsm/objects/Sky.js" crossorigin>
+<link rel="preload" as="fetch" href="assets/terrain_lod1.glb.png" crossorigin>
+<link rel="preload" as="fetch" href="assets/rock_lod1.glb.png" crossorigin>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.181.0/build/three.module.min.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.181.0/examples/jsm/"}}
 </script>
@@ -117,13 +130,6 @@ import { KTX2Loader } from 'three/addons/loaders/KTX2Loader.js';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { Sky } from 'three/addons/objects/Sky.js';
-import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
-import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
-import { SMAAPass } from 'three/addons/postprocessing/SMAAPass.js';
 
 const $ = (id) => document.getElementById(id);
 const T0 = performance.now();
@@ -181,7 +187,7 @@ function loadTex(name, srgb) {
   if (texCache.has(name)) return texCache.get(name);
   const jpgUrl = BASE + 'assets/' + (name.startsWith('photo_') ? '' : 'fb/') + name + '.jpg';
   const viaJpg = () => new THREE.TextureLoader().loadAsync(jpgUrl).then((t) => finishTex(t, srgb));
-  const p = (decoders.ktx2 === false ? viaJpg() : ktx2.loadAsync(BASE + 'assets/' + name + '.ktx2.png').then((t) => { decoders.ktx2 = true; return finishTex(t, srgb); })
+  const p = (decoders.ktx2 === false || /_s$/.test(name) ? viaJpg() : ktx2.loadAsync(BASE + 'assets/' + name + '.ktx2.png').then((t) => { decoders.ktx2 = true; return finishTex(t, srgb); })
     .catch((e) => { decoders.ktx2 = false; decoders.ktx2Error = String((e && e.message) || e).slice(0, 160); mark('KTX2 failed, JPG fallback'); showNote('KTX2 לא רץ בסביבה הזו (' + decoders.ktx2Error + '). עברתי לקבצי JPG; מדדי המשקל של KTX2 לא תקפים.'); return viaJpg(); }));
   texCache.set(name, p); return p;
 }
@@ -202,7 +208,8 @@ const TIERS = [
   { name: 'אולטרה', key: 'ultra', dpr: 2, shadow: 4096, shadowType: 1, mat: 'l', normals: 'l', terrain: 0, rock: 0, rocks: 400, grass: 60000, motes: 1200, post: true, bloom: 0.45, rays: true, dof: true, smaa: true, msaa: 4, env: true },
 ];
 const QS = new URLSearchParams(location.search); // ?tier=0..3 fixes the start tier and disables auto (repeatable measurements)
-let tierIdx = QS.has('tier') ? Math.max(0, Math.min(3, +QS.get('tier') || 0)) : PHONE ? 1 : 2, auto = !QS.has('tier'), tierCap = PHONE ? 2 : 3, blocked = new Set(), lastTierChange = 0;
+let tierIdx = QS.has('tier') ? Math.max(0, Math.min(3, +QS.get('tier') || 0)) : PHONE ? 1 : 2, auto = !QS.has('tier'), tierCap = 2, // automatic quality never exceeds HIGH; ULTRA is manual only
+    blocked = new Set(), lastTierChange = 0;
 
 /* ------------------------------------------------------------------ lighting / sky / zones */
 const sky = new Sky(); sky.scale.setScalar(5000); scene.add(sky);
@@ -341,19 +348,30 @@ function _makePhotoFrames() {
   });
 }
 makePhotoFrames();
-const photoState = { mode: 'ktx2', loadMs: {}, bytes: {} };
+const photoState = { mode: 'adaptive', loadMs: {}, bytes: {}, chosen: {} };
+// AVIF support probe (1x1 image); falls back to WebP, then to the old JPG
+const AVIF_OK = new Promise((res) => { const i = new Image(); i.onload = () => res(true); i.onerror = () => res(false); i.src = BASE + 'assets/probe.avif'; setTimeout(() => res(false), 2500); });
+const loadImgTex = (url) => new Promise((res, rej) => new THREE.TextureLoader().load(url, res, undefined, rej));
+function setPhotoTex(p, tex) { tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8; tex.generateMipmaps = true; tex.needsUpdate = true; const old = p.mat.map; p.mat.map = tex; p.mat.emissiveMap = tex; p.mat.needsUpdate = true; if (old && old !== tex && old.__own) old.dispose(); tex.__own = true; }
+const PHOTO_MODES = ['adaptive', 'ktx2', 'jpg'], PHOTO_LABEL = { adaptive: 'AVIF/WebP מותאם', ktx2: 'KTX2', jpg: 'JPG (ישן)' };
 async function applyPhotos(mode) {
-  photoState.mode = mode; $('bPhoto').textContent = mode === 'ktx2' ? 'KTX2' : 'JPG'; $('bPhoto').setAttribute('aria-pressed', mode === 'jpg' ? 'true' : 'false');
+  photoState.mode = mode; $('bPhoto').textContent = PHOTO_LABEL[mode]; $('bPhoto').setAttribute('aria-pressed', mode === 'adaptive' ? 'false' : 'true');
+  if (mode === 'adaptive') {
+    // 1) tiny blur-up placeholders for all frames, 2) the display-sized image (m or l, AVIF if supported)
+    const fmt = (await AVIF_OK) ? 'avif' : 'webp', need = innerWidth * Math.min(renderer.getPixelRatio(), 2), tag = need <= 900 ? 'm' : 'l'; // the photo can fill the screen when the camera is close, so size for the full drawing-buffer width photoState.chosen = { format: fmt, size: tag, neededPx: Math.round(need) };
+    const t0 = performance.now(); await Promise.all(photoMeshes.map(async (p) => { const t = performance.now(); setPhotoTex(p, await loadImgTex(photoUrl(p.id, 'xs', 'webp'))); photoState.loadMs['xs:' + p.id] = Math.round(performance.now() - t); })); mark('photos placeholder (xs) shown', { ms: Math.round(performance.now() - t0) });
+    for (const p of photoMeshes) { const t = performance.now(); let tex; try { tex = await loadImgTex(photoUrl(p.id, tag, fmt)); } catch (_) { tex = await loadImgTex(photoUrl(p.id, tag, 'webp')); } setPhotoTex(p, tex); photoState.loadMs[`${tag}_${fmt}:${p.id}`] = Math.round(performance.now() - t); }
+    mark('photos adaptive ' + tag + '/' + fmt); return;
+  }
   for (const p of photoMeshes) {
-    const t0 = performance.now();
-    let tex;
-    if (mode === 'ktx2') tex = await loadTex('photo_' + p.id, true);
-    else tex = await new Promise((res, rej) => new THREE.TextureLoader().load(BASE + 'assets/photo_' + p.id + '.jpg', res, undefined, rej));
+    const t0 = performance.now(); let tex;
+    if (mode === 'ktx2') tex = await loadTex('photo_' + p.id, true); else tex = await loadImgTex(BASE + 'assets/photo_' + p.id + '.jpg');
     tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8; if (mode === 'jpg') { tex.generateMipmaps = true; tex.needsUpdate = true; }
     p.mat.map = tex; p.mat.emissiveMap = tex; p.mat.needsUpdate = true; const k = mode + ':' + p.id; if (!(k in photoState.loadMs)) photoState.loadMs[k] = Math.round(performance.now() - t0);
   }
   mark('photos ' + mode);
 }
+const photoUrl = (id, tag, fmt) => BASE + 'assets/photo_' + id + '_' + tag + '.' + fmt;
 // floating motes (atmosphere / depth cue)
 const moteGeo = new THREE.BufferGeometry(); { const n = 1200, p = new Float32Array(n * 3), ph = new Float32Array(n); const r = rng(5); for (let i = 0; i < n; i++) { p[i * 3] = (r() - .5) * 360; p[i * 3 + 1] = 1 + r() * 26; p[i * 3 + 2] = (r() - .5) * 360; ph[i] = r() * 6.28; } moteGeo.setAttribute('position', new THREE.BufferAttribute(p, 3)); moteGeo.setAttribute('ph', new THREE.BufferAttribute(ph, 1)); }
 const moteMat = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, uniforms: { uT: windU, uCol: { value: new THREE.Color(0xffd9a8) } },
@@ -370,9 +388,16 @@ const RaysShader = { uniforms: { tDiffuse: { value: null }, sunPos: { value: new
 const GradeShader = { uniforms: { tDiffuse: { value: null }, uT: { value: 0 }, uAsp: { value: 1 } },
   vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
   fragmentShader: 'uniform sampler2D tDiffuse;uniform float uT;varying vec2 vUv;float h(vec2 p){return fract(sin(dot(p,vec2(12.9898,78.233)))*43758.5453);}void main(){vec4 c=texture2D(tDiffuse,vUv);vec2 q=vUv-.5;float v=smoothstep(.95,.25,length(q*vec2(1.,.9)));c.rgb*=mix(.72,1.,v);c.rgb+=(h(vUv*vec2(1731.,977.)+uT)-.5)*.022;gl_FragColor=c;}' };
+let PPm = null; // post-processing modules load only when a tier needs them (keeps them out of the first-frame path)
+async function ensurePP() {
+  if (PPm) return PPm; const t0 = performance.now(), A = 'three/addons/postprocessing/';
+  const [ec, rp, ub, op, sp, bp, sm] = await Promise.all([import(A + 'EffectComposer.js'), import(A + 'RenderPass.js'), import(A + 'UnrealBloomPass.js'), import(A + 'OutputPass.js'), import(A + 'ShaderPass.js'), import(A + 'BokehPass.js'), import(A + 'SMAAPass.js')]);
+  PPm = { EffectComposer: ec.EffectComposer, RenderPass: rp.RenderPass, UnrealBloomPass: ub.UnrealBloomPass, OutputPass: op.OutputPass, ShaderPass: sp.ShaderPass, BokehPass: bp.BokehPass, SMAAPass: sm.SMAAPass }; mark('post modules loaded', { ms: Math.round(performance.now() - t0) }); return PPm;
+}
 function _buildComposer() {
   if (composer) { composer.dispose(); composer = null; }
-  const T = TIERS[tierIdx]; if (!T.post) return;
+  const T = TIERS[tierIdx]; if (!T.post || !PPm) return;
+  const { EffectComposer, RenderPass, UnrealBloomPass, OutputPass, ShaderPass, BokehPass, SMAAPass } = PPm;
   const size = renderer.getDrawingBufferSize(new THREE.Vector2());
   const rt = new THREE.WebGLRenderTarget(size.x, size.y, { type: THREE.HalfFloatType, samples: T.msaa });
   composer = new EffectComposer(renderer, rt); composer.setPixelRatio(1); composer.setSize(size.x, size.y);
@@ -403,7 +428,10 @@ async function applyTier(idx, why) {
   motes.visible = T.motes > 0; moteGeo.setDrawRange(0, T.motes);
   scene.environment = T.env ? envRT && envRT.texture : null; if (T.env && !envRT) buildEnv();
   for (const k of ['A', 'B']) { if (rocks[k]) rocks[k].count = Math.min(rocks[k].instanceMatrix.count, Math.floor(T.rocks / 2)); if (grass[k]) { grass[k].visible = T.grass > 0; grass[k].count = Math.min(grass[k].instanceMatrix.count, Math.floor(T.grass / 2)); } }
+  if (T.post) await ensurePP(); if (token !== applyToken) return;
   resize(); buildComposer();
+  try { const tc = performance.now(); await renderer.compileAsync(scene, camera); stageAdd('compileAsync', performance.now() - tc); } catch (_) { /* compile happens lazily on first render */ }
+  if (token !== applyToken) return;
   [...document.querySelectorAll('[data-tier]')].forEach((b) => b.setAttribute('aria-pressed', String((auto && b.dataset.tier === 'auto') || (!auto && b.dataset.tier === String(idx)))));
   // heavier, asynchronous upgrades: textures, normal maps, high-detail geometry
   const t0 = performance.now();
@@ -427,7 +455,7 @@ async function streamZoneB() {
   rocks.A = makeRocks(rocks.listA, rg); rocks.B = makeRocks(rocks.listB, rg); scene.add(rocks.A, rocks.B);
   grass.A = makeGrass(Math.floor(TIERS[3].grass / 2), ZA, 48, new THREE.Color(0x8d9a45), ZA); grass.B = makeGrass(Math.floor(TIERS[3].grass / 2), ZB, 48, new THREE.Color(0x5c7d58), ZB);
   scene.add(grass.A, grass.B); pavA.visible = true; pavB = pavilion(ZB.x, ZB.z, 2.6); applyTier(tierIdx, 'zone B content');
-  await applyPhotos('ktx2');
+  await applyPhotos('adaptive');
   zoneB.ms = Math.round(performance.now() - zoneB.t0); zoneB.state = 'ready'; mark('zone B ready', { ms: zoneB.ms }); TP.state.zoneBReady = true; checkWorld();
   $('bFly').disabled = false; $('bFly').textContent = 'לאזור B';
 }
@@ -517,7 +545,7 @@ function renderDetails() {
 }
 
 /* ------------------------------------------------------------------ results / benchmark / UI */
-function photoBytes() { const o = {}; for (const e of performance.getEntriesByType('resource')) { const m = /photo_(\w+)\.(ktx2|jpg)/.exec(e.name); if (m) o[m[0]] = e.encodedBodySize || e.transferSize || 0; } return o; }
+function photoBytes() { const o = {}; for (const e of performance.getEntriesByType('resource')) { const m = /photo_([^/?]+\.(ktx2|jpg|webp|avif))/.exec(e.name); if (m) o[m[0]] = e.encodedBodySize || e.transferSize || 0; } return o; }
 function bytesByPhase() {
   const cat = (n) => (/\/basis\//.test(n) ? 'transcoder' : /\/assets\/.*(photo_)/.test(n) ? 'photos' : /\.glb/.test(n) ? 'geometry' : /\/assets\//.test(n) ? 'textures' : /jsdelivr|unpkg|cdnjs/.test(n) ? 'threejs' : 'page');
   const o = { total: 0, beforeFirstFrame: 0, beforeWorldComplete: 0, byCategory: {}, requests: 0, requestsBeforeFirstFrame: 0 };
@@ -526,7 +554,7 @@ function bytesByPhase() {
   const nav = performance.getEntriesByType('navigation')[0]; if (nav) o.page = { encodedBodySize: nav.encodedBodySize, responseEndMs: r0(nav.responseEnd), domContentLoadedMs: r0(nav.domContentLoadedEventEnd) };
   return o;
 }
-function results() { return { tool: 'Shiko tech proof v2 (measurement build)', schema: 2, phases: phasesReport(), longTasks: longTaskReport(), bytes: bytesByPhase(), gpuTimerAvailable: !!gpuExt, decoders, photoBytes: photoBytes(), time: new Date().toISOString(), device: deviceInfo(), current: snapshot(), stageCostMs: Object.fromEntries(Object.entries(stageMs).map(([k, v]) => [k, { calls: v.calls, ms: Math.round(v.ms), maxMs: Math.round(v.maxMs) }])), benchmark: TP.bench || [], benchmarkMeta: TP.benchMeta || null, timeline, zoneBStreamMs: zoneB.ms || null, photoLoadMs: photoState.loadMs,
+function results() { return { tool: 'Shiko tech proof v2 (measurement build)', schema: 2, phases: phasesReport(), longTasks: longTaskReport(), bytes: bytesByPhase(), gpuTimerAvailable: !!gpuExt, decoders, photoBytes: photoBytes(), time: new Date().toISOString(), device: deviceInfo(), current: snapshot(), stageCostMs: Object.fromEntries(Object.entries(stageMs).map(([k, v]) => [k, { calls: v.calls, ms: Math.round(v.ms), maxMs: Math.round(v.maxMs) }])), bootMode: TP.bootMode, benchmark: TP.bench || [], benchmarkMeta: TP.benchMeta || null, timeline, zoneBStreamMs: zoneB.ms || null, photoLoadMs: photoState.loadMs, photoDelivery: photoState.chosen,
   note: SOFTWARE ? 'SOFTWARE RENDERER: fps values are not representative of a real GPU' : 'measured on this device' }; }
 async function copyResults() {
   const txt = JSON.stringify(results(), null, 1), out = $('out'); out.value = txt; out.hidden = false;
@@ -581,13 +609,13 @@ async function runBench() {
   } finally {
     benchSink = null; L.forEach(([ev, f]) => removeEventListener(ev, f, true)); btns.forEach((b, k) => { b.disabled = was[k]; }); document.body.classList.remove('benching');
     auto = prevAuto; autopilot = prevAP; camT = prevT; benchRunning = false; // benchRunning must be false before the restore so applyTier is not blocked
-    await applyTier(Math.min(prevTier, tierCap), 'after benchmark'); $('bBench').textContent = 'בדיקת ביצועים (כ־45 שניות)'; mark('benchmark done'); renderDetails();
+    await applyTier(prevAuto ? Math.min(prevTier, tierCap) : prevTier, 'after benchmark'); $('bBench').textContent = 'בדיקת ביצועים (כ־45 שניות)'; mark('benchmark done'); renderDetails();
   }
 }
 document.querySelectorAll('[data-tier]').forEach((b) => b.addEventListener('click', () => { if (b.dataset.tier === 'auto') { auto = true; blocked.clear(); } else { auto = false; applyTier(+b.dataset.tier, 'manual'); } [...document.querySelectorAll('[data-tier]')].forEach((x) => x.setAttribute('aria-pressed', String((auto && x.dataset.tier === 'auto') || (!auto && x.dataset.tier === String(tierIdx))))); }));
 $('bPlay').addEventListener('click', () => { autopilot = !autopilot; flyTo = null; $('bPlay').setAttribute('aria-pressed', String(autopilot)); });
 $('bFly').addEventListener('click', () => { const toB = camT < 0.5; flyTo = { to: toB ? 1 : 0 }; autopilot = false; $('bPlay').setAttribute('aria-pressed', 'false'); $('bFly').textContent = toB ? 'לאזור A' : 'לאזור B'; mark('fly to ' + (toB ? 'B' : 'A')); });
-$('bPhoto').addEventListener('click', () => applyPhotos(photoState.mode === 'ktx2' ? 'jpg' : 'ktx2'));
+$('bPhoto').addEventListener('click', () => applyPhotos(PHOTO_MODES[(PHOTO_MODES.indexOf(photoState.mode) + 1) % PHOTO_MODES.length]));
 $('bHide').addEventListener('click', () => { const h = document.body.classList.toggle('hide-ui'); $('bHide').setAttribute('aria-pressed', String(h)); $('bHide').textContent = h ? 'הצג ממשק' : 'הסתר ממשק'; });
 $('banner').addEventListener('click', () => { $('banner').hidden = true; });
 $('bBench').addEventListener('click', runBench); $('bCopy').addEventListener('click', copyResults);
@@ -639,7 +667,12 @@ const startTier = tierIdx;
 }
 if (!(new URLSearchParams(location.search).has('manual'))) { /* normal start */ }
 requestAnimationFrame(loop);
-await applyTier(startTier, 'start');
+const STAGED = QS.get('boot') !== 'direct'; // ?boot=direct: skip the light first-frame level and go straight to the start tier (A/B on real devices)
+TP.bootMode = STAGED ? 'staged' : 'direct';
+if (STAGED) await applyTier(0, 'boot: first frame without post-processing');
+// first frames are on screen at the light level; only then step up to the start tier (spreads shader compilation instead of blocking the first frame)
+if (STAGED) await new Promise((res) => { const iv = setInterval(() => { if (TP.state.firstFrame && frame >= 6) { clearInterval(iv); res(); } }, 50); });
+if (!STAGED || startTier > 0) await applyTier(startTier, 'start');
 setTimeout(() => { if (rocks.A) { scene.remove(rocks.A); rocks.A.dispose(); rocks.A = null; } streamZoneB(); }, 1200);
 } catch (e) { fail(e); }
 </script>

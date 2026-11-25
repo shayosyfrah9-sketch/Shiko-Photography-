@@ -1,0 +1,1510 @@
+[
+ {
+  "tool": "Shiko tech proof v2 (measurement build)",
+  "schema": 2,
+  "phases": {
+   "usefulContentMs": 730,
+   "placeholderAssetsMs": 198,
+   "interactiveMs": null,
+   "worldCompleteMs": 51243,
+   "definitions": {
+    "usefulContent": "first rendered frame with placeholder quality",
+    "interactive": "first 1 s without a long task after the first frame",
+    "worldComplete": "zone B streamed and active tier fully upgraded"
+   }
+  },
+  "longTasks": {
+   "supported": true,
+   "boot": {
+    "count": 3,
+    "ms": 622,
+    "maxMs": 394
+   },
+   "loading": {
+    "count": 37,
+    "ms": 50246,
+    "maxMs": 3410
+   },
+   "afterWorldComplete": {
+    "count": 2,
+    "ms": 4078,
+    "maxMs": 2105
+   },
+   "session": {
+    "count": 42,
+    "ms": 54946,
+    "maxMs": 3410
+   },
+   "timeToQuietMainThreadMs": null,
+   "note": "boot = until first frame; loading = first frame until world complete; session = everything since page start (cumulative)"
+  },
+  "bytes": {
+   "total": 4636529,
+   "beforeFirstFrame": 1114981,
+   "beforeWorldComplete": 4636529,
+   "byCategory": {
+    "threejs": 1144117,
+    "geometry": 560936,
+    "textures": 1820221,
+    "transcoder": 584862,
+    "photos": 526393
+   },
+   "requests": 53,
+   "requestsBeforeFirstFrame": 20,
+   "page": {
+    "encodedBodySize": 65618,
+    "responseEndMs": 6,
+    "domContentLoadedMs": 141
+   }
+  },
+  "gpuTimerAvailable": false,
+  "decoders": {
+   "wasm": true,
+   "ktx2": true,
+   "ktx2Error": null,
+   "meshopt": true,
+   "meshoptError": null
+  },
+  "photoBytes": {
+   "photo_2w2a1130_xs.webp": 7412,
+   "photo_2w2a7966_xs.webp": 6416,
+   "photo_2w2a0403_xs.webp": 6490,
+   "photo_2w2a1130_l.avif": 292964,
+   "photo_2w2a7966_l.avif": 107943,
+   "photo_2w2a0403_l.avif": 105168
+  },
+  "time": "2026-11-25T17:17:33.378Z",
+  "device": {
+   "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.8127.36 Safari/537.36",
+   "platform": "Linux x86_64",
+   "cores": 4,
+   "deviceMemoryGB": 16,
+   "screen": {
+    "w": 1280,
+    "h": 800,
+    "dpr": 1
+   },
+   "viewport": {
+    "w": 1280,
+    "h": 800
+   },
+   "gpu": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+   "gpuVendor": "Google Inc. (Google)",
+   "softwareRenderer": true,
+   "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+   "maxTextureSize": 8192,
+   "compressedTextures": {
+    "astc": true,
+    "etc2": true,
+    "bc": true,
+    "ktx2Transcode": {
+     "astcSupported": true,
+     "astcHDRSupported": false,
+     "etc1Supported": true,
+     "etc2Supported": true,
+     "dxtSupported": true,
+     "bptcSupported": true,
+     "pvrtcSupported": false
+    }
+   },
+   "phoneHeuristic": false
+  },
+  "current": {
+   "tier": "high",
+   "tierName": "גבוה",
+   "auto": false,
+   "dpr": 1,
+   "fps": 0.8,
+   "fps1pctLow": 0.3,
+   "frameMs": 1325.4,
+   "frames": 40,
+   "drawCalls": 57,
+   "triangles": 1252957,
+   "geometries": 40,
+   "textures": 54,
+   "shadowMap": 2048,
+   "postChain": true,
+   "assetsBytes": 3492412,
+   "assetFiles": 28,
+   "libraryBytes": 1144117,
+   "libraryFiles": 25,
+   "longTasks": 42,
+   "longTaskMs": 54946
+  },
+  "stageCostMs": {
+   "pavilion": {
+    "calls": 2,
+    "ms": 3,
+    "maxMs": 2
+   },
+   "makePhotoFrames": {
+    "calls": 1,
+    "ms": 0,
+    "maxMs": 0
+   },
+   "dequantizeGeometry": {
+    "calls": 4,
+    "ms": 22,
+    "maxMs": 14
+   },
+   "makeRocks": {
+    "calls": 3,
+    "ms": 2,
+    "maxMs": 1
+   },
+   "buildComposer": {
+    "calls": 3,
+    "ms": 3,
+    "maxMs": 2
+   },
+   "renderCall_frame1": {
+    "calls": 1,
+    "ms": 84,
+    "maxMs": 84
+   },
+   "renderCall_frame2": {
+    "calls": 1,
+    "ms": 1,
+    "maxMs": 1
+   },
+   "compileAsync": {
+    "calls": 3,
+    "ms": 9760,
+    "maxMs": 5511
+   },
+   "renderCall_frame3": {
+    "calls": 1,
+    "ms": 1,
+    "maxMs": 1
+   },
+   "renderCall_frame4": {
+    "calls": 1,
+    "ms": 1,
+    "maxMs": 1
+   },
+   "buildEnv": {
+    "calls": 1,
+    "ms": 31,
+    "maxMs": 31
+   },
+   "makeGrass": {
+    "calls": 2,
+    "ms": 48,
+    "maxMs": 29
+   }
+  },
+  "bootMode": "staged",
+  "benchmark": [],
+  "benchmarkMeta": null,
+  "timeline": [
+   {
+    "t": 94,
+    "name": "placeholder assets ready"
+   },
+   {
+    "t": 95,
+    "name": "tier low",
+    "why": "boot: first frame without post-processing"
+   },
+   {
+    "t": 624,
+    "name": "quality low ready",
+    "ms": 0
+   },
+   {
+    "t": 626,
+    "name": "first frame (placeholder quality)"
+   },
+   {
+    "t": 1165,
+    "name": "tier high",
+    "why": "start"
+   },
+   {
+    "t": 5435,
+    "name": "post modules loaded",
+    "ms": 4239
+   },
+   {
+    "t": 30210,
+    "name": "quality high ready",
+    "ms": 21052
+   },
+   {
+    "t": 30210,
+    "name": "full quality visible"
+   },
+   {
+    "t": 33096,
+    "name": "zone B stream start"
+   },
+   {
+    "t": 33146,
+    "name": "tier high",
+    "why": "zone B content"
+   },
+   {
+    "t": 38659,
+    "name": "quality high ready",
+    "ms": 0
+   },
+   {
+    "t": 38659,
+    "name": "photos placeholder (xs) shown",
+    "ms": 5506
+   },
+   {
+    "t": 51139,
+    "name": "photos adaptive l/avif"
+   },
+   {
+    "t": 51139,
+    "name": "zone B ready",
+    "ms": 18044
+   },
+   {
+    "t": 51139,
+    "name": "world complete"
+   }
+  ],
+  "zoneBStreamMs": 18044,
+  "photoLoadMs": {
+   "xs:2w2a1130": 5506,
+   "xs:2w2a7966": 5506,
+   "xs:2w2a0403": 5506,
+   "l_avif:2w2a1130": 4174,
+   "l_avif:2w2a7966": 4402,
+   "l_avif:2w2a0403": 3905
+  },
+  "photoDelivery": {},
+  "note": "SOFTWARE RENDERER: fps values are not representative of a real GPU",
+  "errors": [],
+  "run": 0,
+  "kind": "desktop",
+  "tierParam": "2",
+  "label": "after",
+  "benchRun": false
+ },
+ {
+  "tool": "Shiko tech proof v2 (measurement build)",
+  "schema": 2,
+  "phases": {
+   "usefulContentMs": 656,
+   "placeholderAssetsMs": 174,
+   "interactiveMs": 53197,
+   "worldCompleteMs": 51179,
+   "definitions": {
+    "usefulContent": "first rendered frame with placeholder quality",
+    "interactive": "first 1 s without a long task after the first frame",
+    "worldComplete": "zone B streamed and active tier fully upgraded"
+   }
+  },
+  "longTasks": {
+   "supported": true,
+   "boot": {
+    "count": 3,
+    "ms": 581,
+    "maxMs": 335
+   },
+   "loading": {
+    "count": 38,
+    "ms": 50240,
+    "maxMs": 3647
+   },
+   "afterWorldComplete": {
+    "count": 1,
+    "ms": 2018,
+    "maxMs": 2018
+   },
+   "session": {
+    "count": 42,
+    "ms": 52839,
+    "maxMs": 3647
+   },
+   "timeToQuietMainThreadMs": 53197,
+   "note": "boot = until first frame; loading = first frame until world complete; session = everything since page start (cumulative)"
+  },
+  "bytes": {
+   "total": 4636529,
+   "beforeFirstFrame": 1114981,
+   "beforeWorldComplete": 4636529,
+   "byCategory": {
+    "threejs": 1144117,
+    "geometry": 560936,
+    "textures": 1820221,
+    "transcoder": 584862,
+    "photos": 526393
+   },
+   "requests": 53,
+   "requestsBeforeFirstFrame": 20,
+   "page": {
+    "encodedBodySize": 65618,
+    "responseEndMs": 6,
+    "domContentLoadedMs": 106
+   }
+  },
+  "gpuTimerAvailable": false,
+  "decoders": {
+   "wasm": true,
+   "ktx2": true,
+   "ktx2Error": null,
+   "meshopt": true,
+   "meshoptError": null
+  },
+  "photoBytes": {
+   "photo_2w2a1130_xs.webp": 7412,
+   "photo_2w2a7966_xs.webp": 6416,
+   "photo_2w2a0403_xs.webp": 6490,
+   "photo_2w2a1130_l.avif": 292964,
+   "photo_2w2a7966_l.avif": 107943,
+   "photo_2w2a0403_l.avif": 105168
+  },
+  "time": "2026-11-25T17:18:28.884Z",
+  "device": {
+   "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.8127.36 Safari/537.36",
+   "platform": "Linux x86_64",
+   "cores": 4,
+   "deviceMemoryGB": 16,
+   "screen": {
+    "w": 1280,
+    "h": 800,
+    "dpr": 1
+   },
+   "viewport": {
+    "w": 1280,
+    "h": 800
+   },
+   "gpu": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+   "gpuVendor": "Google Inc. (Google)",
+   "softwareRenderer": true,
+   "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+   "maxTextureSize": 8192,
+   "compressedTextures": {
+    "astc": true,
+    "etc2": true,
+    "bc": true,
+    "ktx2Transcode": {
+     "astcSupported": true,
+     "astcHDRSupported": false,
+     "etc1Supported": true,
+     "etc2Supported": true,
+     "dxtSupported": true,
+     "bptcSupported": true,
+     "pvrtcSupported": false
+    }
+   },
+   "phoneHeuristic": false
+  },
+  "current": {
+   "tier": "high",
+   "tierName": "גבוה",
+   "auto": false,
+   "dpr": 1,
+   "fps": 0.8,
+   "fps1pctLow": 0.3,
+   "frameMs": 1292.6,
+   "frames": 41,
+   "drawCalls": 57,
+   "triangles": 1252957,
+   "geometries": 40,
+   "textures": 54,
+   "shadowMap": 2048,
+   "postChain": true,
+   "assetsBytes": 3492412,
+   "assetFiles": 28,
+   "libraryBytes": 1144117,
+   "libraryFiles": 25,
+   "longTasks": 42,
+   "longTaskMs": 52839
+  },
+  "stageCostMs": {
+   "pavilion": {
+    "calls": 2,
+    "ms": 1,
+    "maxMs": 1
+   },
+   "makePhotoFrames": {
+    "calls": 1,
+    "ms": 1,
+    "maxMs": 1
+   },
+   "dequantizeGeometry": {
+    "calls": 4,
+    "ms": 29,
+    "maxMs": 21
+   },
+   "makeRocks": {
+    "calls": 3,
+    "ms": 3,
+    "maxMs": 1
+   },
+   "buildComposer": {
+    "calls": 3,
+    "ms": 3,
+    "maxMs": 2
+   },
+   "renderCall_frame1": {
+    "calls": 1,
+    "ms": 67,
+    "maxMs": 67
+   },
+   "renderCall_frame2": {
+    "calls": 1,
+    "ms": 2,
+    "maxMs": 2
+   },
+   "compileAsync": {
+    "calls": 3,
+    "ms": 9064,
+    "maxMs": 5528
+   },
+   "renderCall_frame3": {
+    "calls": 1,
+    "ms": 1,
+    "maxMs": 1
+   },
+   "renderCall_frame4": {
+    "calls": 1,
+    "ms": 2,
+    "maxMs": 2
+   },
+   "buildEnv": {
+    "calls": 1,
+    "ms": 29,
+    "maxMs": 29
+   },
+   "makeGrass": {
+    "calls": 2,
+    "ms": 41,
+    "maxMs": 22
+   }
+  },
+  "bootMode": "staged",
+  "benchmark": [],
+  "benchmarkMeta": null,
+  "timeline": [
+   {
+    "t": 106,
+    "name": "placeholder assets ready"
+   },
+   {
+    "t": 107,
+    "name": "tier low",
+    "why": "boot: first frame without post-processing"
+   },
+   {
+    "t": 586,
+    "name": "quality low ready",
+    "ms": 0
+   },
+   {
+    "t": 588,
+    "name": "first frame (placeholder quality)"
+   },
+   {
+    "t": 1174,
+    "name": "tier high",
+    "why": "start"
+   },
+   {
+    "t": 5625,
+    "name": "post modules loaded",
+    "ms": 4422
+   },
+   {
+    "t": 29719,
+    "name": "quality high ready",
+    "ms": 21034
+   },
+   {
+    "t": 29719,
+    "name": "full quality visible"
+   },
+   {
+    "t": 33022,
+    "name": "zone B stream start"
+   },
+   {
+    "t": 33065,
+    "name": "tier high",
+    "why": "zone B content"
+   },
+   {
+    "t": 38595,
+    "name": "quality high ready",
+    "ms": 0
+   },
+   {
+    "t": 38595,
+    "name": "photos placeholder (xs) shown",
+    "ms": 5524
+   },
+   {
+    "t": 51111,
+    "name": "photos adaptive l/avif"
+   },
+   {
+    "t": 51111,
+    "name": "zone B ready",
+    "ms": 18089
+   },
+   {
+    "t": 51111,
+    "name": "world complete"
+   }
+  ],
+  "zoneBStreamMs": 18089,
+  "photoLoadMs": {
+   "xs:2w2a1130": 5523,
+   "xs:2w2a7966": 5523,
+   "xs:2w2a0403": 5523,
+   "l_avif:2w2a1130": 4509,
+   "l_avif:2w2a7966": 4081,
+   "l_avif:2w2a0403": 3926
+  },
+  "photoDelivery": {},
+  "note": "SOFTWARE RENDERER: fps values are not representative of a real GPU",
+  "errors": [],
+  "run": 1,
+  "kind": "desktop",
+  "tierParam": "2",
+  "label": "after",
+  "benchRun": false
+ },
+ {
+  "tool": "Shiko tech proof v2 (measurement build)",
+  "schema": 2,
+  "phases": {
+   "usefulContentMs": 574,
+   "placeholderAssetsMs": 146,
+   "interactiveMs": null,
+   "worldCompleteMs": 49838,
+   "definitions": {
+    "usefulContent": "first rendered frame with placeholder quality",
+    "interactive": "first 1 s without a long task after the first frame",
+    "worldComplete": "zone B streamed and active tier fully upgraded"
+   }
+  },
+  "longTasks": {
+   "supported": true,
+   "boot": {
+    "count": 3,
+    "ms": 520,
+    "maxMs": 315
+   },
+   "loading": {
+    "count": 36,
+    "ms": 48946,
+    "maxMs": 3415
+   },
+   "afterWorldComplete": {
+    "count": 2,
+    "ms": 4555,
+    "maxMs": 2301
+   },
+   "session": {
+    "count": 41,
+    "ms": 54021,
+    "maxMs": 3415
+   },
+   "timeToQuietMainThreadMs": null,
+   "note": "boot = until first frame; loading = first frame until world complete; session = everything since page start (cumulative)"
+  },
+  "bytes": {
+   "total": 4636529,
+   "beforeFirstFrame": 1114981,
+   "beforeWorldComplete": 4636529,
+   "byCategory": {
+    "threejs": 1144117,
+    "geometry": 560936,
+    "textures": 1820221,
+    "transcoder": 584862,
+    "photos": 526393
+   },
+   "requests": 53,
+   "requestsBeforeFirstFrame": 20,
+   "page": {
+    "encodedBodySize": 65618,
+    "responseEndMs": 6,
+    "domContentLoadedMs": 104
+   }
+  },
+  "gpuTimerAvailable": false,
+  "decoders": {
+   "wasm": true,
+   "ktx2": true,
+   "ktx2Error": null,
+   "meshopt": true,
+   "meshoptError": null
+  },
+  "photoBytes": {
+   "photo_2w2a1130_xs.webp": 7412,
+   "photo_2w2a7966_xs.webp": 6416,
+   "photo_2w2a0403_xs.webp": 6490,
+   "photo_2w2a1130_l.avif": 292964,
+   "photo_2w2a7966_l.avif": 107943,
+   "photo_2w2a0403_l.avif": 105168
+  },
+  "time": "2026-11-25T17:19:23.425Z",
+  "device": {
+   "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.8127.36 Safari/537.36",
+   "platform": "Linux x86_64",
+   "cores": 4,
+   "deviceMemoryGB": 16,
+   "screen": {
+    "w": 1280,
+    "h": 800,
+    "dpr": 1
+   },
+   "viewport": {
+    "w": 1280,
+    "h": 800
+   },
+   "gpu": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+   "gpuVendor": "Google Inc. (Google)",
+   "softwareRenderer": true,
+   "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+   "maxTextureSize": 8192,
+   "compressedTextures": {
+    "astc": true,
+    "etc2": true,
+    "bc": true,
+    "ktx2Transcode": {
+     "astcSupported": true,
+     "astcHDRSupported": false,
+     "etc1Supported": true,
+     "etc2Supported": true,
+     "dxtSupported": true,
+     "bptcSupported": true,
+     "pvrtcSupported": false
+    }
+   },
+   "phoneHeuristic": false
+  },
+  "current": {
+   "tier": "high",
+   "tierName": "גבוה",
+   "auto": false,
+   "dpr": 1,
+   "fps": 0.8,
+   "fps1pctLow": 0.3,
+   "frameMs": 1298.3,
+   "frames": 40,
+   "drawCalls": 57,
+   "triangles": 1252957,
+   "geometries": 40,
+   "textures": 54,
+   "shadowMap": 2048,
+   "postChain": true,
+   "assetsBytes": 3492412,
+   "assetFiles": 28,
+   "libraryBytes": 1144117,
+   "libraryFiles": 25,
+   "longTasks": 41,
+   "longTaskMs": 54021
+  },
+  "stageCostMs": {
+   "pavilion": {
+    "calls": 2,
+    "ms": 1,
+    "maxMs": 1
+   },
+   "makePhotoFrames": {
+    "calls": 1,
+    "ms": 1,
+    "maxMs": 1
+   },
+   "dequantizeGeometry": {
+    "calls": 4,
+    "ms": 23,
+    "maxMs": 18
+   },
+   "makeRocks": {
+    "calls": 3,
+    "ms": 3,
+    "maxMs": 1
+   },
+   "buildComposer": {
+    "calls": 3,
+    "ms": 2,
+    "maxMs": 2
+   },
+   "renderCall_frame1": {
+    "calls": 1,
+    "ms": 68,
+    "maxMs": 68
+   },
+   "renderCall_frame2": {
+    "calls": 1,
+    "ms": 1,
+    "maxMs": 1
+   },
+   "compileAsync": {
+    "calls": 3,
+    "ms": 8802,
+    "maxMs": 4975
+   },
+   "renderCall_frame3": {
+    "calls": 1,
+    "ms": 1,
+    "maxMs": 1
+   },
+   "renderCall_frame4": {
+    "calls": 1,
+    "ms": 1,
+    "maxMs": 1
+   },
+   "buildEnv": {
+    "calls": 1,
+    "ms": 39,
+    "maxMs": 39
+   },
+   "makeGrass": {
+    "calls": 2,
+    "ms": 39,
+    "maxMs": 23
+   }
+  },
+  "bootMode": "staged",
+  "benchmark": [],
+  "benchmarkMeta": null,
+  "timeline": [
+   {
+    "t": 73,
+    "name": "placeholder assets ready"
+   },
+   {
+    "t": 74,
+    "name": "tier low",
+    "why": "boot: first frame without post-processing"
+   },
+   {
+    "t": 500,
+    "name": "quality low ready",
+    "ms": 0
+   },
+   {
+    "t": 502,
+    "name": "first frame (placeholder quality)"
+   },
+   {
+    "t": 1018,
+    "name": "tier high",
+    "why": "start"
+   },
+   {
+    "t": 5233,
+    "name": "post modules loaded",
+    "ms": 4176
+   },
+   {
+    "t": 28403,
+    "name": "quality high ready",
+    "ms": 19768
+   },
+   {
+    "t": 28403,
+    "name": "full quality visible"
+   },
+   {
+    "t": 31082,
+    "name": "zone B stream start"
+   },
+   {
+    "t": 31123,
+    "name": "tier high",
+    "why": "zone B content"
+   },
+   {
+    "t": 36099,
+    "name": "quality high ready",
+    "ms": 0
+   },
+   {
+    "t": 36101,
+    "name": "photos placeholder (xs) shown",
+    "ms": 4972
+   },
+   {
+    "t": 49765,
+    "name": "photos adaptive l/avif"
+   },
+   {
+    "t": 49765,
+    "name": "zone B ready",
+    "ms": 18684
+   },
+   {
+    "t": 49765,
+    "name": "world complete"
+   }
+  ],
+  "zoneBStreamMs": 18684,
+  "photoLoadMs": {
+   "xs:2w2a1130": 4971,
+   "xs:2w2a7966": 4971,
+   "xs:2w2a0403": 4971,
+   "l_avif:2w2a1130": 4315,
+   "l_avif:2w2a7966": 4544,
+   "l_avif:2w2a0403": 4805
+  },
+  "photoDelivery": {},
+  "note": "SOFTWARE RENDERER: fps values are not representative of a real GPU",
+  "errors": [],
+  "run": 2,
+  "kind": "desktop",
+  "tierParam": "2",
+  "label": "after",
+  "benchRun": false
+ },
+ {
+  "tool": "Shiko tech proof v2 (measurement build)",
+  "schema": 2,
+  "phases": {
+   "usefulContentMs": 660,
+   "placeholderAssetsMs": 137,
+   "interactiveMs": null,
+   "worldCompleteMs": 53313,
+   "definitions": {
+    "usefulContent": "first rendered frame with placeholder quality",
+    "interactive": "first 1 s without a long task after the first frame",
+    "worldComplete": "zone B streamed and active tier fully upgraded"
+   }
+  },
+  "longTasks": {
+   "supported": true,
+   "boot": {
+    "count": 3,
+    "ms": 616,
+    "maxMs": 389
+   },
+   "loading": {
+    "count": 37,
+    "ms": 52315,
+    "maxMs": 3422
+   },
+   "afterWorldComplete": {
+    "count": 275,
+    "ms": 222233,
+    "maxMs": 6107
+   },
+   "session": {
+    "count": 315,
+    "ms": 275164,
+    "maxMs": 6107
+   },
+   "timeToQuietMainThreadMs": null,
+   "note": "boot = until first frame; loading = first frame until world complete; session = everything since page start (cumulative)"
+  },
+  "bytes": {
+   "total": 4816119,
+   "beforeFirstFrame": 1114981,
+   "beforeWorldComplete": 4636529,
+   "byCategory": {
+    "threejs": 1144117,
+    "geometry": 560936,
+    "textures": 1999811,
+    "transcoder": 584862,
+    "photos": 526393
+   },
+   "requests": 56,
+   "requestsBeforeFirstFrame": 20,
+   "page": {
+    "encodedBodySize": 65618,
+    "responseEndMs": 4,
+    "domContentLoadedMs": 100
+   }
+  },
+  "gpuTimerAvailable": false,
+  "decoders": {
+   "wasm": true,
+   "ktx2": true,
+   "ktx2Error": null,
+   "meshopt": true,
+   "meshoptError": null
+  },
+  "photoBytes": {
+   "photo_2w2a1130_xs.webp": 7412,
+   "photo_2w2a7966_xs.webp": 6416,
+   "photo_2w2a0403_xs.webp": 6490,
+   "photo_2w2a1130_l.avif": 292964,
+   "photo_2w2a7966_l.avif": 107943,
+   "photo_2w2a0403_l.avif": 105168
+  },
+  "time": "2026-11-25T17:23:59.379Z",
+  "device": {
+   "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/158.0.8127.36 Safari/537.36",
+   "platform": "Linux x86_64",
+   "cores": 4,
+   "deviceMemoryGB": 16,
+   "screen": {
+    "w": 1280,
+    "h": 800,
+    "dpr": 1
+   },
+   "viewport": {
+    "w": 1280,
+    "h": 800
+   },
+   "gpu": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (Subzero) (0x0000C0DE)), SwiftShader driver)",
+   "gpuVendor": "Google Inc. (Google)",
+   "softwareRenderer": true,
+   "webgl": "WebGL 2.0 (OpenGL ES 3.0 Chromium)",
+   "maxTextureSize": 8192,
+   "compressedTextures": {
+    "astc": true,
+    "etc2": true,
+    "bc": true,
+    "ktx2Transcode": {
+     "astcSupported": true,
+     "astcHDRSupported": false,
+     "etc1Supported": true,
+     "etc2Supported": true,
+     "dxtSupported": true,
+     "bptcSupported": true,
+     "pvrtcSupported": false
+    }
+   },
+   "phoneHeuristic": false
+  },
+  "current": {
+   "tier": "high",
+   "tierName": "גבוה",
+   "auto": false,
+   "dpr": 1,
+   "fps": 0.6,
+   "fps1pctLow": 0.2,
+   "frameMs": 1647.9,
+   "frames": 120,
+   "drawCalls": 57,
+   "triangles": 1252957,
+   "geometries": 45,
+   "textures": 114,
+   "shadowMap": 2048,
+   "postChain": true,
+   "assetsBytes": 3672002,
+   "assetFiles": 31,
+   "libraryBytes": 1144117,
+   "libraryFiles": 25,
+   "longTasks": 315,
+   "longTaskMs": 275164
+  },
+  "stageCostMs": {
+   "pavilion": {
+    "calls": 2,
+    "ms": 1,
+    "maxMs": 1
+   },
+   "makePhotoFrames": {
+    "calls": 1,
+    "ms": 0,
+    "maxMs": 0
+   },
+   "dequantizeGeometry": {
+    "calls": 4,
+    "ms": 20,
+    "maxMs": 15
+   },
+   "makeRocks": {
+    "calls": 3,
+    "ms": 2,
+    "maxMs": 1
+   },
+   "buildComposer": {
+    "calls": 8,
+    "ms": 8,
+    "maxMs": 2
+   },
+   "renderCall_frame1": {
+    "calls": 1,
+    "ms": 93,
+    "maxMs": 93
+   },
+   "renderCall_frame2": {
+    "calls": 1,
+    "ms": 1,
+    "maxMs": 1
+   },
+   "compileAsync": {
+    "calls": 8,
+    "ms": 33192,
+    "maxMs": 10577
+   },
+   "renderCall_frame3": {
+    "calls": 1,
+    "ms": 1,
+    "maxMs": 1
+   },
+   "renderCall_frame4": {
+    "calls": 1,
+    "ms": 1,
+    "maxMs": 1
+   },
+   "buildEnv": {
+    "calls": 1,
+    "ms": 28,
+    "maxMs": 28
+   },
+   "makeGrass": {
+    "calls": 2,
+    "ms": 37,
+    "maxMs": 21
+   }
+  },
+  "bootMode": "staged",
+  "benchmark": [
+   {
+    "tier": "low",
+    "tierName": "נמוך",
+    "valid": true,
+    "invalidReasons": [],
+    "insufficientFrames": true,
+    "settledMs": 8030,
+    "fps": null,
+    "fps1pctLow": null,
+    "frameMs": null,
+    "worstP95Ms": null,
+    "cpuMsAvg": 0.44,
+    "gpuMsAvg": null,
+    "drawCalls": 28,
+    "triangles": 35598,
+    "frames": 78,
+    "longTasksDuringTier": {
+     "count": 177,
+     "ms": 21598,
+     "maxMs": 444
+    },
+    "poses": [
+     {
+      "pose": "A",
+      "frames": 27,
+      "fps": 8.7,
+      "p50Ms": 116.6,
+      "p95Ms": 133.3,
+      "p99Ms": 150.1,
+      "fps1pctLow": 6.7,
+      "cpuMsAvg": 0.45,
+      "cpuMsP95": 0.6,
+      "gpuMsAvg": null,
+      "gpuMsP95": null,
+      "drawCalls": 19,
+      "triangles": 35490
+     },
+     {
+      "pose": "mid",
+      "frames": 29,
+      "fps": 9.3,
+      "p50Ms": 100.1,
+      "p95Ms": 116.8,
+      "p99Ms": 133.4,
+      "fps1pctLow": 7.5,
+      "cpuMsAvg": 0.38,
+      "cpuMsP95": 0.7,
+      "gpuMsAvg": null,
+      "gpuMsP95": null,
+      "drawCalls": 13,
+      "triangles": 35448
+     },
+     {
+      "pose": "B",
+      "frames": 22,
+      "fps": 6.9,
+      "p50Ms": 150,
+      "p95Ms": 166.7,
+      "p99Ms": 166.7,
+      "fps1pctLow": 6,
+      "cpuMsAvg": 0.5,
+      "cpuMsP95": 0.6,
+      "gpuMsAvg": null,
+      "gpuMsP95": null,
+      "drawCalls": 28,
+      "triangles": 35598
+     }
+    ],
+    "nearDisplayCap": false
+   },
+   {
+    "tier": "med",
+    "tierName": "בינוני",
+    "valid": true,
+    "invalidReasons": [],
+    "insufficientFrames": true,
+    "settledMs": 8589,
+    "fps": null,
+    "fps1pctLow": null,
+    "frameMs": null,
+    "worstP95Ms": null,
+    "cpuMsAvg": 1.27,
+    "gpuMsAvg": null,
+    "drawCalls": 56,
+    "triangles": 680600,
+    "frames": 18,
+    "longTasksDuringTier": {
+     "count": 48,
+     "ms": 34279,
+     "maxMs": 1598
+    },
+    "poses": [
+     {
+      "pose": "A",
+      "frames": 6,
+      "fps": 1.3,
+      "p50Ms": 733.3,
+      "p95Ms": 833.4,
+      "p99Ms": 833.4,
+      "fps1pctLow": 1.2,
+      "cpuMsAvg": 1.85,
+      "cpuMsP95": 5.4,
+      "gpuMsAvg": null,
+      "gpuMsP95": null,
+      "drawCalls": 55,
+      "triangles": 680588
+     },
+     {
+      "pose": "mid",
+      "frames": 6,
+      "fps": 1.6,
+      "p50Ms": 633.4,
+      "p95Ms": 733.3,
+      "p99Ms": 733.3,
+      "fps1pctLow": 1.4,
+      "cpuMsAvg": 0.85,
+      "cpuMsP95": 1.2,
+      "gpuMsAvg": null,
+      "gpuMsP95": null,
+      "drawCalls": 42,
+      "triangles": 680462
+     },
+     {
+      "pose": "B",
+      "frames": 6,
+      "fps": 1.4,
+      "p50Ms": 750,
+      "p95Ms": 783.3,
+      "p99Ms": 783.3,
+      "fps1pctLow": 1.3,
+      "cpuMsAvg": 1.1,
+      "cpuMsP95": 1.7,
+      "gpuMsAvg": null,
+      "gpuMsP95": null,
+      "drawCalls": 56,
+      "triangles": 680600
+     }
+    ],
+    "nearDisplayCap": false
+   },
+   {
+    "tier": "high",
+    "tierName": "גבוה",
+    "valid": true,
+    "invalidReasons": [],
+    "insufficientFrames": true,
+    "settledMs": 11105,
+    "fps": null,
+    "fps1pctLow": null,
+    "frameMs": null,
+    "worstP95Ms": null,
+    "cpuMsAvg": 2.44,
+    "gpuMsAvg": null,
+    "drawCalls": 61,
+    "triangles": 1253005,
+    "frames": 9,
+    "longTasksDuringTier": {
+     "count": 24,
+     "ms": 56025,
+     "maxMs": 2955
+    },
+    "poses": [
+     {
+      "pose": "A",
+      "frames": 3,
+      "fps": 0.5,
+      "p50Ms": 2183.3,
+      "p95Ms": 2183.3,
+      "p99Ms": 2183.3,
+      "fps1pctLow": 0.5,
+      "cpuMsAvg": 2.73,
+      "cpuMsP95": 5.8,
+      "gpuMsAvg": null,
+      "gpuMsP95": null,
+      "drawCalls": 60,
+      "triangles": 1252993
+     },
+     {
+      "pose": "mid",
+      "frames": 3,
+      "fps": 0.5,
+      "p50Ms": 1983.3,
+      "p95Ms": 2083.3,
+      "p99Ms": 2083.3,
+      "fps1pctLow": 0.5,
+      "cpuMsAvg": 2.2,
+      "cpuMsP95": 4.7,
+      "gpuMsAvg": null,
+      "gpuMsP95": null,
+      "drawCalls": 47,
+      "triangles": 1252867
+     },
+     {
+      "pose": "B",
+      "frames": 3,
+      "fps": 0.4,
+      "p50Ms": 2399.9,
+      "p95Ms": 2600,
+      "p99Ms": 2600,
+      "fps1pctLow": 0.4,
+      "cpuMsAvg": 2.4,
+      "cpuMsP95": 5.1,
+      "gpuMsAvg": null,
+      "gpuMsP95": null,
+      "drawCalls": 61,
+      "triangles": 1253005
+     }
+    ],
+    "nearDisplayCap": false
+   },
+   {
+    "tier": "ultra",
+    "tierName": "אולטרה",
+    "valid": true,
+    "invalidReasons": [],
+    "insufficientFrames": true,
+    "settledMs": 11878,
+    "fps": null,
+    "fps1pctLow": null,
+    "frameMs": null,
+    "worstP95Ms": null,
+    "cpuMsAvg": 2.58,
+    "gpuMsAvg": null,
+    "drawCalls": 104,
+    "triangles": 4631432,
+    "frames": 5,
+    "longTasksDuringTier": {
+     "count": 20,
+     "ms": 99251,
+     "maxMs": 6107
+    },
+    "poses": [
+     {
+      "pose": "A",
+      "frames": 1,
+      "fps": 0.2,
+      "p50Ms": 4499.9,
+      "p95Ms": 4499.9,
+      "p99Ms": 4499.9,
+      "fps1pctLow": 0.2,
+      "cpuMsAvg": 2,
+      "cpuMsP95": 2,
+      "gpuMsAvg": null,
+      "gpuMsP95": null,
+      "drawCalls": 102,
+      "triangles": 4631408
+     },
+     {
+      "pose": "mid",
+      "frames": 2,
+      "fps": 0.2,
+      "p50Ms": 4666.5,
+      "p95Ms": 4666.5,
+      "p99Ms": 4666.5,
+      "fps1pctLow": 0.2,
+      "cpuMsAvg": 1.55,
+      "cpuMsP95": 1.7,
+      "gpuMsAvg": null,
+      "gpuMsP95": null,
+      "drawCalls": 76,
+      "triangles": 4631156
+     },
+     {
+      "pose": "B",
+      "frames": 2,
+      "fps": 0.2,
+      "p50Ms": 5616.6,
+      "p95Ms": 5616.6,
+      "p99Ms": 5616.6,
+      "fps1pctLow": 0.2,
+      "cpuMsAvg": 4.2,
+      "cpuMsP95": 6.7,
+      "gpuMsAvg": null,
+      "gpuMsP95": null,
+      "drawCalls": 104,
+      "triangles": 4631432
+     }
+    ],
+    "nearDisplayCap": false
+   }
+  ],
+  "benchmarkMeta": {
+   "cfg": {
+    "settleMinMs": 1500,
+    "settleMaxMs": 8000,
+    "quietMs": 800,
+    "poseSettleMs": 700,
+    "poseWindowMs": 3000,
+    "minFrames": 30
+   },
+   "startedAt": "2026-11-25T17:20:21.554Z",
+   "gpuTimer": false,
+   "poses": [
+    {
+     "name": "A",
+     "t": 0.12
+    },
+    {
+     "name": "mid",
+     "t": 0.5
+    },
+    {
+     "name": "B",
+     "t": 0.9
+    }
+   ],
+   "worldCompleteBeforeStart": true,
+   "refreshHzEstimate": null,
+   "finishedAt": "2026-11-25T17:23:55.312Z",
+   "allValid": true
+  },
+  "timeline": [
+   {
+    "t": 70,
+    "name": "placeholder assets ready"
+   },
+   {
+    "t": 71,
+    "name": "tier low",
+    "why": "boot: first frame without post-processing"
+   },
+   {
+    "t": 590,
+    "name": "quality low ready",
+    "ms": 0
+   },
+   {
+    "t": 592,
+    "name": "first frame (placeholder quality)"
+   },
+   {
+    "t": 1127,
+    "name": "tier high",
+    "why": "start"
+   },
+   {
+    "t": 5418,
+    "name": "post modules loaded",
+    "ms": 4263
+   },
+   {
+    "t": 31585,
+    "name": "quality high ready",
+    "ms": 22084
+   },
+   {
+    "t": 31585,
+    "name": "full quality visible"
+   },
+   {
+    "t": 34722,
+    "name": "zone B stream start"
+   },
+   {
+    "t": 34761,
+    "name": "tier high",
+    "why": "zone B content"
+   },
+   {
+    "t": 40053,
+    "name": "quality high ready",
+    "ms": 0
+   },
+   {
+    "t": 40053,
+    "name": "photos placeholder (xs) shown",
+    "ms": 5283
+   },
+   {
+    "t": 53246,
+    "name": "photos adaptive l/avif"
+   },
+   {
+    "t": 53246,
+    "name": "zone B ready",
+    "ms": 18524
+   },
+   {
+    "t": 53246,
+    "name": "world complete"
+   },
+   {
+    "t": 57913,
+    "name": "tier low",
+    "why": "benchmark"
+   },
+   {
+    "t": 58600,
+    "name": "quality low ready",
+    "ms": 0
+   },
+   {
+    "t": 79769,
+    "name": "tier med",
+    "why": "benchmark"
+   },
+   {
+    "t": 84015,
+    "name": "quality med ready",
+    "ms": 2037
+   },
+   {
+    "t": 114107,
+    "name": "tier high",
+    "why": "benchmark"
+   },
+   {
+    "t": 119892,
+    "name": "quality high ready",
+    "ms": 0
+   },
+   {
+    "t": 172401,
+    "name": "tier ultra",
+    "why": "benchmark"
+   },
+   {
+    "t": 182979,
+    "name": "quality ultra ready",
+    "ms": 0
+   },
+   {
+    "t": 271670,
+    "name": "tier high",
+    "why": "after benchmark"
+   },
+   {
+    "t": 275721,
+    "name": "quality high ready",
+    "ms": 1
+   },
+   {
+    "t": 275721,
+    "name": "benchmark done"
+   }
+  ],
+  "zoneBStreamMs": 18524,
+  "photoLoadMs": {
+   "xs:2w2a1130": 5283,
+   "xs:2w2a7966": 5283,
+   "xs:2w2a0403": 5283,
+   "l_avif:2w2a1130": 4510,
+   "l_avif:2w2a7966": 4300,
+   "l_avif:2w2a0403": 4383
+  },
+  "photoDelivery": {},
+  "note": "SOFTWARE RENDERER: fps values are not representative of a real GPU",
+  "errors": [],
+  "run": 3,
+  "kind": "desktop",
+  "tierParam": "2",
+  "label": "after",
+  "benchRun": true
+ }
+]

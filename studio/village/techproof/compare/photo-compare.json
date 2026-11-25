@@ -1,0 +1,362 @@
+[
+ {
+  "id": "2w2a1130",
+  "width": 960,
+  "src": "1200x1800",
+  "variant": "jpeg q82 (current)",
+  "bytes": 125493,
+  "psnr": 33.86,
+  "ssim": 0.9426,
+  "encodeMs": 77
+ },
+ {
+  "id": "2w2a1130",
+  "width": 960,
+  "src": "1200x1800",
+  "variant": "jpeg q88",
+  "bytes": 160272,
+  "psnr": 35.7,
+  "ssim": 0.9601,
+  "encodeMs": 96
+ },
+ {
+  "id": "2w2a1130",
+  "width": 960,
+  "src": "1200x1800",
+  "variant": "webp q80",
+  "bytes": 115432,
+  "psnr": 37.61,
+  "ssim": 0.9679,
+  "encodeMs": 83
+ },
+ {
+  "id": "2w2a1130",
+  "width": 960,
+  "src": "1200x1800",
+  "variant": "webp q88",
+  "bytes": 164258,
+  "psnr": 40.86,
+  "ssim": 0.9833,
+  "encodeMs": 91
+ },
+ {
+  "id": "2w2a1130",
+  "width": 960,
+  "src": "1200x1800",
+  "variant": "avif q55",
+  "bytes": 77903,
+  "psnr": 34.74,
+  "ssim": 0.9488,
+  "encodeMs": 2714
+ },
+ {
+  "id": "2w2a1130",
+  "width": 960,
+  "src": "1200x1800",
+  "variant": "avif q65",
+  "bytes": 108114,
+  "psnr": 37.32,
+  "ssim": 0.9686,
+  "encodeMs": 2914
+ },
+ {
+  "id": "2w2a1130",
+  "width": 1600,
+  "src": "1200x1800",
+  "variant": "jpeg q82 (current)",
+  "bytes": 292905,
+  "psnr": 36.24,
+  "ssim": 0.96,
+  "encodeMs": 193
+ },
+ {
+  "id": "2w2a1130",
+  "width": 1600,
+  "src": "1200x1800",
+  "variant": "jpeg q88",
+  "bytes": 372505,
+  "psnr": 38.1,
+  "ssim": 0.9722,
+  "encodeMs": 219
+ },
+ {
+  "id": "2w2a1130",
+  "width": 1600,
+  "src": "1200x1800",
+  "variant": "webp q80",
+  "bytes": 244042,
+  "psnr": 38.37,
+  "ssim": 0.9651,
+  "encodeMs": 247
+ },
+ {
+  "id": "2w2a1130",
+  "width": 1600,
+  "src": "1200x1800",
+  "variant": "webp q88",
+  "bytes": 355244,
+  "psnr": 41.4,
+  "ssim": 0.9804,
+  "encodeMs": 252
+ },
+ {
+  "id": "2w2a1130",
+  "width": 1600,
+  "src": "1200x1800",
+  "variant": "avif q55",
+  "bytes": 172012,
+  "psnr": 36.22,
+  "ssim": 0.9551,
+  "encodeMs": 6541
+ },
+ {
+  "id": "2w2a1130",
+  "width": 1600,
+  "src": "1200x1800",
+  "variant": "avif q65",
+  "bytes": 235256,
+  "psnr": 38.59,
+  "ssim": 0.9706,
+  "encodeMs": 7854
+ },
+ {
+  "id": "2w2a7966",
+  "width": 960,
+  "src": "1800x1200",
+  "variant": "jpeg q82 (current)",
+  "bytes": 75170,
+  "psnr": 39.43,
+  "ssim": 0.983,
+  "encodeMs": 54
+ },
+ {
+  "id": "2w2a7966",
+  "width": 960,
+  "src": "1800x1200",
+  "variant": "jpeg q88",
+  "bytes": 93703,
+  "psnr": 41.13,
+  "ssim": 0.9874,
+  "encodeMs": 67
+ },
+ {
+  "id": "2w2a7966",
+  "width": 960,
+  "src": "1800x1200",
+  "variant": "webp q80",
+  "bytes": 50552,
+  "psnr": 40.8,
+  "ssim": 0.98,
+  "encodeMs": 64
+ },
+ {
+  "id": "2w2a7966",
+  "width": 960,
+  "src": "1800x1200",
+  "variant": "webp q88",
+  "bytes": 72042,
+  "psnr": 43.1,
+  "ssim": 0.9867,
+  "encodeMs": 68
+ },
+ {
+  "id": "2w2a7966",
+  "width": 960,
+  "src": "1800x1200",
+  "variant": "avif q55",
+  "bytes": 34269,
+  "psnr": 39.63,
+  "ssim": 0.9803,
+  "encodeMs": 2061
+ },
+ {
+  "id": "2w2a7966",
+  "width": 960,
+  "src": "1800x1200",
+  "variant": "avif q65",
+  "bytes": 45519,
+  "psnr": 41.69,
+  "ssim": 0.9855,
+  "encodeMs": 2217
+ },
+ {
+  "id": "2w2a7966",
+  "width": 1600,
+  "src": "1800x1200",
+  "variant": "jpeg q82 (current)",
+  "bytes": 155538,
+  "psnr": 41.64,
+  "ssim": 0.9856,
+  "encodeMs": 119
+ },
+ {
+  "id": "2w2a7966",
+  "width": 1600,
+  "src": "1800x1200",
+  "variant": "jpeg q88",
+  "bytes": 196409,
+  "psnr": 43.36,
+  "ssim": 0.9893,
+  "encodeMs": 134
+ },
+ {
+  "id": "2w2a7966",
+  "width": 1600,
+  "src": "1800x1200",
+  "variant": "webp q80",
+  "bytes": 97246,
+  "psnr": 42.1,
+  "ssim": 0.9813,
+  "encodeMs": 149
+ },
+ {
+  "id": "2w2a7966",
+  "width": 1600,
+  "src": "1800x1200",
+  "variant": "webp q88",
+  "bytes": 142996,
+  "psnr": 44.45,
+  "ssim": 0.9874,
+  "encodeMs": 181
+ },
+ {
+  "id": "2w2a7966",
+  "width": 1600,
+  "src": "1800x1200",
+  "variant": "avif q55",
+  "bytes": 65239,
+  "psnr": 41.48,
+  "ssim": 0.983,
+  "encodeMs": 6644
+ },
+ {
+  "id": "2w2a7966",
+  "width": 1600,
+  "src": "1800x1200",
+  "variant": "avif q65",
+  "bytes": 86894,
+  "psnr": 43.27,
+  "ssim": 0.9866,
+  "encodeMs": 6945
+ },
+ {
+  "id": "2w2a0403",
+  "width": 960,
+  "src": "1000x1500",
+  "variant": "jpeg q82 (current)",
+  "bytes": 80314,
+  "psnr": 39.03,
+  "ssim": 0.9841,
+  "encodeMs": 79
+ },
+ {
+  "id": "2w2a0403",
+  "width": 960,
+  "src": "1000x1500",
+  "variant": "jpeg q88",
+  "bytes": 100876,
+  "psnr": 40.74,
+  "ssim": 0.9884,
+  "encodeMs": 73
+ },
+ {
+  "id": "2w2a0403",
+  "width": 960,
+  "src": "1000x1500",
+  "variant": "webp q80",
+  "bytes": 62746,
+  "psnr": 39.89,
+  "ssim": 0.9809,
+  "encodeMs": 63
+ },
+ {
+  "id": "2w2a0403",
+  "width": 960,
+  "src": "1000x1500",
+  "variant": "webp q88",
+  "bytes": 91712,
+  "psnr": 42.84,
+  "ssim": 0.9879,
+  "encodeMs": 70
+ },
+ {
+  "id": "2w2a0403",
+  "width": 960,
+  "src": "1000x1500",
+  "variant": "avif q55",
+  "bytes": 36392,
+  "psnr": 37.59,
+  "ssim": 0.9785,
+  "encodeMs": 1869
+ },
+ {
+  "id": "2w2a0403",
+  "width": 960,
+  "src": "1000x1500",
+  "variant": "avif q65",
+  "bytes": 50511,
+  "psnr": 39.89,
+  "ssim": 0.9847,
+  "encodeMs": 2155
+ },
+ {
+  "id": "2w2a0403",
+  "width": 1600,
+  "src": "1000x1500",
+  "variant": "jpeg q82 (current)",
+  "bytes": 169736,
+  "psnr": 42.01,
+  "ssim": 0.9869,
+  "encodeMs": 120
+ },
+ {
+  "id": "2w2a0403",
+  "width": 1600,
+  "src": "1000x1500",
+  "variant": "jpeg q88",
+  "bytes": 215476,
+  "psnr": 43.75,
+  "ssim": 0.9906,
+  "encodeMs": 135
+ },
+ {
+  "id": "2w2a0403",
+  "width": 1600,
+  "src": "1000x1500",
+  "variant": "webp q80",
+  "bytes": 120066,
+  "psnr": 41.53,
+  "ssim": 0.9822,
+  "encodeMs": 186
+ },
+ {
+  "id": "2w2a0403",
+  "width": 1600,
+  "src": "1000x1500",
+  "variant": "webp q88",
+  "bytes": 177548,
+  "psnr": 43.93,
+  "ssim": 0.9875,
+  "encodeMs": 202
+ },
+ {
+  "id": "2w2a0403",
+  "width": 1600,
+  "src": "1000x1500",
+  "variant": "avif q55",
+  "bytes": 74297,
+  "psnr": 40.14,
+  "ssim": 0.9819,
+  "encodeMs": 4035
+ },
+ {
+  "id": "2w2a0403",
+  "width": 1600,
+  "src": "1000x1500",
+  "variant": "avif q65",
+  "bytes": 102367,
+  "psnr": 42.25,
+  "ssim": 0.9867,
+  "encodeMs": 4329
+ }
+]
